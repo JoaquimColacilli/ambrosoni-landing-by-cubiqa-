@@ -6,9 +6,6 @@ import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import { brand } from "@/config/brand"
 import { SmoothScrollProvider } from "@/components/smooth-scroll-provider"
-import { ImmersiveBackground } from "@/components/immersive-background"
-import { CursorTrail } from "@/components/cursor-trail"
-import { ScrollProgress } from "@/components/scroll-progress"
 import "./globals.css"
 
 export const metadata: Metadata = {
@@ -28,9 +25,11 @@ export default function RootLayout({
   return (
     <html lang="es" className="dark scroll-smooth overflow-x-hidden">
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased overflow-x-hidden`}>
-        <CursorTrail />
-        <ScrollProgress />
-        <ImmersiveBackground />
+        {/* Fixed ambient background that follows scroll */}
+        <div className="fixed inset-0 pointer-events-none z-0">
+          <div className="absolute top-0 left-1/4 w-[800px] h-[800px] bg-amber-500/10 rounded-full blur-[150px]" />
+          <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-yellow-500/8 rounded-full blur-[120px]" />
+        </div>
         <SmoothScrollProvider>
           <Suspense fallback={<div>Loading...</div>}>
             {children}

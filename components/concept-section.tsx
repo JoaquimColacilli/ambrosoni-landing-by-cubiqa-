@@ -66,7 +66,7 @@ export function ConceptSection() {
   }, [isVisible])
 
   return (
-    <section id="concepto" ref={sectionRef} className="relative py-16 bg-gray-50">
+    <section id="concepto" ref={sectionRef} className="relative py-24 bg-gradient-to-b from-white to-amber-50/40">
       <div className="container mx-auto px-4 lg:px-8">
         <div
           className={`bg-[#1a1a1a] text-white rounded-2xl p-12 lg:p-16 mb-16 transition-all duration-1000 ${
@@ -113,8 +113,8 @@ export function ConceptSection() {
               isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"
             }`}
           >
-            <span className="text-black text-sm font-semibold tracking-wider uppercase">El Concepto</span>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 text-balance text-black gradient-headline">
+            <span className="inline-block px-4 py-2 bg-black text-white text-sm font-semibold tracking-wider uppercase rounded-full mb-6">El Concepto</span>
+            <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 text-balance text-black">
               De la idea a la experiencia
             </h2>
             <p className="text-lg text-gray-700 mb-6 leading-relaxed text-pretty">

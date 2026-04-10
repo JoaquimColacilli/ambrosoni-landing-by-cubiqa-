@@ -75,13 +75,13 @@ export function ProjectsSection() {
   }, [selectedCategory])
 
   return (
-    <section id="proyectos" ref={sectionRef} className="relative py-24 bg-gray-50">
+    <section id="proyectos" ref={sectionRef} className="relative py-24 bg-gradient-to-b from-amber-50/40 to-gray-50">
       <div className="container mx-auto px-4 lg:px-8">
         <div
           className={`text-center mb-20 transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
         >
-          <span className="text-black text-sm font-semibold tracking-[0.2em] uppercase">El Proyecto</span>
-          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold mt-6 mb-8 text-balance text-black leading-tight gradient-headline">
+          <span className="inline-block px-4 py-2 bg-black text-white text-sm font-semibold tracking-wider uppercase rounded-full mb-6">El Proyecto</span>
+          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-8 text-balance text-black leading-tight">
             Desarrollos que transforman la forma de vivir
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto text-pretty leading-relaxed">

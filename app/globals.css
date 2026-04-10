@@ -180,129 +180,20 @@
 }
 
 /* ============================================================================
- * Permanent animated border glow (D.5.2b) - GOLD THEME
+ * Spotlight card border glow on hover
  * ========================================================================= */
 .glow-border {
   position: relative;
+  transition: box-shadow 0.3s ease;
 }
 
-.glow-border::before {
-  content: "";
-  position: absolute;
-  inset: -2px;
-  border-radius: inherit;
-  padding: 2px;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 215, 0, 0.8) 0%,
-    rgba(212, 175, 55, 0.3) 25%,
-    rgba(184, 134, 11, 0.7) 50%,
-    rgba(212, 175, 55, 0.3) 75%,
-    rgba(255, 215, 0, 0.8) 100%
-  );
-  background-size: 200% 200%;
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-  z-index: 20;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  animation: border-glow-shift 4s ease-in-out infinite;
-}
-
-.glow-border:hover::before {
-  opacity: 1;
-}
-
-@keyframes border-glow-shift {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
+.glow-border:hover {
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.2), 0 0 60px rgba(212, 175, 55, 0.1);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .glow-border::before {
-    animation: none;
-    background: linear-gradient(
-      135deg,
-      oklch(0.78 0.18 65 / 0.4) 0%,
-      oklch(0.72 0.16 55 / 0.3) 100%
-    );
-  }
   .spotlight-card .spotlight-layer {
     opacity: 0 !important;
     transition: none !important;
-  }
-}
-
-/* ============================================================================
- * Warm ambient section wash
- * ========================================================================= */
-.warm-wash {
-  position: relative;
-}
-
-.warm-wash::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    ellipse at top,
-    oklch(0.78 0.18 65 / 0.06) 0%,
-    oklch(0.72 0.16 55 / 0.03) 40%,
-    transparent 70%
-  );
-  pointer-events: none;
-  z-index: 0;
-}
-
-.warm-wash > * {
-  position: relative;
-  z-index: 1;
-}
-
-/* ============================================================================
- * Gold gradient text for main headlines — single shimmer on scroll-in
- * ========================================================================= */
-.gradient-headline {
-  background: linear-gradient(
-    110deg,
-    currentColor 0%,
-    currentColor 30%,
-    #d4af37 45%,
-    #ffd700 50%,
-    #d4af37 55%,
-    currentColor 70%,
-    currentColor 100%
-  );
-  background-size: 300% 100%;
-  background-position: 100% 50%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-  animation: headline-shimmer-once 2s ease-out 0.5s forwards;
-}
-
-@keyframes headline-shimmer-once {
-  0% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .gradient-headline {
-    animation: none;
-    -webkit-text-fill-color: currentColor;
-    color: inherit;
   }
 }

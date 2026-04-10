@@ -101,13 +101,13 @@ export function AmenitiesSection() {
   }, [selectedAmenityIndex])
 
   return (
-    <section id="amenidades" ref={sectionRef} className="relative py-16 bg-gray-50">
+    <section id="amenidades" ref={sectionRef} className="relative py-24 bg-gradient-to-b from-gray-50 to-amber-50/30">
       <div className="container mx-auto px-4 lg:px-8">
         <div
           className={`text-center mb-16 transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
         >
-          <span className="text-black text-sm font-semibold tracking-wider uppercase">Amenidades</span>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 text-balance text-black gradient-headline">
+          <span className="inline-block px-4 py-2 bg-black text-white text-sm font-semibold tracking-wider uppercase rounded-full mb-6">Amenidades</span>
+          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 text-balance text-black">
             Vivir como experiencia
           </h2>
           <p className="text-lg text-gray-700 max-w-2xl mx-auto text-pretty">
