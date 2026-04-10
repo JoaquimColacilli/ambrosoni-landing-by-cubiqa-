@@ -25,10 +25,10 @@ export default function RootLayout({
   return (
     <html lang="es" className="dark scroll-smooth overflow-x-hidden">
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased overflow-x-hidden`}>
-        {/* Fixed ambient background that follows scroll */}
+        {/* Fixed ambient background */}
         <div className="fixed inset-0 pointer-events-none z-0">
           <div className="absolute top-0 left-1/4 w-[800px] h-[800px] bg-amber-500/10 rounded-full blur-[150px]" />
-          <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-yellow-500/8 rounded-full blur-[120px]" />
+          <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-yellow-500/10 rounded-full blur-[120px]" />
         </div>
         <SmoothScrollProvider>
           <Suspense fallback={<div>Loading...</div>}>
