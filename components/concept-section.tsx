@@ -7,6 +7,7 @@ import { useReducedMotion } from "@/hooks/use-reduced-motion"
 
 export function ConceptSection() {
   const [isVisible, setIsVisible] = useState(false)
+  
   const sectionRef = useRef<HTMLElement>(null)
   const [counts, setCounts] = useState<number[]>(Array(brand.stats.length).fill(0))
   const prefersReducedMotion = useReducedMotion()
