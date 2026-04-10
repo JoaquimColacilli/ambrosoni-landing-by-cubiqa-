@@ -107,8 +107,8 @@ export function AmenitiesSection() {
           className={`text-center mb-16 transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
         >
           <span className="text-black text-sm font-semibold tracking-wider uppercase">Amenidades</span>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 text-balance text-black">
-            Vivir como <span className="text-black">experiencia</span>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 text-balance text-black gradient-headline">
+            Vivir como experiencia
           </h2>
           <p className="text-lg text-gray-700 max-w-2xl mx-auto text-pretty">
             Cada detalle pensado para elevar tu calidad de vida

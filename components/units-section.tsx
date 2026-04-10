@@ -72,14 +72,14 @@ export function UnitsSection() {
   const filteredUnits = selectedRooms ? brand.units.filter((unit) => unit.rooms === selectedRooms) : brand.units
 
   return (
-    <section id="unidades" ref={sectionRef} className="relative py-16 bg-gray-50">
+    <section id="unidades" ref={sectionRef} className="relative py-16 bg-gray-50 warm-wash">
       <div className="container mx-auto px-4 lg:px-8">
         <div
           className={`text-center mb-16 transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
         >
           <span className="text-black text-sm font-semibold tracking-wider uppercase">Disponibilidad</span>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 text-balance text-black">
-            Tu espacio <span className="text-black">perfecto</span>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 text-balance text-black gradient-headline">
+            Tu espacio perfecto
           </h2>
         </div>
 

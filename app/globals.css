@@ -180,14 +180,10 @@
 }
 
 /* ============================================================================
- * Spotlight card border glow (D.5.2)
- * Uses a ::before pseudo-element with mask-composite to draw a gradient
- * "border" that respects the parent's border-radius. More performant than
- * box-shadow with large blur values.
+ * Permanent animated border glow (D.5.2b)
  * ========================================================================= */
 .glow-border {
   position: relative;
-  transition: border-color 300ms ease-out;
 }
 
 .glow-border::before {
@@ -195,54 +191,113 @@
   position: absolute;
   inset: -1px;
   border-radius: inherit;
-  padding: 1px;
+  padding: 1.5px;
   background: linear-gradient(
     135deg,
-    oklch(0.92 0.02 80 / 0) 0%,
-    oklch(0.92 0.02 80 / 0) 100%
+    oklch(0.78 0.18 65 / 0.6) 0%,
+    oklch(0.82 0.14 70 / 0.2) 25%,
+    oklch(0.72 0.16 55 / 0.5) 50%,
+    oklch(0.82 0.14 70 / 0.2) 75%,
+    oklch(0.78 0.18 65 / 0.6) 100%
   );
+  background-size: 200% 200%;
   -webkit-mask:
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
-  transition: background 400ms ease-out;
   z-index: 20;
+  animation: border-glow-shift 6s ease-in-out infinite;
+}
+
+@keyframes border-glow-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 .glow-border:hover::before {
-  background: linear-gradient(
-    135deg,
-    oklch(0.92 0.02 80 / 0.6) 0%,
-    oklch(0.92 0.02 80 / 0.2) 50%,
-    oklch(0.92 0.02 80 / 0.6) 100%
-  );
+  animation-duration: 2s;
 }
 
-/* Reduced-motion: disable spotlight layer hover effect, keep border glow static */
 @media (prefers-reduced-motion: reduce) {
+  .glow-border::before {
+    animation: none;
+    background: linear-gradient(
+      135deg,
+      oklch(0.78 0.18 65 / 0.4) 0%,
+      oklch(0.72 0.16 55 / 0.3) 100%
+    );
+  }
   .spotlight-card .spotlight-layer {
     opacity: 0 !important;
     transition: none !important;
   }
+}
 
-  .glow-border::before {
-    background: linear-gradient(
-      135deg,
-      oklch(0.92 0.02 80 / 0.2) 0%,
-      oklch(0.92 0.02 80 / 0.1) 50%,
-      oklch(0.92 0.02 80 / 0.2) 100%
-    );
-    transition: none !important;
+/* ============================================================================
+ * Warm ambient section wash
+ * ========================================================================= */
+.warm-wash {
+  position: relative;
+}
+
+.warm-wash::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at top,
+    oklch(0.78 0.18 65 / 0.06) 0%,
+    oklch(0.72 0.16 55 / 0.03) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.warm-wash > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================================================
+ * Animated gradient text for main headlines
+ * ========================================================================= */
+.gradient-headline {
+  background: linear-gradient(
+    110deg,
+    currentColor 0%,
+    currentColor 40%,
+    oklch(0.82 0.14 70) 50%,
+    currentColor 60%,
+    currentColor 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: headline-shimmer 5s ease-in-out infinite;
+}
+
+@keyframes headline-shimmer {
+  0%, 100% {
+    background-position: 100% 50%;
   }
+  50% {
+    background-position: 0% 50%;
+  }
+}
 
-  .glow-border:hover::before {
-    background: linear-gradient(
-      135deg,
-      oklch(0.92 0.02 80 / 0.2) 0%,
-      oklch(0.92 0.02 80 / 0.1) 50%,
-      oklch(0.92 0.02 80 / 0.2) 100%
-    );
+@media (prefers-reduced-motion: reduce) {
+  .gradient-headline {
+    animation: none;
+    -webkit-text-fill-color: currentColor;
+    color: inherit;
   }
 }

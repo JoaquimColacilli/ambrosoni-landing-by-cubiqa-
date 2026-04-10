@@ -61,15 +61,15 @@ export function LocationSection() {
   }, [])
 
   return (
-    <section id="ubicacion" ref={sectionRef} className="relative py-16 bg-gray-50">
+    <section id="ubicacion" ref={sectionRef} className="relative py-16 bg-gray-50 warm-wash">
       <div className="container mx-auto px-4 lg:px-8">
         {/* Header */}
         <div
           className={`text-center mb-16 transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
         >
           <span className="text-black text-sm font-semibold tracking-wider uppercase">Ubicación</span>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 text-balance text-black">
-            En el corazón de <span className="text-black">todo</span>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 text-balance text-black gradient-headline">
+            En el corazón de todo
           </h2>
           <p className="text-lg text-gray-700 max-w-2xl mx-auto text-pretty">
             Conectividad premium en la zona más exclusiva de la ciudad

@@ -113,8 +113,8 @@ export function ConceptSection() {
             }`}
           >
             <span className="text-black text-sm font-semibold tracking-wider uppercase">El Concepto</span>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 text-balance text-black">
-              De la idea a la <span className="text-black">experiencia</span>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 text-balance text-black gradient-headline">
+              De la idea a la experiencia
             </h2>
             <p className="text-lg text-gray-700 mb-6 leading-relaxed text-pretty">
               Cada proyecto comienza con una visión. Transformamos bocetos y conceptos arquitectónicos en experiencias

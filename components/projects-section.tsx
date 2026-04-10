@@ -81,12 +81,8 @@ export function ProjectsSection() {
           className={`text-center mb-20 transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
         >
           <span className="text-black text-sm font-semibold tracking-[0.2em] uppercase">El Proyecto</span>
-          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold mt-6 mb-8 text-balance text-black leading-tight">
-            Desarrollos que transforman
-            <br />
-            <span className="bg-gradient-to-r from-black to-gray-600 bg-clip-text text-transparent">
-              la forma de vivir
-            </span>
+          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold mt-6 mb-8 text-balance text-black leading-tight gradient-headline">
+            Desarrollos que transforman la forma de vivir
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto text-pretty leading-relaxed">
             Cada detalle pensado para crear espacios excepcionales que elevan la calidad de vida
