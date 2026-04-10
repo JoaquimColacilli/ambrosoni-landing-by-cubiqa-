@@ -266,30 +266,31 @@
 }
 
 /* ============================================================================
- * Animated gradient text for main headlines
+ * Subtle gradient text for main headlines — single shimmer on scroll-in
  * ========================================================================= */
 .gradient-headline {
   background: linear-gradient(
     110deg,
     currentColor 0%,
-    currentColor 40%,
-    oklch(0.82 0.14 70) 50%,
-    currentColor 60%,
+    currentColor 35%,
+    oklch(0.65 0.08 50) 50%,
+    currentColor 65%,
     currentColor 100%
   );
-  background-size: 200% 100%;
+  background-size: 300% 100%;
+  background-position: 100% 50%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
-  animation: headline-shimmer 5s ease-in-out infinite;
+  animation: headline-shimmer-once 1.8s ease-out 0.3s forwards;
 }
 
-@keyframes headline-shimmer {
-  0%, 100% {
+@keyframes headline-shimmer-once {
+  0% {
     background-position: 100% 50%;
   }
-  50% {
+  100% {
     background-position: 0% 50%;
   }
 }

@@ -9,6 +9,7 @@ import { LocationSection } from "@/components/location-section"
 import { ContactSection } from "@/components/contact-section"
 import { Navigation } from "@/components/navigation"
 import { WhatsAppButton } from "@/components/whatsapp-button"
+import { Footer } from "@/components/footer"
 
 export default function Page() {
   return (
@@ -25,6 +26,7 @@ export default function Page() {
         <LocationSection />
         <ContactSection />
       </main>
+      <Footer />
       <WhatsAppButton />
     </>
   )

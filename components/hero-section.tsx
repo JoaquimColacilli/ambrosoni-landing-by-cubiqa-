@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import { ChevronDown } from "lucide-react"
 import { brand } from "@/config/brand"
 import { useMagnetic } from "@/hooks/use-magnetic"
-import { HeroAurora } from "@/components/hero-aurora"
 import { HeroParticles } from "@/components/hero-particles"
 
 export function HeroSection() {
@@ -31,9 +30,6 @@ export function HeroSection() {
           className="w-full h-full object-cover"
         />
       </div>
-
-      {/* Aurora overlay */}
-      <HeroAurora />
 
       {/* Floating particles */}
       <HeroParticles />
