@@ -7,6 +7,8 @@ import { Suspense } from "react"
 import { brand } from "@/config/brand"
 import { SmoothScrollProvider } from "@/components/smooth-scroll-provider"
 import { ImmersiveBackground } from "@/components/immersive-background"
+import { CursorTrail } from "@/components/cursor-trail"
+import { ScrollProgress } from "@/components/scroll-progress"
 import "./globals.css"
 
 export const metadata: Metadata = {
@@ -26,6 +28,8 @@ export default function RootLayout({
   return (
     <html lang="es" className="dark scroll-smooth overflow-x-hidden">
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased overflow-x-hidden`}>
+        <CursorTrail />
+        <ScrollProgress />
         <ImmersiveBackground />
         <SmoothScrollProvider>
           <Suspense fallback={<div>Loading...</div>}>
