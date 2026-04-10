@@ -1,126 +1,129 @@
 "use client"
 
-import { useRef, useEffect, useState } from "react"
-import { motion, useScroll, useTransform, useSpring, useReducedMotion } from "framer-motion"
+import { useEffect, useRef, useState } from "react"
 
 /**
- * ImmersiveBackground — Subtle ambient layer that follows the user through the page.
- * Features:
- * - Floating grid lines that respond to scroll
- * - Subtle gradient orbs that move slowly
- * - Grain texture overlay for premium feel
- * - Only visible below the hero section
+ * ImmersiveBackground — Elegant floating particles that follow the user through the page.
+ * Creates a premium, luxury feel with subtle gold dust particles.
  */
 export function ImmersiveBackground() {
-  const prefersReduced = useReducedMotion()
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [windowHeight, setWindowHeight] = useState(0)
-  
-  const { scrollYProgress } = useScroll()
-  
-  // Smooth spring for parallax effects
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 50,
-    damping: 30,
-    restDelta: 0.001,
-  })
-
-  // Transform values for ambient elements
-  const gridOpacity = useTransform(smoothProgress, [0, 0.1, 0.9, 1], [0, 0.03, 0.03, 0])
-  const orb1Y = useTransform(smoothProgress, [0, 1], ["0%", "-30%"])
-  const orb2Y = useTransform(smoothProgress, [0, 1], ["0%", "-50%"])
-  const orb3Y = useTransform(smoothProgress, [0, 1], ["0%", "-20%"])
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const particlesRef = useRef<Particle[]>([])
+  const rafRef = useRef<number>(0)
+  const scrollRef = useRef(0)
+  const [isReady, setIsReady] = useState(false)
 
   useEffect(() => {
-    setWindowHeight(window.innerHeight)
-    const handleResize = () => setWindowHeight(window.innerHeight)
-    window.addEventListener("resize", handleResize)
-    return () => window.removeEventListener("resize", handleResize)
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    if (prefersReducedMotion) return
+
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext("2d")
+    if (!ctx) return
+
+    // Set canvas size
+    const resize = () => {
+      canvas.width = window.innerWidth
+      canvas.height = window.innerHeight * 3 // Cover more scroll area
+    }
+    resize()
+    window.addEventListener("resize", resize)
+
+    // Create particles
+    const particleCount = 60
+    particlesRef.current = []
+    
+    for (let i = 0; i < particleCount; i++) {
+      particlesRef.current.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        size: Math.random() * 3 + 1,
+        speedX: (Math.random() - 0.5) * 0.3,
+        speedY: Math.random() * 0.2 + 0.05,
+        opacity: Math.random() * 0.5 + 0.2,
+        hue: Math.random() * 20 + 35, // Gold range 35-55
+      })
+    }
+
+    setIsReady(true)
+
+    // Track scroll
+    const handleScroll = () => {
+      scrollRef.current = window.scrollY
+    }
+    window.addEventListener("scroll", handleScroll, { passive: true })
+
+    // Animation loop
+    const animate = () => {
+      if (!ctx || !canvas) return
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+      const scrollOffset = scrollRef.current * 0.3
+
+      particlesRef.current.forEach((p) => {
+        // Update position
+        p.x += p.speedX
+        p.y += p.speedY
+
+        // Wrap around
+        if (p.x < 0) p.x = canvas.width
+        if (p.x > canvas.width) p.x = 0
+        if (p.y > canvas.height) p.y = 0
+
+        // Draw particle with glow
+        const drawY = (p.y - scrollOffset) % canvas.height
+        if (drawY < 0 || drawY > window.innerHeight * 1.5) return
+
+        // Glow effect
+        const gradient = ctx.createRadialGradient(p.x, drawY, 0, p.x, drawY, p.size * 4)
+        gradient.addColorStop(0, `hsla(${p.hue}, 70%, 60%, ${p.opacity})`)
+        gradient.addColorStop(0.5, `hsla(${p.hue}, 60%, 50%, ${p.opacity * 0.3})`)
+        gradient.addColorStop(1, `hsla(${p.hue}, 50%, 40%, 0)`)
+
+        ctx.beginPath()
+        ctx.arc(p.x, drawY, p.size * 4, 0, Math.PI * 2)
+        ctx.fillStyle = gradient
+        ctx.fill()
+
+        // Core
+        ctx.beginPath()
+        ctx.arc(p.x, drawY, p.size, 0, Math.PI * 2)
+        ctx.fillStyle = `hsla(${p.hue}, 80%, 70%, ${p.opacity})`
+        ctx.fill()
+      })
+
+      rafRef.current = requestAnimationFrame(animate)
+    }
+
+    rafRef.current = requestAnimationFrame(animate)
+
+    return () => {
+      window.removeEventListener("resize", resize)
+      window.removeEventListener("scroll", handleScroll)
+      cancelAnimationFrame(rafRef.current)
+    }
   }, [])
 
-  if (prefersReduced) {
-    return null
-  }
-
   return (
-    <div
-      ref={containerRef}
-      className="pointer-events-none fixed inset-0 z-[1] overflow-hidden"
-      style={{ top: windowHeight }}
+    <canvas
+      ref={canvasRef}
+      className={`fixed inset-0 pointer-events-none z-[2] transition-opacity duration-1000 ${
+        isReady ? "opacity-100" : "opacity-0"
+      }`}
+      style={{ top: "100vh" }} // Start below hero
       aria-hidden="true"
-    >
-      {/* Subtle grain texture */}
-      <div 
-        className="absolute inset-0 opacity-[0.015]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-        }}
-      />
-
-      {/* Floating grid lines */}
-      <motion.div 
-        className="absolute inset-0"
-        style={{ opacity: gridOpacity }}
-      >
-        <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse">
-              <path
-                d="M 80 0 L 0 0 0 80"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="0.5"
-                className="text-foreground"
-              />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#grid)" />
-        </svg>
-      </motion.div>
-
-      {/* Ambient orb 1 — Very subtle, top-right */}
-      <motion.div
-        className="absolute -right-[20%] top-[10%]"
-        style={{
-          width: "800px",
-          height: "800px",
-          background: "radial-gradient(circle at center, oklch(0.20 0.02 240 / 0.15) 0%, transparent 70%)",
-          filter: "blur(100px)",
-          y: orb1Y,
-        }}
-      />
-
-      {/* Ambient orb 2 — Very subtle, left side */}
-      <motion.div
-        className="absolute -left-[15%] top-[40%]"
-        style={{
-          width: "600px",
-          height: "600px",
-          background: "radial-gradient(circle at center, oklch(0.18 0.01 200 / 0.12) 0%, transparent 70%)",
-          filter: "blur(120px)",
-          y: orb2Y,
-        }}
-      />
-
-      {/* Ambient orb 3 — Very subtle, bottom-right */}
-      <motion.div
-        className="absolute right-[10%] top-[70%]"
-        style={{
-          width: "700px",
-          height: "700px",
-          background: "radial-gradient(circle at center, oklch(0.22 0.02 220 / 0.10) 0%, transparent 70%)",
-          filter: "blur(110px)",
-          y: orb3Y,
-        }}
-      />
-
-      {/* Horizontal accent line that moves with scroll */}
-      <motion.div
-        className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-foreground/5 to-transparent"
-        style={{
-          top: useTransform(smoothProgress, [0, 1], ["20%", "80%"]),
-        }}
-      />
-    </div>
+    />
   )
+}
+
+interface Particle {
+  x: number
+  y: number
+  size: number
+  speedX: number
+  speedY: number
+  opacity: number
+  hue: number
 }

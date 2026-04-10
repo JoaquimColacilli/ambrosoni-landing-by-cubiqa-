@@ -27,7 +27,7 @@ export function ScrollProgress() {
 
   return (
     <div
-      className={`fixed top-0 left-0 right-0 h-[3px] z-[100] transition-opacity duration-300 ${
+      className={`fixed top-0 left-0 right-0 h-1 z-[100] transition-opacity duration-300 ${
         isVisible ? "opacity-100" : "opacity-0"
       }`}
       role="progressbar"
@@ -40,7 +40,8 @@ export function ScrollProgress() {
         className="h-full transition-transform duration-100 ease-out origin-left"
         style={{
           transform: `scaleX(${progress / 100})`,
-          background: "linear-gradient(90deg, rgba(180, 140, 80, 0.8) 0%, rgba(160, 120, 60, 0.9) 100%)",
+          background: "linear-gradient(90deg, #b8860b 0%, #ffd700 50%, #daa520 100%)",
+          boxShadow: "0 0 8px rgba(255, 215, 0, 0.6), 0 0 16px rgba(212, 175, 55, 0.4)",
         }}
       />
     </div>

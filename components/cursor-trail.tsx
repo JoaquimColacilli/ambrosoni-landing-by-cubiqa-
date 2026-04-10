@@ -17,7 +17,6 @@ export function CursorTrail() {
   const [isTouchDevice, setIsTouchDevice] = useState(false)
 
   useEffect(() => {
-    // Check for touch device and reduced motion preference
     const isTouchDeviceCheck = "ontouchstart" in window || navigator.maxTouchPoints > 0
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
     
@@ -42,15 +41,14 @@ export function CursorTrail() {
       mouseRef.current = { x: e.clientX, y: e.clientY }
       setIsVisible(true)
       
-      // Add new point
       pointsRef.current.push({
         x: e.clientX,
         y: e.clientY,
         age: 0,
       })
       
-      // Keep only last 20 points for performance
-      if (pointsRef.current.length > 20) {
+      // Keep more points for longer trail
+      if (pointsRef.current.length > 35) {
         pointsRef.current.shift()
       }
     }
@@ -69,41 +67,62 @@ export function CursorTrail() {
       // Age all points
       for (let i = points.length - 1; i >= 0; i--) {
         points[i].age += 1
-        if (points[i].age > 30) {
+        if (points[i].age > 40) {
           points.splice(i, 1)
         }
       }
 
-      if (points.length > 1) {
-        ctx.beginPath()
-        ctx.moveTo(points[0].x, points[0].y)
+      if (points.length > 2) {
+        // Draw multiple layers for glow effect
+        for (let layer = 3; layer >= 0; layer--) {
+          ctx.beginPath()
+          ctx.moveTo(points[0].x, points[0].y)
 
-        for (let i = 1; i < points.length; i++) {
-          const p0 = points[i - 1]
-          const p1 = points[i]
+          for (let i = 1; i < points.length; i++) {
+            const p0 = points[i - 1]
+            const p1 = points[i]
+            const midX = (p0.x + p1.x) / 2
+            const midY = (p0.y + p1.y) / 2
+            ctx.quadraticCurveTo(p0.x, p0.y, midX, midY)
+          }
+
+          // Gold gradient
+          const gradient = ctx.createLinearGradient(
+            points[0].x,
+            points[0].y,
+            points[points.length - 1].x,
+            points[points.length - 1].y
+          )
           
-          // Smooth curve
-          const midX = (p0.x + p1.x) / 2
-          const midY = (p0.y + p1.y) / 2
-          ctx.quadraticCurveTo(p0.x, p0.y, midX, midY)
+          const alpha = layer === 0 ? 0.9 : layer === 1 ? 0.4 : layer === 2 ? 0.2 : 0.1
+          gradient.addColorStop(0, `rgba(212, 175, 55, 0)`)
+          gradient.addColorStop(0.3, `rgba(212, 175, 55, ${alpha * 0.5})`)
+          gradient.addColorStop(0.7, `rgba(255, 200, 87, ${alpha})`)
+          gradient.addColorStop(1, `rgba(255, 215, 0, ${alpha})`)
+
+          ctx.strokeStyle = gradient
+          ctx.lineWidth = layer === 0 ? 3 : layer === 1 ? 6 : layer === 2 ? 10 : 16
+          ctx.lineCap = "round"
+          ctx.lineJoin = "round"
+          ctx.stroke()
         }
+      }
 
-        // Gradient stroke with warm gold color
-        const gradient = ctx.createLinearGradient(
-          points[0].x,
-          points[0].y,
-          points[points.length - 1].x,
-          points[points.length - 1].y
+      // Draw cursor dot
+      if (points.length > 0) {
+        const lastPoint = points[points.length - 1]
+        const dotGradient = ctx.createRadialGradient(
+          lastPoint.x, lastPoint.y, 0,
+          lastPoint.x, lastPoint.y, 12
         )
-        gradient.addColorStop(0, "rgba(180, 140, 80, 0)")
-        gradient.addColorStop(0.5, "rgba(180, 140, 80, 0.3)")
-        gradient.addColorStop(1, "rgba(180, 140, 80, 0.5)")
-
-        ctx.strokeStyle = gradient
-        ctx.lineWidth = 2
-        ctx.lineCap = "round"
-        ctx.lineJoin = "round"
-        ctx.stroke()
+        dotGradient.addColorStop(0, "rgba(255, 215, 0, 0.8)")
+        dotGradient.addColorStop(0.5, "rgba(212, 175, 55, 0.3)")
+        dotGradient.addColorStop(1, "rgba(212, 175, 55, 0)")
+        
+        ctx.beginPath()
+        ctx.arc(lastPoint.x, lastPoint.y, 12, 0, Math.PI * 2)
+        ctx.fillStyle = dotGradient
+        ctx.fill()
       }
 
       rafRef.current = requestAnimationFrame(animate)

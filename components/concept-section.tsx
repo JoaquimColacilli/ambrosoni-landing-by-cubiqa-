@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react"
 import { motion } from "framer-motion"
 import { brand } from "@/config/brand"
 import { useReducedMotion } from "@/hooks/use-reduced-motion"
-import { ParallaxImage } from "@/components/ui/parallax-image"
 
 export function ConceptSection() {
   const [isVisible, setIsVisible] = useState(false)
@@ -93,15 +92,14 @@ export function ConceptSection() {
             >
               <div className="relative aspect-square">
                 <div
-                  className={`absolute inset-0 transition-all duration-1000 rounded-lg overflow-hidden ${
+                  className={`absolute inset-0 transition-all duration-1000 ${
                     isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
                   }`}
                 >
-                  <ParallaxImage
+                  <img
                     src="/images/design-mode/cbq_gbd_ath_View_10.jpg"
                     alt="Concept Evolution"
-                    className="w-full h-full rounded-lg"
-                    speed={0.1}
+                    className="w-full h-full object-cover rounded-lg"
                   />
                 </div>
               </div>

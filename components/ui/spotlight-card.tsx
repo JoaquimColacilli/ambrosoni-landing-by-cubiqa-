@@ -19,7 +19,7 @@ interface SpotlightCardProps {
 export function SpotlightCard({
   children,
   className,
-  spotlightColor = "oklch(0.92 0.02 80 / 0.45)",
+  spotlightColor = "rgba(212, 175, 55, 0.35)",
   spotlightSize = 500,
   glowBorder = true,
 }: SpotlightCardProps) {
@@ -41,7 +41,8 @@ export function SpotlightCard({
       ref={cardRef}
       onMouseMove={handleMouseMove}
       className={cn(
-        "spotlight-card group relative overflow-hidden",
+        "spotlight-card group relative overflow-hidden transition-all duration-300",
+        "hover:shadow-[0_0_30px_rgba(212,175,55,0.15)]",
         glowBorder && "glow-border",
         className,
       )}
