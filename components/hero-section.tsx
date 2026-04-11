@@ -8,6 +8,7 @@ import { useMagnetic } from "@/hooks/use-magnetic"
 import {
   gsap,
   ScrollTrigger,
+  getScrubValue,
   useIsomorphicLayoutEffect,
 } from "@/lib/gsap-utils"
 
@@ -295,6 +296,10 @@ export function HeroSection() {
       // stays set on these elements because the scrub can fire at any time.
       // --------------------------------------------------------------
       if (sectionRef.current) {
+        // scrub:0.5 on mobile decouples the tween from iOS's native momentum
+        // scroll event stream — far fewer repaints per flick.
+        const scrub = getScrubValue()
+
         if (imageWrapperRef.current) {
           gsap.set(imageWrapperRef.current, { willChange: "transform" })
           gsap.to(imageWrapperRef.current, {
@@ -304,7 +309,7 @@ export function HeroSection() {
               trigger: sectionRef.current,
               start: "top top",
               end: "bottom top",
-              scrub: true,
+              scrub,
             },
           })
         }
@@ -319,7 +324,7 @@ export function HeroSection() {
               trigger: sectionRef.current,
               start: "top top",
               end: "70% top",
-              scrub: true,
+              scrub,
             },
           })
         }
@@ -333,7 +338,7 @@ export function HeroSection() {
               trigger: sectionRef.current,
               start: "top top",
               end: "20% top",
-              scrub: true,
+              scrub,
             },
           })
         }

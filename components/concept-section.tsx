@@ -5,7 +5,7 @@ import SplitType from "split-type"
 import { brand } from "@/config/brand"
 import { GooeyText } from "@/components/ui/gooey-text"
 import { FloatingPaths } from "@/components/ui/background-paths"
-import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap-utils"
+import { gsap, ScrollTrigger, getScrubValue, prefersReducedMotion } from "@/lib/gsap-utils"
 
 export function ConceptSection() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -181,7 +181,7 @@ export function ConceptSection() {
                 trigger: imageWrapperRef.current,
                 start: "top bottom",
                 end: "bottom top",
-                scrub: true,
+                scrub: getScrubValue(),
               },
             })
           }

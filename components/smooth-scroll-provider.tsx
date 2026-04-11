@@ -2,12 +2,21 @@
 
 import { useEffect, useRef } from "react"
 import Lenis from "lenis"
-import { gsap, ScrollTrigger } from "@/lib/gsap-utils"
+import { gsap, ScrollTrigger, isTouchDevice } from "@/lib/gsap-utils"
 
 export function SmoothScrollProvider({ children }: { children: React.ReactNode }) {
   const lenisRef = useRef<Lenis | null>(null)
 
   useEffect(() => {
+    // Touch devices (iOS / Android): skip Lenis entirely. iOS has hardware
+    // momentum scroll that beats any JS smoothing, and the Lenis wiring
+    // (lenis.on("scroll", ScrollTrigger.update) + gsap.ticker.lagSmoothing(0)
+    // + RAF loop on the ticker) tanks FPS on Safari iOS under touch scroll.
+    // ScrollTrigger falls back to the native window scroller automatically —
+    // no scrollerProxy, no extra wiring needed. Any scrub:true parallax in
+    // the page is also softened to scrub:0.5 on mobile via getScrubValue().
+    if (isTouchDevice()) return
+
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
     const lenis = new Lenis({

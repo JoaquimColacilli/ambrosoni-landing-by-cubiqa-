@@ -24,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="es" className="dark scroll-smooth overflow-x-hidden">
+    <html lang="es" className="dark overflow-x-hidden">
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased overflow-x-hidden`}>
         <AtmosphericLayer />
         <SmoothScrollProvider>

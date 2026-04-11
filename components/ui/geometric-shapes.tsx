@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap-utils"
+import { gsap, ScrollTrigger, getScrubValue, prefersReducedMotion } from "@/lib/gsap-utils"
 
 interface GeometricShapesProps {
   className?: string
@@ -70,6 +70,7 @@ export function GeometricShapes({ className = "" }: GeometricShapesProps) {
 
       // Scroll-linked parallax — each shape drifts at its own speed
       if (!reduced) {
+        const scrub = getScrubValue()
         shapeEls.forEach((el) => {
           const strength = Number(el.getAttribute("data-parallax") ?? 0.3)
           gsap.to(el, {
@@ -79,7 +80,7 @@ export function GeometricShapes({ className = "" }: GeometricShapesProps) {
               trigger: wrapperRef.current,
               start: "top bottom",
               end: "bottom top",
-              scrub: true,
+              scrub,
             },
           })
         })
