@@ -21,7 +21,7 @@ const defaultMarkers: PolaroidMarker[] = [
   {
     id: "polaroid-ambrosoni",
     location: [-34.45, -58.44],
-    image: "/images/View_04_01.jpg",
+    image: "/images/amb-04.jpg",
     caption: "AMBROSONI",
     rotate: -4,
   },

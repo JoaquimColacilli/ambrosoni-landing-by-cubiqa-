@@ -310,7 +310,7 @@ export function ConceptSection() {
 
   return (
     <section id="concepto" ref={sectionRef} className="relative py-16 bg-gray-50 overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+      <div className="absolute inset-0 pointer-events-none hidden md:block" aria-hidden="true">
         <FloatingPaths position={1} svgClassName="text-slate-900" />
         <FloatingPaths position={-1} svgClassName="text-slate-900" />
       </div>

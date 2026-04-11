@@ -197,7 +197,7 @@ export const brand = {
       title: "Pileta", // TODO: contenido real pendiente de Cubiqa
       description: "Pileta descubierta con solarium y deck de madera", // TODO: contenido real pendiente de Cubiqa
       details: "Zona de descanso con reposeras y duchas", // TODO: contenido real pendiente de Cubiqa
-      image: "/images/View_06_01.jpg", // TODO: asset AMBROSONI pendiente
+      image: "/images/amb-06.jpg",
     },
     {
       id: "gimnasio",
@@ -205,7 +205,7 @@ export const brand = {
       title: "Gimnasio", // TODO: contenido real pendiente de Cubiqa
       description: "Equipamiento completo para entrenamiento", // TODO: contenido real pendiente de Cubiqa
       details: "Zona de pesas, cardio y funcional", // TODO: contenido real pendiente de Cubiqa
-      image: "/images/View_05_01.jpg", // TODO: asset AMBROSONI pendiente
+      image: "/images/amb-05.jpg",
     },
     {
       id: "sum",
@@ -213,7 +213,7 @@ export const brand = {
       title: "SUM", // TODO: contenido real pendiente de Cubiqa
       description: "Salón de usos múltiples para eventos", // TODO: contenido real pendiente de Cubiqa
       details: "Capacidad para 40 personas, cocina integrada", // TODO: contenido real pendiente de Cubiqa
-      image: "/images/View_03_01.jpg", // TODO: asset AMBROSONI pendiente
+      image: "/images/amb-03.jpg",
     },
     {
       id: "cochera",
@@ -221,7 +221,7 @@ export const brand = {
       title: "Cocheras", // TODO: contenido real pendiente de Cubiqa
       description: "Cocheras cubiertas con acceso directo", // TODO: contenido real pendiente de Cubiqa
       details: "Seguridad 24/7 y acceso por control remoto", // TODO: contenido real pendiente de Cubiqa
-      image: "/images/View_05_01.jpg", // TODO: asset AMBROSONI pendiente
+      image: "/images/amb-11.jpg",
     },
     {
       id: "seguridad",
@@ -229,7 +229,7 @@ export const brand = {
       title: "Seguridad", // TODO: contenido real pendiente de Cubiqa
       description: "Vigilancia perimetral y control de accesos", // TODO: contenido real pendiente de Cubiqa
       details: "Cámaras HD, portero eléctrico, cerco perimetral", // TODO: contenido real pendiente de Cubiqa
-      image: "/images/View_06_01.jpg", // TODO: asset AMBROSONI pendiente
+      image: "/images/amb-12.jpg",
     },
     {
       id: "parrillas",
@@ -237,7 +237,7 @@ export const brand = {
       title: "Parrillas", // TODO: contenido real pendiente de Cubiqa
       description: "Sector de parrillas con quincho cubierto", // TODO: contenido real pendiente de Cubiqa
       details: "Dos parrillas equipadas con mesada y bacha", // TODO: contenido real pendiente de Cubiqa
-      image: "/images/View_03_01.jpg", // TODO: asset AMBROSONI pendiente
+      image: "/images/amb-13.jpg",
     },
   ] satisfies Amenity[],
 
@@ -291,11 +291,11 @@ export const brand = {
       description:
         "Cada unidad combina diseño contemporáneo con funcionalidad. Amplios ambientes con luz natural y terminaciones de primera calidad.", // TODO: copy pendiente de cliente
       images: [
-        "/images/View_04_01.jpg", // TODO: asset AMBROSONI pendiente
-        "/images/View_01_01.jpg", // TODO: asset AMBROSONI pendiente
-        "/images/View_02_01.jpg", // TODO: asset AMBROSONI pendiente
-        "/images/cbq_gbd_ath_View_09.jpg", // TODO: asset AMBROSONI pendiente
-        "/images/cbq_gbd_ath_View_12.jpg", // TODO: asset AMBROSONI pendiente
+        "/images/amb-04.jpg",
+        "/images/amb-01.jpg",
+        "/images/amb-02.jpg",
+        "/images/amb-09.jpg",
+        "/images/amb-10.jpg",
       ],
     },
     {
@@ -306,11 +306,11 @@ export const brand = {
       description:
         "Espacios comunes pensados para el disfrute y el bienestar. Cada amenity está diseñado para enriquecer tu día a día.", // TODO: copy pendiente de cliente
       images: [
-        "/images/View_05_01.jpg", // TODO: asset AMBROSONI pendiente
-        "/images/View_06_01.jpg", // TODO: asset AMBROSONI pendiente
-        "/images/View_03_01.jpg", // TODO: asset AMBROSONI pendiente
-        "/images/cbq_gbd_ath_View_07.jpg", // TODO: asset AMBROSONI pendiente
-        "/images/cbq_gbd_ath_View_08.jpg", // TODO: asset AMBROSONI pendiente
+        "/images/amb-05.jpg",
+        "/images/amb-06.jpg",
+        "/images/amb-07.jpg",
+        "/images/amb-08.jpg",
+        "/images/amb-14.jpg",
       ],
     },
   ] satisfies GalleryCategory[],
