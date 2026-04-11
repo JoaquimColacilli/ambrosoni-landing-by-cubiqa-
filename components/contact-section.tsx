@@ -10,7 +10,7 @@ import { Mail, Phone, MapPin } from "lucide-react"
 import SplitType from "split-type"
 import { brand } from "@/config/brand"
 import { AntiGravityCanvas } from "@/components/ui/particle-effect-for-hero"
-import { gsap, prefersReducedMotion } from "@/lib/gsap-utils"
+import { gsap, prefersReducedMotion, useGSAP } from "@/lib/gsapConfig"
 
 export function ContactSection() {
   const [formData, setFormData] = useState({
@@ -24,10 +24,10 @@ export function ContactSection() {
   const leftColRef = useRef<HTMLDivElement>(null)
   const formCardRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    const reduced = prefersReducedMotion()
+  useGSAP(
+    () => {
+      const reduced = prefersReducedMotion()
 
-    const ctx = gsap.context(() => {
       // ----------------------------------------------------------
       // HEADER
       // ----------------------------------------------------------
@@ -225,12 +225,9 @@ export function ContactSection() {
           )
         }
       }
-    }, sectionRef)
-
-    return () => {
-      ctx.revert()
-    }
-  }, [])
+    },
+    { scope: sectionRef },
+  )
 
   useEffect(() => {
     const messageTextarea = document.getElementById("message") as HTMLTextAreaElement

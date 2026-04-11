@@ -7,7 +7,7 @@ import SplitType from "split-type"
 import { brand, type GalleryCategory } from "@/config/brand"
 import { SpotlightCard } from "@/components/ui/spotlight-card"
 import { GridPattern } from "@/components/ui/grid-pattern"
-import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap-utils"
+import { gsap, prefersReducedMotion, useGSAP } from "@/lib/gsapConfig"
 
 const iconMap: Record<string, LucideIcon> = { Building2, Sparkles }
 
@@ -17,12 +17,12 @@ export function ProjectsSection() {
   const sectionRef = useRef<HTMLElement>(null)
   const headerRef = useRef<HTMLDivElement>(null)
 
-  // Entry animations — runs on mount via context, uses ScrollTrigger to watch
-  // the header and each category block independently.
-  useEffect(() => {
-    const reduced = prefersReducedMotion()
+  // Entry animations — useGSAP runs pre-paint and auto-reverts the full
+  // context (ScrollTriggers included) on unmount.
+  useGSAP(
+    () => {
+      const reduced = prefersReducedMotion()
 
-    const ctx = gsap.context(() => {
       // ----------------------------------------------------------
       // HEADER
       // ----------------------------------------------------------
@@ -213,12 +213,9 @@ export function ProjectsSection() {
           )
         }
       })
-    }, sectionRef)
-
-    return () => {
-      ctx.revert()
-    }
-  }, [])
+    },
+    { scope: sectionRef },
+  )
 
   const openModal = (category: GalleryCategory, imageIndex = 0) => {
     setSelectedCategory(category)

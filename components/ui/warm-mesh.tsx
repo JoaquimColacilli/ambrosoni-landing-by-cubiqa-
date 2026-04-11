@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useRef } from "react"
-import { gsap, prefersReducedMotion } from "@/lib/gsap-utils"
+import { useRef } from "react"
+import { gsap, prefersReducedMotion, useGSAP } from "@/lib/gsapConfig"
 
 interface WarmMeshProps {
   className?: string
@@ -29,11 +29,11 @@ const variants = {
 export function WarmMesh({ className = "", variant = "a" }: WarmMeshProps) {
   const wrapperRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    const reduced = prefersReducedMotion()
-    if (!wrapperRef.current) return
+  useGSAP(
+    () => {
+      const reduced = prefersReducedMotion()
+      if (!wrapperRef.current) return
 
-    const ctx = gsap.context(() => {
       gsap.fromTo(
         wrapperRef.current,
         { opacity: 0 },
@@ -48,12 +48,9 @@ export function WarmMesh({ className = "", variant = "a" }: WarmMeshProps) {
           },
         },
       )
-    }, wrapperRef)
-
-    return () => {
-      ctx.revert()
-    }
-  }, [])
+    },
+    { scope: wrapperRef },
+  )
 
   return (
     <div

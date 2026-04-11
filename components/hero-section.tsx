@@ -5,12 +5,7 @@ import { ChevronDown } from "lucide-react"
 import SplitType from "split-type"
 import { brand } from "@/config/brand"
 import { useMagnetic } from "@/hooks/use-magnetic"
-import {
-  gsap,
-  ScrollTrigger,
-  getScrubValue,
-  useIsomorphicLayoutEffect,
-} from "@/lib/gsap-utils"
+import { gsap, getScrubValue, useGSAP } from "@/lib/gsapConfig"
 
 export function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -25,11 +20,12 @@ export function HeroSection() {
   const primaryMagnetic = useMagnetic<HTMLAnchorElement>({ strength: 0.35, radius: 100 })
   const secondaryMagnetic = useMagnetic<HTMLAnchorElement>({ strength: 0.35, radius: 100 })
 
-  // useLayoutEffect so GSAP takes control before the first paint. This
-  // eliminates the "double paint" on iOS where Safari paints at the starting
-  // state, then repaints when useEffect (post-paint) runs GSAP.
-  useIsomorphicLayoutEffect(() => {
-    const ctx = gsap.context(() => {
+  // useGSAP runs pre-paint (via useLayoutEffect internally) and handles full
+  // cleanup via gsap.context().revert() on unmount — including matchMedia and
+  // ScrollTriggers. This is the official pattern for Next.js App Router and
+  // prevents ScrollTrigger leaks across route changes.
+  useGSAP(
+    () => {
       // Split the title ONCE, outside matchMedia. Both breakpoints reference
       // the same split; matchMedia only branches the tween shape.
       const splitTitle = titleRef.current
@@ -343,13 +339,9 @@ export function HeroSection() {
           })
         }
       }
-    }, sectionRef)
-
-    return () => {
-      ctx.revert()
-      ScrollTrigger.refresh()
-    }
-  }, [])
+    },
+    { scope: sectionRef },
+  )
 
   return (
     <section

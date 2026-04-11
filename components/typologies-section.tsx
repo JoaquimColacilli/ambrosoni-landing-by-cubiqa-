@@ -10,7 +10,7 @@ import { useReducedMotion } from "@/hooks/use-reduced-motion"
 import { brand } from "@/config/brand"
 import { SpotlightCard } from "@/components/ui/spotlight-card"
 import { WarmMesh } from "@/components/ui/warm-mesh"
-import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap-utils"
+import { gsap, prefersReducedMotion, useGSAP } from "@/lib/gsapConfig"
 
 export function TypologiesSection() {
   const [selectedPlanImage, setSelectedPlanImage] = useState<string | null>(null)
@@ -72,10 +72,10 @@ export function TypologiesSection() {
     }
   }, [])
 
-  useEffect(() => {
-    const reduced = prefersReducedMotion()
+  useGSAP(
+    () => {
+      const reduced = prefersReducedMotion()
 
-    const ctx = gsap.context(() => {
       // ----------------------------------------------------------
       // HEADER
       // ----------------------------------------------------------
@@ -217,12 +217,9 @@ export function TypologiesSection() {
           )
         }
       }
-    }, sectionRef)
-
-    return () => {
-      ctx.revert()
-    }
-  }, [])
+    },
+    { scope: sectionRef },
+  )
 
   const openLightbox = (planImage: string, planAlt: string) => {
     setSelectedPlanImage(planImage)

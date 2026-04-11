@@ -1,11 +1,11 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react"
 import SplitType from "split-type"
 import { brand } from "@/config/brand"
 import { GooeyText } from "@/components/ui/gooey-text"
 import { FloatingPaths } from "@/components/ui/background-paths"
-import { gsap, ScrollTrigger, getScrubValue, prefersReducedMotion } from "@/lib/gsap-utils"
+import { gsap, ScrollTrigger, getScrubValue, prefersReducedMotion, useGSAP } from "@/lib/gsapConfig"
 
 export function ConceptSection() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -20,10 +20,10 @@ export function ConceptSection() {
 
   const [counts, setCounts] = useState<number[]>(Array(brand.stats.length).fill(0))
 
-  useEffect(() => {
-    const reduced = prefersReducedMotion()
+  useGSAP(
+    () => {
+      const reduced = prefersReducedMotion()
 
-    const ctx = gsap.context(() => {
       // Split the static top line "CONVERTIMOS CONCEPTOS EN"
       const topLine = h2Ref.current?.querySelector<HTMLElement>("[data-concept-top]")
       const splitTop =
@@ -301,12 +301,9 @@ export function ConceptSection() {
           },
         })
       }
-    }, sectionRef)
-
-    return () => {
-      ctx.revert()
-    }
-  }, [])
+    },
+    { scope: sectionRef },
+  )
 
   return (
     <section id="concepto" ref={sectionRef} className="relative py-16 bg-gray-50 overflow-hidden">

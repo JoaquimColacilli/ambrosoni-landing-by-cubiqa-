@@ -1,10 +1,10 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useRef } from "react"
 import { MapPin, Clock, Car, Train, type LucideIcon } from "lucide-react"
 import SplitType from "split-type"
 import { brand } from "@/config/brand"
-import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap-utils"
+import { gsap, prefersReducedMotion, useGSAP } from "@/lib/gsapConfig"
 import { SpotlightCard } from "@/components/ui/spotlight-card"
 import { GlobePolaroids } from "@/components/ui/cobe-globe-polaroids"
 
@@ -19,10 +19,10 @@ export function LocationSection() {
   const addressRef = useRef<HTMLDivElement>(null)
   const globeRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    const reduced = prefersReducedMotion()
+  useGSAP(
+    () => {
+      const reduced = prefersReducedMotion()
 
-    const ctx = gsap.context(() => {
       // ----------------------------------------------------------
       // HEADER
       // ----------------------------------------------------------
@@ -190,12 +190,9 @@ export function LocationSection() {
           },
         )
       }
-    }, sectionRef)
-
-    return () => {
-      ctx.revert()
-    }
-  }, [])
+    },
+    { scope: sectionRef },
+  )
 
   return (
     <section id="ubicacion" ref={sectionRef} className="relative py-16 bg-gray-50 overflow-hidden">

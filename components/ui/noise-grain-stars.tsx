@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import { prefersReducedMotion } from "@/lib/gsap-utils"
+import { prefersReducedMotion } from "@/lib/gsapConfig"
 
 interface NoiseGrainStarsProps {
   className?: string

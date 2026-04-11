@@ -7,7 +7,7 @@ import SplitType from "split-type"
 import { brand } from "@/config/brand"
 import { SpotlightCard } from "@/components/ui/spotlight-card"
 import { DotMatrix } from "@/components/ui/dot-matrix"
-import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap-utils"
+import { gsap, ScrollTrigger, prefersReducedMotion, useGSAP } from "@/lib/gsapConfig"
 
 const iconMap: Record<string, LucideIcon> = { Waves, Dumbbell, Trees, Users, Car, Shield, Flame }
 
@@ -20,10 +20,10 @@ export function AmenitiesSection() {
   const gridRef = useRef<HTMLDivElement>(null)
   const sustainableRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    const reduced = prefersReducedMotion()
+  useGSAP(
+    () => {
+      const reduced = prefersReducedMotion()
 
-    const ctx = gsap.context(() => {
       // ----------------------------------------------------------
       // HEADER
       // ----------------------------------------------------------
@@ -231,12 +231,9 @@ export function AmenitiesSection() {
           },
         })
       }
-    }, sectionRef)
-
-    return () => {
-      ctx.revert()
-    }
-  }, [])
+    },
+    { scope: sectionRef },
+  )
 
   const openModal = (index: number) => {
     setSelectedAmenityIndex(index)

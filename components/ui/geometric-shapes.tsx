@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useRef } from "react"
-import { gsap, ScrollTrigger, getScrubValue, prefersReducedMotion } from "@/lib/gsap-utils"
+import { useRef } from "react"
+import { gsap, getScrubValue, prefersReducedMotion, useGSAP } from "@/lib/gsapConfig"
 
 interface GeometricShapesProps {
   className?: string
@@ -34,12 +34,12 @@ const shapes: Shape[] = [
 export function GeometricShapes({ className = "" }: GeometricShapesProps) {
   const wrapperRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    const reduced = prefersReducedMotion()
-    if (!wrapperRef.current) return
+  useGSAP(
+    () => {
+      const reduced = prefersReducedMotion()
+      if (!wrapperRef.current) return
 
-    const ctx = gsap.context(() => {
-      const shapeEls = wrapperRef.current!.querySelectorAll<HTMLElement>(
+      const shapeEls = wrapperRef.current.querySelectorAll<HTMLElement>(
         "[data-shape]",
       )
 
@@ -98,12 +98,9 @@ export function GeometricShapes({ className = "" }: GeometricShapesProps) {
           }
         })
       }
-    }, wrapperRef)
-
-    return () => {
-      ctx.revert()
-    }
-  }, [])
+    },
+    { scope: wrapperRef },
+  )
 
   return (
     <div

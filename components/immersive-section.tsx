@@ -5,7 +5,7 @@ import { Maximize2 } from "lucide-react"
 import SplitType from "split-type"
 import { brand } from "@/config/brand"
 import { NetworkNodes } from "@/components/ui/network-nodes"
-import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap-utils"
+import { gsap, prefersReducedMotion, useGSAP } from "@/lib/gsapConfig"
 
 export function ImmersiveSection() {
   const [selectedTour, setSelectedTour] = useState(brand.tours360[0]?.id ?? "")
@@ -26,10 +26,10 @@ export function ImmersiveSection() {
     iframeRef.current = el
   }
 
-  useEffect(() => {
-    const reduced = prefersReducedMotion()
+  useGSAP(
+    () => {
+      const reduced = prefersReducedMotion()
 
-    const ctx = gsap.context(() => {
       // ----------------------------------------------------------
       // HEADER — SplitText por líneas con reveal + blur
       // ----------------------------------------------------------
@@ -255,12 +255,9 @@ export function ImmersiveSection() {
           )
         }
       }
-    }, sectionRef)
-
-    return () => {
-      ctx.revert()
-    }
-  }, [])
+    },
+    { scope: sectionRef },
+  )
 
   const toggleFullscreen = () => {
     const container = iframeRef.current

@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useRef } from "react"
-import { gsap, prefersReducedMotion } from "@/lib/gsap-utils"
+import { useRef } from "react"
+import { gsap, prefersReducedMotion, useGSAP } from "@/lib/gsapConfig"
 
 interface FlowingLinesProps {
   className?: string
@@ -15,16 +15,16 @@ export function FlowingLines({
   const wrapperRef = useRef<HTMLDivElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
 
-  useEffect(() => {
-    const reduced = prefersReducedMotion()
-    if (!svgRef.current || !wrapperRef.current) return
+  useGSAP(
+    () => {
+      const reduced = prefersReducedMotion()
+      if (!svgRef.current || !wrapperRef.current) return
 
-    const ctx = gsap.context(() => {
-      const lines = svgRef.current!.querySelectorAll<SVGLineElement>("[data-line]")
-      const shimmers = svgRef.current!.querySelectorAll<SVGLineElement>(
+      const lines = svgRef.current.querySelectorAll<SVGLineElement>("[data-line]")
+      const shimmers = svgRef.current.querySelectorAll<SVGLineElement>(
         "[data-shimmer]",
       )
-      const tickers = svgRef.current!.querySelectorAll<SVGCircleElement>(
+      const tickers = svgRef.current.querySelectorAll<SVGCircleElement>(
         "[data-ticker]",
       )
 
@@ -86,12 +86,9 @@ export function FlowingLines({
           )
         })
       }
-    }, wrapperRef)
-
-    return () => {
-      ctx.revert()
-    }
-  }, [lineCount])
+    },
+    { scope: wrapperRef, dependencies: [lineCount] },
+  )
 
   // Generate line positions and ticker positions
   const lines = Array.from({ length: lineCount }, (_, i) => {

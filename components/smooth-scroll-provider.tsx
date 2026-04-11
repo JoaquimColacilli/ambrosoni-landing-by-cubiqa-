@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react"
 import Lenis from "lenis"
-import { gsap, ScrollTrigger, isTouchDevice } from "@/lib/gsap-utils"
+import { gsap, ScrollTrigger, isTouchDevice } from "@/lib/gsapConfig"
 
 export function SmoothScrollProvider({ children }: { children: React.ReactNode }) {
   const lenisRef = useRef<Lenis | null>(null)

@@ -1,23 +1,23 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useRef } from "react"
 import Image from "next/image"
 import { Instagram, Mail, MapPin, Phone } from "lucide-react"
 import { brand } from "@/config/brand"
 import { NoiseGrainStars } from "@/components/ui/noise-grain-stars"
-import { gsap, prefersReducedMotion } from "@/lib/gsap-utils"
+import { gsap, prefersReducedMotion, useGSAP } from "@/lib/gsapConfig"
 
 export function Footer() {
   const year = new Date().getFullYear()
   const footerRef = useRef<HTMLElement>(null)
 
-  useEffect(() => {
-    const reduced = prefersReducedMotion()
-    if (!footerRef.current) return
+  useGSAP(
+    () => {
+      const reduced = prefersReducedMotion()
+      if (!footerRef.current) return
 
-    const ctx = gsap.context(() => {
-      const columns = footerRef.current!.querySelectorAll<HTMLElement>("[data-footer-col]")
-      const bottomBar = footerRef.current!.querySelector<HTMLElement>("[data-footer-bottom]")
+      const columns = footerRef.current.querySelectorAll<HTMLElement>("[data-footer-col]")
+      const bottomBar = footerRef.current.querySelector<HTMLElement>("[data-footer-bottom]")
 
       const footerTl = gsap.timeline({
         scrollTrigger: {
@@ -61,12 +61,9 @@ export function Footer() {
           reduced ? 0 : 0.8,
         )
       }
-    }, footerRef)
-
-    return () => {
-      ctx.revert()
-    }
-  }, [])
+    },
+    { scope: footerRef },
+  )
 
   return (
     <footer

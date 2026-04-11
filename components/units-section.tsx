@@ -1,13 +1,13 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useRef } from "react"
 import { Check, X, AlertCircle } from "lucide-react"
 import SplitType from "split-type"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { brand, type UnitStatus, type Unit } from "@/config/brand"
 import { WarmMesh } from "@/components/ui/warm-mesh"
-import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap-utils"
+import { gsap, prefersReducedMotion, useGSAP } from "@/lib/gsapConfig"
 
 const statusConfig: Record<UnitStatus, { label: string; color: string }> = {
   available: { label: "Disponible", color: "bg-primary text-primary-foreground" },
@@ -26,10 +26,10 @@ export function UnitsSection() {
   const legendRef = useRef<HTMLDivElement>(null)
   const hasInteracted = useRef(false)
 
-  useEffect(() => {
-    const reduced = prefersReducedMotion()
+  useGSAP(
+    () => {
+      const reduced = prefersReducedMotion()
 
-    const ctx = gsap.context(() => {
       // ----------------------------------------------------------
       // HEADER
       // ----------------------------------------------------------
@@ -184,12 +184,9 @@ export function UnitsSection() {
           )
         }
       }
-    }, sectionRef)
-
-    return () => {
-      ctx.revert()
-    }
-  }, [])
+    },
+    { scope: sectionRef },
+  )
 
   const handleConsult = (unit: Unit) => {
     const unitInfo = `Piso ${unit.floor}, Unidad ${unit.unit} - ${unit.rooms} ambientes, ${unit.sqm}m² - ${unit.price}`

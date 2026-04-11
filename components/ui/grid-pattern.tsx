@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap-utils"
+import { gsap, prefersReducedMotion, useGSAP } from "@/lib/gsapConfig"
 
 interface GridPatternProps {
   className?: string
@@ -12,12 +12,11 @@ export function GridPattern({ className = "" }: GridPatternProps) {
   const svgRef = useRef<SVGSVGElement>(null)
   const cursorLightRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    const reduced = prefersReducedMotion()
-    if (!wrapperRef.current || !svgRef.current) return
+  useGSAP(
+    () => {
+      const reduced = prefersReducedMotion()
+      if (!wrapperRef.current || !svgRef.current) return
 
-    const ctx = gsap.context(() => {
-      // Fade-in the grid itself on enter viewport
       gsap.fromTo(
         svgRef.current,
         { opacity: 0 },
@@ -32,9 +31,11 @@ export function GridPattern({ className = "" }: GridPatternProps) {
           },
         },
       )
-    }, wrapperRef)
+    },
+    { scope: wrapperRef },
+  )
 
-    // Cursor follow light
+  useEffect(() => {
     const handleMove = (e: MouseEvent) => {
       if (!wrapperRef.current || !cursorLightRef.current) return
       const rect = wrapperRef.current.getBoundingClientRect()
@@ -50,11 +51,7 @@ export function GridPattern({ className = "" }: GridPatternProps) {
       }
     }
     window.addEventListener("mousemove", handleMove)
-
-    return () => {
-      window.removeEventListener("mousemove", handleMove)
-      ctx.revert()
-    }
+    return () => window.removeEventListener("mousemove", handleMove)
   }, [])
 
   return (

@@ -8,7 +8,7 @@ import { brand } from "@/config/brand"
 import { motion, AnimatePresence } from "framer-motion"
 import { useReducedMotion } from "@/hooks/use-reduced-motion"
 import { useMagnetic } from "@/hooks/use-magnetic"
-import { gsap, useIsomorphicLayoutEffect } from "@/lib/gsap-utils"
+import { gsap, useGSAP } from "@/lib/gsapConfig"
 
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -66,14 +66,14 @@ export function Navigation() {
   }, [])
 
   // Entry animation — coordinated with the hero timeline.
-  // useLayoutEffect so GSAP takes control before the first paint and we get
-  // a single-paint path (no flash from inline opacity:0 → GSAP visible).
-  useIsomorphicLayoutEffect(() => {
-    const linkEls = linksRef.current
-      ? (Array.from(linksRef.current.children) as HTMLElement[])
-      : []
+  // useGSAP runs pre-paint (via useLayoutEffect internally) and auto-reverts
+  // the full context on unmount — the official Next.js App Router pattern.
+  useGSAP(
+    () => {
+      const linkEls = linksRef.current
+        ? (Array.from(linksRef.current.children) as HTMLElement[])
+        : []
 
-    const ctx = gsap.context(() => {
       // Hide elements synchronously before first paint.
       const allEls = [
         logoRef.current,
@@ -202,10 +202,9 @@ export function Navigation() {
           }
         },
       )
-    }, navRef)
-
-    return () => ctx.revert()
-  }, [])
+    },
+    { scope: navRef },
+  )
 
   // Lock body scroll while the mobile menu is open.
   useEffect(() => {
