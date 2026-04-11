@@ -1,11 +1,15 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useRef } from "react"
 import { ChevronDown } from "lucide-react"
 import SplitType from "split-type"
 import { brand } from "@/config/brand"
 import { useMagnetic } from "@/hooks/use-magnetic"
-import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap-utils"
+import {
+  gsap,
+  ScrollTrigger,
+  useIsomorphicLayoutEffect,
+} from "@/lib/gsap-utils"
 
 export function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -20,134 +24,279 @@ export function HeroSection() {
   const primaryMagnetic = useMagnetic<HTMLAnchorElement>({ strength: 0.35, radius: 100 })
   const secondaryMagnetic = useMagnetic<HTMLAnchorElement>({ strength: 0.35, radius: 100 })
 
-  useEffect(() => {
-    const reduced = prefersReducedMotion()
-
+  // useLayoutEffect so GSAP takes control before the first paint. This
+  // eliminates the "double paint" on iOS where Safari paints at the starting
+  // state, then repaints when useEffect (post-paint) runs GSAP.
+  useIsomorphicLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      // Split title into characters
-      const splitTitle =
-        titleRef.current && !reduced
-          ? new SplitType(titleRef.current, { types: "chars,words" })
-          : null
+      // Split the title ONCE, outside matchMedia. Both breakpoints reference
+      // the same split; matchMedia only branches the tween shape.
+      const splitTitle = titleRef.current
+        ? new SplitType(titleRef.current, { types: "chars,words" })
+        : null
 
-      // Entry timeline — plays on mount
-      const tl = gsap.timeline({
-        defaults: { ease: "expo.out" },
-      })
+      // --------------------------------------------------------------
+      // ENTRY — matchMedia-driven. Single callback, branches on isMobile.
+      // --------------------------------------------------------------
+      const mm = gsap.matchMedia()
 
-      // 1. Background image: curtain reveal with clip-path + subtle zoom-out
-      if (imageWrapperRef.current) {
-        tl.fromTo(
-          imageWrapperRef.current,
-          {
-            clipPath: "inset(0 50% 0 50%)",
-            opacity: 0,
-          },
-          {
-            clipPath: "inset(0 0% 0 0%)",
-            opacity: 1,
-            duration: reduced ? 0 : 1.8,
-            ease: "power3.inOut",
-          },
-          0,
-        )
-      }
-      if (imageRef.current) {
-        tl.fromTo(
-          imageRef.current,
-          { scale: 1.2 },
-          {
-            scale: 1,
-            duration: reduced ? 0 : 2.4,
-            ease: "power2.out",
-          },
-          0,
-        )
-      }
+      mm.add(
+        {
+          isDesktop: "(min-width: 769px) and (prefers-reduced-motion: no-preference)",
+          isMobile: "(max-width: 768px) and (prefers-reduced-motion: no-preference)",
+          reduced: "(prefers-reduced-motion: reduce)",
+        },
+        (context) => {
+          const { isMobile, reduced } = context.conditions as {
+            isDesktop: boolean
+            isMobile: boolean
+            reduced: boolean
+          }
 
-      // 2. Title characters: cascade from below with stagger
-      if (splitTitle?.chars && splitTitle.chars.length > 0) {
-        tl.fromTo(
-          splitTitle.chars,
-          {
-            yPercent: 120,
-            opacity: 0,
-            rotateX: -60,
-          },
-          {
-            yPercent: 0,
-            opacity: 1,
-            rotateX: 0,
-            duration: 1.2,
-            ease: "expo.out",
-            stagger: 0.025,
-          },
-          0.6,
-        )
-      } else if (titleRef.current) {
-        tl.fromTo(
-          titleRef.current,
-          { opacity: 0, y: 40 },
-          { opacity: 1, y: 0, duration: reduced ? 0 : 0.8 },
-          0.6,
-        )
-      }
+          // Suppress CSS transition-transform on the CTA anchors during the
+          // entry. They have `transition-transform duration-300` for the
+          // useMagnetic smoothing, which fights GSAP's per-frame transform
+          // writes. Restored in the CTA tween's onComplete.
+          const buttons = ctasRef.current
+            ? (Array.from(
+                ctasRef.current.querySelectorAll<HTMLAnchorElement>("a"),
+              ) as HTMLAnchorElement[])
+            : []
+          buttons.forEach((b) => {
+            b.style.transition = "none"
+          })
 
-      // 3. Subtitle: fade + slight rise
-      if (subtitleRef.current) {
-        tl.fromTo(
-          subtitleRef.current,
-          { opacity: 0, y: 30, filter: "blur(8px)" },
-          {
-            opacity: 1,
-            y: 0,
-            filter: "blur(0px)",
-            duration: reduced ? 0 : 1.0,
-            ease: "power3.out",
-          },
-          reduced ? 0 : 1.4,
-        )
-      }
+          if (reduced) {
+            // Snap everything to the final state.
+            if (imageWrapperRef.current) {
+              gsap.set(imageWrapperRef.current, { opacity: 1, clipPath: "inset(0 0% 0 0%)" })
+            }
+            if (imageRef.current) gsap.set(imageRef.current, { scale: 1 })
+            if (splitTitle?.chars) {
+              gsap.set(splitTitle.chars, { opacity: 1, yPercent: 0, rotateX: 0 })
+            } else if (titleRef.current) {
+              gsap.set(titleRef.current, { opacity: 1, y: 0 })
+            }
+            if (subtitleRef.current) gsap.set(subtitleRef.current, { opacity: 1, y: 0 })
+            if (buttons.length > 0) {
+              gsap.set(buttons, { opacity: 1, y: 0, scale: 1 })
+            }
+            if (scrollIndicatorRef.current) {
+              gsap.set(scrollIndicatorRef.current, { opacity: 1, y: 0 })
+            }
+            buttons.forEach((b) => {
+              b.style.transition = ""
+            })
+            return
+          }
 
-      // 4. CTAs: scale + fade stagger
-      if (ctasRef.current) {
-        const buttons = ctasRef.current.querySelectorAll("a")
-        if (buttons.length > 0) {
-          tl.fromTo(
-            buttons,
-            { opacity: 0, scale: 0.85, y: 20 },
-            {
+          // Mobile tuning: duration -20%, stagger -30%, gentler eases.
+          const factor = isMobile ? 0.8 : 1
+          const staggerFactor = isMobile ? 0.7 : 1
+          const baseEase = isMobile ? "power2.out" : "expo.out"
+          const ctaEase = isMobile ? "back.out(1.2)" : "back.out(1.6)"
+
+          // Desktop gets `perspective` for the 3D char rotation. Mobile
+          // skips it — no rotateX means no need for the 3D layer context.
+          if (!isMobile && titleRef.current) {
+            gsap.set(titleRef.current, { perspective: 800 })
+          }
+
+          const tl = gsap.timeline({
+            defaults: { ease: baseEase },
+          })
+
+          // -- 1. Background image reveal ------------------------------
+          if (imageWrapperRef.current) {
+            if (isMobile) {
+              // Mobile: no clipPath (iOS Safari repaints the full layer on
+              // clip-path animation). Scale + opacity is composited.
+              tl.fromTo(
+                imageWrapperRef.current,
+                {
+                  opacity: 0,
+                  scale: 1.08,
+                  willChange: "transform, opacity",
+                },
+                {
+                  opacity: 1,
+                  scale: 1,
+                  duration: 1.4,
+                  ease: "power3.out",
+                  onComplete: () => {
+                    if (imageWrapperRef.current) {
+                      // Keep willChange — parallax scroll below needs the layer.
+                      gsap.set(imageWrapperRef.current, { clearProps: "transform" })
+                    }
+                  },
+                },
+                0,
+              )
+            } else {
+              tl.fromTo(
+                imageWrapperRef.current,
+                {
+                  clipPath: "inset(0 50% 0 50%)",
+                  opacity: 0,
+                  willChange: "clip-path, opacity",
+                },
+                {
+                  clipPath: "inset(0 0% 0 0%)",
+                  opacity: 1,
+                  duration: 1.8,
+                  ease: "power3.inOut",
+                  onComplete: () => {
+                    if (imageWrapperRef.current) {
+                      // Swap willChange to `transform` for the scroll parallax
+                      // that follows. Don't clear it entirely.
+                      gsap.set(imageWrapperRef.current, {
+                        willChange: "transform",
+                        clearProps: "clip-path",
+                      })
+                    }
+                  },
+                },
+                0,
+              )
+            }
+          }
+
+          if (imageRef.current) {
+            tl.fromTo(
+              imageRef.current,
+              { scale: 1.2, willChange: "transform" },
+              {
+                scale: 1,
+                duration: 2.4 * factor,
+                ease: "power2.out",
+                onComplete: () => {
+                  if (imageRef.current) {
+                    gsap.set(imageRef.current, { clearProps: "willChange,transform" })
+                  }
+                },
+              },
+              0,
+            )
+          }
+
+          // -- 2. Title characters cascade ------------------------------
+          if (splitTitle?.chars && splitTitle.chars.length > 0) {
+            const charFrom: gsap.TweenVars = {
+              yPercent: 120,
+              opacity: 0,
+              willChange: "transform, opacity",
+            }
+            const charTo: gsap.TweenVars = {
+              yPercent: 0,
               opacity: 1,
-              scale: 1,
-              y: 0,
-              duration: reduced ? 0 : 0.7,
-              ease: "back.out(1.6)",
-              stagger: 0.12,
-            },
-            reduced ? 0 : 1.7,
-          )
-        }
-      }
+              duration: 1.2 * factor,
+              ease: "expo.out",
+              stagger: 0.025 * staggerFactor,
+              onComplete: () => {
+                if (splitTitle?.chars) {
+                  gsap.set(splitTitle.chars, { clearProps: "willChange,transform" })
+                }
+              },
+            }
+            // Desktop keeps the full 3D rotation; mobile skips it entirely
+            // (no perspective layer context, no software rendering tax).
+            if (!isMobile) {
+              charFrom.rotateX = -60
+              charTo.rotateX = 0
+            }
+            tl.fromTo(splitTitle.chars, charFrom, charTo, 0.6)
+          } else if (titleRef.current) {
+            tl.fromTo(
+              titleRef.current,
+              { opacity: 0, y: 40, willChange: "transform, opacity" },
+              {
+                opacity: 1,
+                y: 0,
+                duration: 0.8 * factor,
+                onComplete: () => {
+                  if (titleRef.current) {
+                    gsap.set(titleRef.current, { clearProps: "willChange,transform" })
+                  }
+                },
+              },
+              0.6,
+            )
+          }
 
-      // 5. Scroll indicator: fade in last
-      if (scrollIndicatorRef.current) {
-        tl.fromTo(
-          scrollIndicatorRef.current,
-          { opacity: 0, y: -10 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: reduced ? 0 : 0.8,
-            ease: "power2.out",
-          },
-          reduced ? 0 : 2.2,
-        )
-      }
+          // -- 3. Subtitle: opacity + y only (no filter blur) -----------
+          if (subtitleRef.current) {
+            tl.fromTo(
+              subtitleRef.current,
+              { opacity: 0, y: 30, willChange: "transform, opacity" },
+              {
+                opacity: 1,
+                y: 0,
+                duration: 1.0 * factor,
+                ease: "power3.out",
+                onComplete: () => {
+                  if (subtitleRef.current) {
+                    gsap.set(subtitleRef.current, { clearProps: "willChange,transform" })
+                  }
+                },
+              },
+              1.4,
+            )
+          }
 
-      // Scroll-linked effects: parallax + fade-out as user scrolls away from hero
-      if (!reduced && sectionRef.current) {
-        // Background image parallax (moves slower than scroll)
+          // -- 4. CTAs: scale + fade stagger ----------------------------
+          if (buttons.length > 0) {
+            tl.fromTo(
+              buttons,
+              { opacity: 0, scale: 0.85, y: 20, willChange: "transform, opacity" },
+              {
+                opacity: 1,
+                scale: 1,
+                y: 0,
+                duration: 0.7 * factor,
+                ease: ctaEase,
+                stagger: 0.12 * staggerFactor,
+                onComplete: () => {
+                  buttons.forEach((b) => {
+                    gsap.set(b, { clearProps: "willChange,transform" })
+                    b.style.transition = ""
+                  })
+                },
+              },
+              1.7,
+            )
+          }
+
+          // -- 5. Scroll indicator --------------------------------------
+          if (scrollIndicatorRef.current) {
+            tl.fromTo(
+              scrollIndicatorRef.current,
+              { opacity: 0, y: -10, willChange: "transform, opacity" },
+              {
+                opacity: 1,
+                y: 0,
+                duration: 0.8 * factor,
+                ease: "power2.out",
+                onComplete: () => {
+                  if (scrollIndicatorRef.current) {
+                    // Leave willChange set — scroll-linked fade-out below needs it.
+                    gsap.set(scrollIndicatorRef.current, { clearProps: "transform" })
+                  }
+                },
+              },
+              2.2,
+            )
+          }
+        },
+      )
+
+      // --------------------------------------------------------------
+      // SCROLL-LINKED — parallax + fade-out. Not inside matchMedia
+      // because the behavior is the same across breakpoints; willChange
+      // stays set on these elements because the scrub can fire at any time.
+      // --------------------------------------------------------------
+      if (sectionRef.current) {
         if (imageWrapperRef.current) {
+          gsap.set(imageWrapperRef.current, { willChange: "transform" })
           gsap.to(imageWrapperRef.current, {
             yPercent: 25,
             ease: "none",
@@ -160,8 +309,8 @@ export function HeroSection() {
           })
         }
 
-        // Content fades and drifts up as user scrolls past
         if (contentRef.current) {
+          gsap.set(contentRef.current, { willChange: "transform, opacity" })
           gsap.to(contentRef.current, {
             yPercent: -30,
             opacity: 0,
@@ -175,8 +324,8 @@ export function HeroSection() {
           })
         }
 
-        // Scroll indicator fades out quickly
         if (scrollIndicatorRef.current) {
+          gsap.set(scrollIndicatorRef.current, { willChange: "transform, opacity" })
           gsap.to(scrollIndicatorRef.current, {
             opacity: 0,
             ease: "none",
@@ -203,14 +352,14 @@ export function HeroSection() {
       className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background"
     >
       {/* Background Image */}
-      <div ref={imageWrapperRef} className="absolute inset-0 will-change-transform">
+      <div ref={imageWrapperRef} className="absolute inset-0">
         {/* Dark overlay for text readability */}
         <div className="absolute inset-0 bg-black/40 z-10" />
         <img
           ref={imageRef}
           src="/images/design-mode/cbq_gbd_ath_View_10.jpg"
           alt="Hero Architecture"
-          className="w-full h-full object-cover will-change-transform"
+          className="w-full h-full object-cover"
         />
       </div>
 
@@ -219,7 +368,6 @@ export function HeroSection() {
         <h1
           ref={titleRef}
           className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold mb-6 tracking-tight text-balance text-white px-4"
-          style={{ perspective: "800px" }}
         >
           EXPERIENCIAS
           <br />
@@ -237,6 +385,7 @@ export function HeroSection() {
         >
           <a
             ref={primaryMagnetic.ref}
+            onMouseEnter={primaryMagnetic.handleMouseEnter}
             onMouseMove={primaryMagnetic.handleMouseMove}
             onMouseLeave={primaryMagnetic.handleMouseLeave}
             href="#experiencia"
@@ -247,6 +396,7 @@ export function HeroSection() {
           </a>
           <a
             ref={secondaryMagnetic.ref}
+            onMouseEnter={secondaryMagnetic.handleMouseEnter}
             onMouseMove={secondaryMagnetic.handleMouseMove}
             onMouseLeave={secondaryMagnetic.handleMouseLeave}
             href="#contacto"

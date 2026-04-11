@@ -157,13 +157,17 @@
   }
 }
 
+/* Opacity pulse replaces the previous box-shadow pulse.
+ * box-shadow animation repaints the composited layer every frame on iOS
+ * Safari, tanking FPS. Opacity is composited on the GPU and is effectively
+ * free. The "latido" CTA feel is preserved via a subtle 1 → 0.85 → 1 cycle. */
 @keyframes glow-pulse {
   0%,
   100% {
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    opacity: 1;
   }
   50% {
-    box-shadow: 0 0 40px rgba(255, 255, 255, 0.6);
+    opacity: 0.85;
   }
 }
 
@@ -175,8 +179,11 @@
   animation: fade-in-up 0.8s cubic-bezier(0.65, 0, 0.35, 1) forwards;
 }
 
+/* 2.6s delay lets the GSAP entry timelines (nav + hero) finish fading the
+ * CTAs in before the CSS opacity pulse takes over — avoids GSAP's opacity
+ * tween fighting the CSS animation on the same property. */
 .animate-glow-pulse {
-  animation: glow-pulse 2s ease-in-out infinite;
+  animation: glow-pulse 2.2s ease-in-out 2.6s infinite;
 }
 
 /* ============================================================================

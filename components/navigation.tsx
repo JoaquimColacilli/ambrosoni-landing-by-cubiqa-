@@ -8,7 +8,7 @@ import { brand } from "@/config/brand"
 import { motion, AnimatePresence } from "framer-motion"
 import { useReducedMotion } from "@/hooks/use-reduced-motion"
 import { useMagnetic } from "@/hooks/use-magnetic"
-import { gsap, prefersReducedMotion as gsapReduced } from "@/lib/gsap-utils"
+import { gsap, useIsomorphicLayoutEffect } from "@/lib/gsap-utils"
 
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -66,63 +66,142 @@ export function Navigation() {
   }, [])
 
   // Entry animation — coordinated with the hero timeline.
-  // The hero's bg starts revealing at 0s; we slide the navbar chrome in
-  // starting at ~0.8s so it feels like the UI settling after the scene loads.
-  useEffect(() => {
-    const reduced = gsapReduced()
+  // useLayoutEffect so GSAP takes control before the first paint and we get
+  // a single-paint path (no flash from inline opacity:0 → GSAP visible).
+  useIsomorphicLayoutEffect(() => {
     const linkEls = linksRef.current
-      ? Array.from(linksRef.current.children) as HTMLElement[]
+      ? (Array.from(linksRef.current.children) as HTMLElement[])
       : []
 
     const ctx = gsap.context(() => {
-      if (reduced) {
-        gsap.set(
-          [logoRef.current, ...linkEls, ctaRef.current, mobileBtnRef.current].filter(Boolean),
-          { opacity: 1, y: 0 },
-        )
-        return
-      }
+      // Hide elements synchronously before first paint.
+      const allEls = [
+        logoRef.current,
+        ...linkEls,
+        ctaRef.current,
+        mobileBtnRef.current,
+      ].filter(Boolean) as HTMLElement[]
+      gsap.set(allEls, { opacity: 0, y: -20 })
 
-      const tl = gsap.timeline({
-        delay: 0.8,
-        defaults: { ease: "expo.out" },
-      })
-
-      if (logoRef.current) {
-        tl.fromTo(
-          logoRef.current,
-          { opacity: 0, y: -20 },
-          { opacity: 1, y: 0, duration: 0.9 },
-          0,
-        )
-      }
-
-      if (linkEls.length > 0) {
-        tl.fromTo(
-          linkEls,
-          { opacity: 0, y: -18 },
-          { opacity: 1, y: 0, duration: 0.7, stagger: 0.07 },
-          0.15,
-        )
-      }
-
+      // The CTA wrapper has `transition-transform` on it (for the useMagnetic
+      // smoothing). During the entry tween, that CSS transition would
+      // interpolate every GSAP transform write with 300ms of easing, fighting
+      // the tween. Suppress it for the duration of the entry and restore in
+      // the CTA tween's onComplete.
       if (ctaRef.current) {
-        tl.fromTo(
-          ctaRef.current,
-          { opacity: 0, y: -18, scale: 0.9 },
-          { opacity: 1, y: 0, scale: 1, duration: 0.7, ease: "back.out(1.6)" },
-          0.4,
-        )
+        ctaRef.current.style.transition = "none"
       }
 
-      if (mobileBtnRef.current) {
-        tl.fromTo(
-          mobileBtnRef.current,
-          { opacity: 0, y: -18 },
-          { opacity: 1, y: 0, duration: 0.7 },
-          0.4,
-        )
-      }
+      const mm = gsap.matchMedia()
+
+      mm.add(
+        {
+          isDesktop: "(min-width: 769px) and (prefers-reduced-motion: no-preference)",
+          isMobile: "(max-width: 768px) and (prefers-reduced-motion: no-preference)",
+          reduced: "(prefers-reduced-motion: reduce)",
+        },
+        (context) => {
+          const { isMobile, reduced } = context.conditions as {
+            isDesktop: boolean
+            isMobile: boolean
+            reduced: boolean
+          }
+
+          if (reduced) {
+            gsap.set(allEls, { opacity: 1, y: 0, clearProps: "willChange,transform" })
+            if (ctaRef.current) ctaRef.current.style.transition = ""
+            return
+          }
+
+          // Mobile variants: duration -20%, stagger -30%, gentler overshoot.
+          const durMain = isMobile ? 0.72 : 0.9
+          const durItem = isMobile ? 0.56 : 0.7
+          const staggerItems = isMobile ? 0.049 : 0.07
+          const ctaEase = isMobile ? "back.out(1.2)" : "back.out(1.6)"
+          const baseEase = isMobile ? "power2.out" : "expo.out"
+
+          const tl = gsap.timeline({
+            delay: 0.8,
+            defaults: { ease: baseEase },
+          })
+
+          if (logoRef.current) {
+            tl.fromTo(
+              logoRef.current,
+              { opacity: 0, y: -20, willChange: "transform, opacity" },
+              {
+                opacity: 1,
+                y: 0,
+                duration: durMain,
+                onComplete: () => {
+                  if (logoRef.current) {
+                    gsap.set(logoRef.current, { clearProps: "willChange,transform" })
+                  }
+                },
+              },
+              0,
+            )
+          }
+
+          if (linkEls.length > 0) {
+            tl.fromTo(
+              linkEls,
+              { opacity: 0, y: -18, willChange: "transform, opacity" },
+              {
+                opacity: 1,
+                y: 0,
+                duration: durItem,
+                stagger: staggerItems,
+                onComplete: () => {
+                  gsap.set(linkEls, { clearProps: "willChange,transform" })
+                },
+              },
+              0.15,
+            )
+          }
+
+          if (ctaRef.current) {
+            tl.fromTo(
+              ctaRef.current,
+              { opacity: 0, y: -18, scale: 0.9, willChange: "transform, opacity" },
+              {
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                duration: durItem,
+                ease: ctaEase,
+                onComplete: () => {
+                  const el = ctaRef.current
+                  if (!el) return
+                  gsap.set(el, { clearProps: "willChange,transform" })
+                  // Restore the CSS transition so the magnetic effect smoothing
+                  // and hover/active feedback work normally after entry.
+                  el.style.transition = ""
+                },
+              },
+              0.4,
+            )
+          }
+
+          if (mobileBtnRef.current) {
+            tl.fromTo(
+              mobileBtnRef.current,
+              { opacity: 0, y: -18, willChange: "transform, opacity" },
+              {
+                opacity: 1,
+                y: 0,
+                duration: durItem,
+                onComplete: () => {
+                  if (mobileBtnRef.current) {
+                    gsap.set(mobileBtnRef.current, { clearProps: "willChange,transform" })
+                  }
+                },
+              },
+              0.4,
+            )
+          }
+        },
+      )
     }, navRef)
 
     return () => ctx.revert()
@@ -152,8 +231,10 @@ export function Navigation() {
     <>
       <nav
         ref={navRef}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          isScrolled ? "bg-[#1a1a1a] backdrop-blur-md border-b border-border" : "bg-transparent"
+        className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${
+          isScrolled
+            ? "bg-[#1a1a1a] md:backdrop-blur-md border-b border-border"
+            : "bg-transparent"
         }`}
       >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -162,7 +243,6 @@ export function Navigation() {
               ref={logoRef}
               href="#"
               className="flex items-center gap-2 sm:gap-3 group min-w-0"
-              style={{ opacity: 0 }}
             >
               <div className="relative w-10 h-10 sm:w-12 sm:h-12 shrink-0 transition-transform duration-300 group-hover:scale-110">
                 <Image src={brand.logo} alt={brand.logoAlt} fill className="object-contain" />
@@ -180,7 +260,6 @@ export function Navigation() {
                   key={item.href}
                   href={item.href}
                   className="text-sm text-white hover:text-white/80 transition-colors duration-300 relative group font-medium"
-                  style={{ opacity: 0 }}
                 >
                   {item.label}
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
@@ -194,10 +273,10 @@ export function Navigation() {
                 ctaRef.current = node
                 desktopCtaMagnetic.ref.current = node
               }}
+              onMouseEnter={desktopCtaMagnetic.handleMouseEnter}
               onMouseMove={desktopCtaMagnetic.handleMouseMove}
               onMouseLeave={desktopCtaMagnetic.handleMouseLeave}
               className="hidden lg:block transition-transform duration-300 ease-out"
-              style={{ opacity: 0 }}
             >
               <Button className="bg-white text-black hover:bg-gray-100 active:scale-[0.97] animate-glow-pulse font-semibold">
                 {brand.cta.nav}
@@ -211,7 +290,6 @@ export function Navigation() {
               aria-label="Abrir menú"
               aria-expanded={isMobileMenuOpen}
               className="lg:hidden -mr-2 p-2 text-white"
-              style={{ opacity: 0 }}
             >
               <Menu size={26} />
             </button>
