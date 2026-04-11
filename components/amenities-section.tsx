@@ -1,69 +1,241 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { motion } from "framer-motion"
 import { Waves, Dumbbell, Trees, Users, Car, Shield, Flame, X, Maximize2, type LucideIcon } from "lucide-react"
 import Image from "next/image"
+import SplitType from "split-type"
 import { brand } from "@/config/brand"
-import { useReducedMotion } from "@/hooks/use-reduced-motion"
 import { SpotlightCard } from "@/components/ui/spotlight-card"
+import { DotMatrix } from "@/components/ui/dot-matrix"
+import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap-utils"
 
 const iconMap: Record<string, LucideIcon> = { Waves, Dumbbell, Trees, Users, Car, Shield, Flame }
 
 export function AmenitiesSection() {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null)
-  const [isVisible, setIsVisible] = useState(false)
   const [energyCount, setEnergyCount] = useState(0)
-  const [certificationVisible, setCertificationVisible] = useState(false)
   const [selectedAmenityIndex, setSelectedAmenityIndex] = useState<number | null>(null)
   const sectionRef = useRef<HTMLElement>(null)
+  const headerRef = useRef<HTMLDivElement>(null)
+  const gridRef = useRef<HTMLDivElement>(null)
   const sustainableRef = useRef<HTMLDivElement>(null)
-  const prefersReducedMotion = useReducedMotion()
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
+    const reduced = prefersReducedMotion()
+
+    const ctx = gsap.context(() => {
+      // ----------------------------------------------------------
+      // HEADER
+      // ----------------------------------------------------------
+      if (headerRef.current) {
+        const eyebrow = headerRef.current.querySelector<HTMLElement>("[data-eyebrow]")
+        const h2 = headerRef.current.querySelector<HTMLHeadingElement>("h2")
+        const paragraph = headerRef.current.querySelector<HTMLParagraphElement>("p")
+
+        const splitH2 =
+          h2 && !reduced ? new SplitType(h2, { types: "words" }) : null
+
+        const headerTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: headerRef.current,
+            start: "top 78%",
+            once: true,
+          },
+          defaults: { ease: "expo.out" },
+        })
+
+        if (eyebrow) {
+          headerTl.fromTo(
+            eyebrow,
+            { opacity: 0, y: 20 },
+            { opacity: 1, y: 0, duration: reduced ? 0 : 0.6 },
+            0,
+          )
         }
-      },
-      { threshold: 0.2 },
-    )
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current)
-    }
-
-    return () => observer.disconnect()
-  }, [])
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          let count = 0
-          const interval = setInterval(() => {
-            count += 2
-            if (count >= 100) {
-              count = 100
-              clearInterval(interval)
-            }
-            setEnergyCount(count)
-          }, 20)
-
-          setTimeout(() => {
-            setCertificationVisible(true)
-          }, 500)
+        if (splitH2?.words && splitH2.words.length > 0) {
+          headerTl.fromTo(
+            splitH2.words,
+            { opacity: 0, y: 50, rotateX: -45 },
+            {
+              opacity: 1,
+              y: 0,
+              rotateX: 0,
+              duration: 1.0,
+              stagger: 0.07,
+            },
+            0.15,
+          )
         }
-      },
-      { threshold: 0.5 },
-    )
 
-    if (sustainableRef.current) {
-      observer.observe(sustainableRef.current)
+        if (paragraph) {
+          headerTl.fromTo(
+            paragraph,
+            { opacity: 0, y: 24, filter: "blur(6px)" },
+            {
+              opacity: 1,
+              y: 0,
+              filter: "blur(0px)",
+              duration: reduced ? 0 : 0.8,
+              ease: "power3.out",
+            },
+            reduced ? 0 : 0.85,
+          )
+        }
+      }
+
+      // ----------------------------------------------------------
+      // GRID — diagonal wave stagger (from.grid utility)
+      // ----------------------------------------------------------
+      if (gridRef.current) {
+        const cards = gridRef.current.querySelectorAll<HTMLElement>("[data-amenity-card]")
+        if (cards.length > 0) {
+          gsap.fromTo(
+            cards,
+            {
+              opacity: 0,
+              y: 50,
+              scale: 0.9,
+              filter: "blur(8px)",
+            },
+            {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              filter: "blur(0px)",
+              duration: reduced ? 0 : 0.8,
+              ease: "expo.out",
+              stagger: {
+                grid: [2, 3],
+                from: "start",
+                amount: 0.6,
+              },
+              scrollTrigger: {
+                trigger: gridRef.current,
+                start: "top 80%",
+                once: true,
+              },
+            },
+          )
+        }
+      }
+
+      // ----------------------------------------------------------
+      // SUSTAINABLE CARD — dark bloque con clip-path + counter
+      // ----------------------------------------------------------
+      if (sustainableRef.current) {
+        const leftSide = sustainableRef.current.querySelector<HTMLElement>("[data-sustain-left]")
+        const statBlocks = sustainableRef.current.querySelectorAll<HTMLElement>("[data-sustain-stat]")
+
+        const cardTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: sustainableRef.current,
+            start: "top 80%",
+            once: true,
+          },
+          defaults: { ease: "expo.out" },
+        })
+
+        // Card reveal con clip-path
+        cardTl.fromTo(
+          sustainableRef.current,
+          {
+            clipPath: "inset(0% 0% 100% 0%)",
+            opacity: 0,
+            scale: 0.96,
+          },
+          {
+            clipPath: "inset(0% 0% 0% 0%)",
+            opacity: 1,
+            scale: 1,
+            duration: reduced ? 0 : 1.2,
+            ease: "power3.out",
+          },
+          0,
+        )
+
+        // Left side: heading + paragraph
+        if (leftSide) {
+          const h3 = leftSide.querySelector<HTMLHeadingElement>("h3")
+          const p = leftSide.querySelector<HTMLParagraphElement>("p")
+
+          const splitH3 =
+            h3 && !reduced ? new SplitType(h3, { types: "words" }) : null
+
+          if (splitH3?.words && splitH3.words.length > 0) {
+            cardTl.fromTo(
+              splitH3.words,
+              { opacity: 0, y: 40, rotateX: -40 },
+              {
+                opacity: 1,
+                y: 0,
+                rotateX: 0,
+                duration: 0.9,
+                stagger: 0.06,
+              },
+              reduced ? 0 : 0.5,
+            )
+          }
+
+          if (p) {
+            cardTl.fromTo(
+              p,
+              { opacity: 0, y: 24, filter: "blur(6px)" },
+              {
+                opacity: 1,
+                y: 0,
+                filter: "blur(0px)",
+                duration: reduced ? 0 : 0.8,
+                ease: "power3.out",
+              },
+              reduced ? 0 : 0.85,
+            )
+          }
+        }
+
+        // Stat blocks (100% Energía + A+ Certificación)
+        if (statBlocks.length > 0) {
+          cardTl.fromTo(
+            statBlocks,
+            {
+              opacity: 0,
+              scale: 0.8,
+              y: 30,
+            },
+            {
+              opacity: 1,
+              scale: 1,
+              y: 0,
+              duration: reduced ? 0 : 0.7,
+              stagger: 0.15,
+              ease: "back.out(1.6)",
+            },
+            reduced ? 0 : 0.7,
+          )
+        }
+
+        // Energy counter — GSAP proxy (triggered with the stats reveal)
+        ScrollTrigger.create({
+          trigger: sustainableRef.current,
+          start: "top 75%",
+          once: true,
+          onEnter: () => {
+            const proxy = { val: 0 }
+            gsap.to(proxy, {
+              val: 100,
+              duration: reduced ? 0 : 2.0,
+              ease: "power2.out",
+              onUpdate: () => setEnergyCount(Math.floor(proxy.val)),
+              onComplete: () => setEnergyCount(100),
+            })
+          },
+        })
+      }
+    }, sectionRef)
+
+    return () => {
+      ctx.revert()
     }
-
-    return () => observer.disconnect()
   }, [])
 
   const openModal = (index: number) => {
@@ -101,12 +273,16 @@ export function AmenitiesSection() {
   }, [selectedAmenityIndex])
 
   return (
-    <section id="amenidades" ref={sectionRef} className="relative py-16 bg-gray-50">
-      <div className="container mx-auto px-4 lg:px-8">
-        <div
-          className={`text-center mb-16 transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
-        >
-          <span className="text-black text-sm font-semibold tracking-wider uppercase">Amenidades</span>
+    <section id="amenidades" ref={sectionRef} className="relative py-16 bg-gray-50 overflow-hidden">
+      <DotMatrix />
+      <div className="relative container mx-auto px-4 lg:px-8">
+        <div ref={headerRef} className="text-center mb-16" style={{ perspective: "1000px" }}>
+          <span
+            data-eyebrow
+            className="text-black text-sm font-semibold tracking-wider uppercase"
+          >
+            Amenidades
+          </span>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 text-balance text-black">
             Vivir como <span className="text-black">experiencia</span>
           </h2>
@@ -115,28 +291,16 @@ export function AmenitiesSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {brand.amenities.map((amenity, index) => {
             const Icon = iconMap[amenity.iconName] ?? Shield
             const isHovered = hoveredCard === index
 
             return (
-              <motion.div
+              <div
                 key={index}
-                className="relative h-64 cursor-pointer group"
-                initial={{ opacity: 0, transform: "translateY(30px)" }}
-                whileInView={{ opacity: 1, transform: "translateY(0px)" }}
-                whileHover={
-                  prefersReducedMotion
-                    ? undefined
-                    : { transform: "translateY(-4px)", transition: { duration: 0.2, ease: "easeOut" } }
-                }
-                viewport={{ once: true }}
-                transition={{
-                  duration: prefersReducedMotion ? 0 : 0.5,
-                  ease: [0.23, 1, 0.32, 1],
-                  delay: prefersReducedMotion ? 0 : index * 0.05,
-                }}
+                data-amenity-card
+                className="relative h-64 cursor-pointer group will-change-transform"
                 onMouseEnter={() => setHoveredCard(index)}
                 onMouseLeave={() => setHoveredCard(null)}
                 onClick={() => openModal(index)}
@@ -163,17 +327,18 @@ export function AmenitiesSection() {
                     </div>
                   </div>
                 </SpotlightCard>
-              </motion.div>
+              </div>
             )
           })}
         </div>
 
         <div
           ref={sustainableRef}
-          className={`mt-16 bg-black text-white rounded-2xl p-12 transition-all duration-1000 delay-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+          className="mt-16 bg-black text-white rounded-2xl p-12 will-change-transform"
+          style={{ perspective: "1000px" }}
         >
           <div className="grid md:grid-cols-2 gap-8 items-center">
-            <div>
+            <div data-sustain-left>
               <h3 className="text-3xl md:text-4xl font-bold mb-4">Diseño Sustentable</h3>
               <p className="text-lg text-gray-300 leading-relaxed">
                 Cada amenidad fue diseñada con criterios de eficiencia energética y respeto por el medio ambiente,
@@ -181,16 +346,12 @@ export function AmenitiesSection() {
               </p>
             </div>
             <div className="grid grid-cols-2 gap-4 text-center">
-              <div className="bg-white/10 rounded-lg p-6">
+              <div data-sustain-stat className="bg-white/10 rounded-lg p-6">
                 <div className="text-4xl font-bold mb-2">{energyCount}%</div>
                 <div className="text-sm text-gray-300">Energía Renovable</div>
               </div>
-              <div className="bg-white/10 rounded-lg p-6">
-                <div
-                  className={`text-4xl font-bold mb-2 transition-all duration-500 ${certificationVisible ? "opacity-100 scale-100" : "opacity-0 scale-50"}`}
-                >
-                  A+
-                </div>
+              <div data-sustain-stat className="bg-white/10 rounded-lg p-6">
+                <div className="text-4xl font-bold mb-2">A+</div>
                 <div className="text-sm text-gray-300">Certificación</div>
               </div>
             </div>

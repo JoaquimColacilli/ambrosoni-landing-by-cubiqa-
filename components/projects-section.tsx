@@ -3,39 +3,221 @@
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import { X, Building2, Sparkles, type LucideIcon } from "lucide-react"
-import { motion } from "framer-motion"
+import SplitType from "split-type"
 import { brand, type GalleryCategory } from "@/config/brand"
-import { useReducedMotion } from "@/hooks/use-reduced-motion"
 import { SpotlightCard } from "@/components/ui/spotlight-card"
+import { GridPattern } from "@/components/ui/grid-pattern"
+import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap-utils"
 
 const iconMap: Record<string, LucideIcon> = { Building2, Sparkles }
 
 export function ProjectsSection() {
-  const [isVisible, setIsVisible] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<GalleryCategory | null>(null)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const sectionRef = useRef<HTMLElement>(null)
-  const prefersReducedMotion = useReducedMotion()
+  const headerRef = useRef<HTMLDivElement>(null)
 
-  const imageRevealDuration = prefersReducedMotion ? 0 : 0.5
-  const imageRevealEasing = [0.23, 1, 0.32, 1] as const
-  const staggerDelay = 0.04 // 40ms between images
-
+  // Entry animations — runs on mount via context, uses ScrollTrigger to watch
+  // the header and each category block independently.
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
+    const reduced = prefersReducedMotion()
+
+    const ctx = gsap.context(() => {
+      // ----------------------------------------------------------
+      // HEADER
+      // ----------------------------------------------------------
+      if (headerRef.current) {
+        const eyebrow = headerRef.current.querySelector<HTMLElement>("[data-eyebrow]")
+        const h2 = headerRef.current.querySelector<HTMLHeadingElement>("h2")
+        const paragraph = headerRef.current.querySelector<HTMLParagraphElement>("p")
+
+        const splitH2 =
+          h2 && !reduced ? new SplitType(h2, { types: "words" }) : null
+
+        const headerTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: headerRef.current,
+            start: "top 78%",
+            once: true,
+          },
+          defaults: { ease: "expo.out" },
+        })
+
+        if (eyebrow) {
+          headerTl.fromTo(
+            eyebrow,
+            { opacity: 0, y: 20 },
+            { opacity: 1, y: 0, duration: reduced ? 0 : 0.7 },
+            0,
+          )
         }
-      },
-      { threshold: 0.2 },
-    )
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current)
+        if (splitH2?.words && splitH2.words.length > 0) {
+          headerTl.fromTo(
+            splitH2.words,
+            { opacity: 0, y: 60, rotateX: -50 },
+            {
+              opacity: 1,
+              y: 0,
+              rotateX: 0,
+              duration: 1.0,
+              stagger: 0.06,
+            },
+            0.2,
+          )
+        }
+
+        if (paragraph) {
+          headerTl.fromTo(
+            paragraph,
+            { opacity: 0, y: 24, filter: "blur(6px)" },
+            {
+              opacity: 1,
+              y: 0,
+              filter: "blur(0px)",
+              duration: reduced ? 0 : 0.9,
+              ease: "power3.out",
+            },
+            reduced ? 0 : 0.9,
+          )
+        }
+      }
+
+      // ----------------------------------------------------------
+      // CATEGORY BLOCKS — one timeline per block, triggered when
+      // the block itself crosses the viewport
+      // ----------------------------------------------------------
+      const categoryBlocks = sectionRef.current?.querySelectorAll<HTMLElement>(
+        "[data-category-block]",
+      )
+
+      categoryBlocks?.forEach((block) => {
+        const bigImageWrap = block.querySelector<HTMLElement>("[data-img-big]")
+        const smallImages = block.querySelectorAll<HTMLElement>("[data-img-small]")
+        const textSide = block.querySelector<HTMLElement>("[data-text-side]")
+        const badge = textSide?.querySelector<HTMLElement>("[data-category-badge]")
+        const h3 = textSide?.querySelector<HTMLHeadingElement>("h3")
+        const paragraph = textSide?.querySelector<HTMLParagraphElement>("p")
+        const button = textSide?.querySelector<HTMLButtonElement>("button")
+
+        const splitH3 =
+          h3 && !reduced ? new SplitType(h3, { types: "words" }) : null
+
+        const blockTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: block,
+            start: "top 75%",
+            once: true,
+          },
+          defaults: { ease: "expo.out" },
+        })
+
+        // 1. Big image: fade + slight rise (no clip-path — simpler and safer)
+        if (bigImageWrap) {
+          blockTl.fromTo(
+            bigImageWrap,
+            {
+              opacity: 0,
+              y: 40,
+            },
+            {
+              opacity: 1,
+              y: 0,
+              duration: reduced ? 0 : 1.0,
+              ease: "power3.out",
+              clearProps: "transform",
+            },
+            0,
+          )
+        }
+
+        // 2. Small images: staggered scale + fade
+        if (smallImages.length > 0) {
+          blockTl.fromTo(
+            smallImages,
+            {
+              opacity: 0,
+              scale: 0.88,
+              y: 30,
+            },
+            {
+              opacity: 1,
+              scale: 1,
+              y: 0,
+              duration: reduced ? 0 : 0.9,
+              stagger: 0.12,
+              ease: "back.out(1.4)",
+            },
+            reduced ? 0 : 0.3,
+          )
+        }
+
+        // 3. Text side: badge → h3 words → paragraph → button
+        if (badge) {
+          blockTl.fromTo(
+            badge,
+            { opacity: 0, scale: 0.8, y: 15 },
+            {
+              opacity: 1,
+              scale: 1,
+              y: 0,
+              duration: reduced ? 0 : 0.6,
+              ease: "back.out(1.6)",
+            },
+            reduced ? 0 : 0.4,
+          )
+        }
+
+        if (splitH3?.words && splitH3.words.length > 0) {
+          blockTl.fromTo(
+            splitH3.words,
+            { opacity: 0, y: 40, rotateX: -40 },
+            {
+              opacity: 1,
+              y: 0,
+              rotateX: 0,
+              duration: 0.9,
+              stagger: 0.06,
+            },
+            reduced ? 0 : 0.55,
+          )
+        }
+
+        if (paragraph) {
+          blockTl.fromTo(
+            paragraph,
+            { opacity: 0, y: 24, filter: "blur(6px)" },
+            {
+              opacity: 1,
+              y: 0,
+              filter: "blur(0px)",
+              duration: reduced ? 0 : 0.8,
+              ease: "power3.out",
+            },
+            reduced ? 0 : 0.9,
+          )
+        }
+
+        if (button) {
+          blockTl.fromTo(
+            button,
+            { opacity: 0, y: 20, scale: 0.92 },
+            {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              duration: reduced ? 0 : 0.6,
+              ease: "back.out(1.6)",
+            },
+            reduced ? 0 : 1.1,
+          )
+        }
+      })
+    }, sectionRef)
+
+    return () => {
+      ctx.revert()
     }
-
-    return () => observer.disconnect()
   }, [])
 
   const openModal = (category: GalleryCategory, imageIndex = 0) => {
@@ -75,18 +257,20 @@ export function ProjectsSection() {
   }, [selectedCategory])
 
   return (
-    <section id="proyectos" ref={sectionRef} className="relative py-24 bg-gray-50">
-      <div className="container mx-auto px-4 lg:px-8">
-        <div
-          className={`text-center mb-20 transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
-        >
-          <span className="text-black text-sm font-semibold tracking-[0.2em] uppercase">El Proyecto</span>
+    <section id="proyectos" ref={sectionRef} className="relative py-24 bg-gray-50 overflow-hidden">
+      <GridPattern />
+      <div className="relative container mx-auto px-4 lg:px-8">
+        <div ref={headerRef} className="text-center mb-20" style={{ perspective: "1000px" }}>
+          <span
+            data-eyebrow
+            className="text-black text-sm font-semibold tracking-[0.2em] uppercase"
+          >
+            El Proyecto
+          </span>
           <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold mt-6 mb-8 text-balance text-black leading-tight">
             Desarrollos que transforman
             <br />
-            <span className="bg-gradient-to-r from-black to-gray-600 bg-clip-text text-transparent">
-              la forma de vivir
-            </span>
+            la forma de vivir
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto text-pretty leading-relaxed">
             Cada detalle pensado para crear espacios excepcionales que elevan la calidad de vida
@@ -99,31 +283,15 @@ export function ProjectsSection() {
             const isEven = index % 2 === 0
 
             return (
-              <div
-                key={category.id}
-                className={`transition-all duration-1000 ${
-                  isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-                }`}
-                style={{ transitionDelay: `${300 + index * 200}ms` }}
-              >
+              <div key={category.id} data-category-block>
                 <div className={`grid lg:grid-cols-2 gap-12 items-center ${!isEven ? "lg:grid-flow-dense" : ""}`}>
                   {/* Image Grid */}
                   <div className={`${!isEven ? "lg:col-start-2" : ""}`}>
                     <div className="grid grid-cols-2 gap-4">
                       {/* Main large image */}
-                      <motion.div
-                        className="col-span-2"
-                        initial={{ opacity: 0, transform: "scale(0.96)" }}
-                        whileInView={{ opacity: 1, transform: "scale(1)" }}
-                        viewport={{ once: true }}
-                        transition={{
-                          duration: imageRevealDuration,
-                          ease: [...imageRevealEasing],
-                          delay: 0 * staggerDelay,
-                        }}
-                      >
+                      <div data-img-big className="col-span-2 will-change-transform">
                         <SpotlightCard
-                          className="relative aspect-[16/10] rounded-2xl cursor-pointer shadow-xl"
+                          className="relative aspect-[16/10] rounded-2xl cursor-pointer shadow-xl overflow-hidden"
                           spotlightSize={400}
                         >
                           <div
@@ -134,26 +302,16 @@ export function ProjectsSection() {
                               src={category.images[0] || "/placeholder.svg"}
                               alt={`${category.name} - Principal`}
                               fill
-                              className="object-cover transition-transform duration-700 group-hover:scale-110"
+                              className="object-cover transition-transform duration-700 group-hover:scale-110 will-change-transform"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                           </div>
                         </SpotlightCard>
-                      </motion.div>
+                      </div>
 
                       {/* Smaller images */}
                       {category.images.slice(1, 3).map((image, imgIndex) => (
-                        <motion.div
-                          key={imgIndex}
-                          initial={{ opacity: 0, transform: "scale(0.96)" }}
-                          whileInView={{ opacity: 1, transform: "scale(1)" }}
-                          viewport={{ once: true }}
-                          transition={{
-                            duration: imageRevealDuration,
-                            ease: [...imageRevealEasing],
-                            delay: (imgIndex + 1) * staggerDelay,
-                          }}
-                        >
+                        <div key={imgIndex} data-img-small className="will-change-transform">
                           <SpotlightCard
                             className="relative aspect-square rounded-xl cursor-pointer shadow-lg"
                             spotlightSize={400}
@@ -171,14 +329,21 @@ export function ProjectsSection() {
                               <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                             </div>
                           </SpotlightCard>
-                        </motion.div>
+                        </div>
                       ))}
                     </div>
                   </div>
 
                   {/* Content */}
-                  <div className={`space-y-6 ${!isEven ? "lg:col-start-1 lg:row-start-1" : ""}`}>
-                    <div className="inline-flex items-center gap-3 px-4 py-2 bg-gray-100 rounded-full">
+                  <div
+                    data-text-side
+                    className={`space-y-6 ${!isEven ? "lg:col-start-1 lg:row-start-1" : ""}`}
+                    style={{ perspective: "1000px" }}
+                  >
+                    <div
+                      data-category-badge
+                      className="inline-flex items-center gap-3 px-4 py-2 bg-gray-100 rounded-full"
+                    >
                       <Icon size={20} className="text-black" />
                       <span className="text-sm font-semibold tracking-wider uppercase text-black">{category.name}</span>
                     </div>

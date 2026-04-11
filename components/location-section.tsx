@@ -1,73 +1,220 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import { MapPin, Clock, Car, Train, type LucideIcon } from "lucide-react"
+import SplitType from "split-type"
 import { brand } from "@/config/brand"
 import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap-utils"
 import { SpotlightCard } from "@/components/ui/spotlight-card"
+import { GlobePolaroids } from "@/components/ui/cobe-globe-polaroids"
 
 const iconMap: Record<string, LucideIcon> = { MapPin, Car, Train }
 
 export function LocationSection() {
-  const [isVisible, setIsVisible] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
-  const poisRef = useRef<HTMLDivElement>(null)
+  const headerRef = useRef<HTMLDivElement>(null)
+  const mapRef = useRef<HTMLDivElement>(null)
+  const poisWrapperRef = useRef<HTMLDivElement>(null)
+  const poisHeadingRef = useRef<HTMLHeadingElement>(null)
+  const addressRef = useRef<HTMLDivElement>(null)
+  const globeRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
-        }
-      },
-      { threshold: 0.2 },
-    )
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current)
-    }
-
-    return () => observer.disconnect()
-  }, [])
-
-  // GSAP ScrollTrigger reveal for POI cards
-  useEffect(() => {
-    if (prefersReducedMotion()) return
-    if (!poisRef.current) return
-
-    const cards = poisRef.current.querySelectorAll("[data-poi-card]")
-    if (cards.length === 0) return
+    const reduced = prefersReducedMotion()
 
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        cards,
-        { opacity: 0, x: -20 },
-        {
-          opacity: 1,
-          x: 0,
-          stagger: 0.08,
-          ease: "power2.out",
-          duration: 0.6,
+      // ----------------------------------------------------------
+      // HEADER
+      // ----------------------------------------------------------
+      if (headerRef.current) {
+        const eyebrow = headerRef.current.querySelector<HTMLElement>("[data-eyebrow]")
+        const h2 = headerRef.current.querySelector<HTMLHeadingElement>("h2")
+        const paragraph = headerRef.current.querySelector<HTMLParagraphElement>("p")
+
+        const splitH2 =
+          h2 && !reduced ? new SplitType(h2, { types: "words" }) : null
+
+        const headerTl = gsap.timeline({
           scrollTrigger: {
-            trigger: poisRef.current,
+            trigger: headerRef.current,
+            start: "top 78%",
+            once: true,
+          },
+          defaults: { ease: "expo.out" },
+        })
+
+        if (eyebrow) {
+          headerTl.fromTo(
+            eyebrow,
+            { opacity: 0, y: 20 },
+            { opacity: 1, y: 0, duration: reduced ? 0 : 0.6 },
+            0,
+          )
+        }
+
+        if (splitH2?.words && splitH2.words.length > 0) {
+          headerTl.fromTo(
+            splitH2.words,
+            { opacity: 0, y: 50, rotateX: -45 },
+            {
+              opacity: 1,
+              y: 0,
+              rotateX: 0,
+              duration: 1.0,
+              stagger: 0.07,
+            },
+            0.15,
+          )
+        }
+
+        if (paragraph) {
+          headerTl.fromTo(
+            paragraph,
+            { opacity: 0, y: 24, filter: "blur(6px)" },
+            {
+              opacity: 1,
+              y: 0,
+              filter: "blur(0px)",
+              duration: reduced ? 0 : 0.8,
+              ease: "power3.out",
+            },
+            reduced ? 0 : 0.85,
+          )
+        }
+      }
+
+      // ----------------------------------------------------------
+      // MAP — clip-path reveal desde abajo hacia arriba
+      // ----------------------------------------------------------
+      if (mapRef.current) {
+        gsap.fromTo(
+          mapRef.current,
+          {
+            clipPath: "inset(100% 0% 0% 0%)",
+            opacity: 0,
+            scale: 0.96,
+          },
+          {
+            clipPath: "inset(0% 0% 0% 0%)",
+            opacity: 1,
+            scale: 1,
+            duration: reduced ? 0 : 1.3,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: mapRef.current,
+              start: "top 80%",
+              once: true,
+            },
+          },
+        )
+      }
+
+      // ----------------------------------------------------------
+      // POIs WRAPPER — heading + cards stagger
+      // ----------------------------------------------------------
+      if (poisWrapperRef.current) {
+        const poiTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: poisWrapperRef.current,
             start: "top 80%",
             once: true,
           },
-        },
-      )
-    }, poisRef)
+          defaults: { ease: "expo.out" },
+        })
 
-    return () => ctx.revert()
+        if (poisHeadingRef.current) {
+          poiTl.fromTo(
+            poisHeadingRef.current,
+            { opacity: 0, x: 30 },
+            { opacity: 1, x: 0, duration: reduced ? 0 : 0.8 },
+            0,
+          )
+        }
+
+        const poiCards = poisWrapperRef.current.querySelectorAll<HTMLElement>("[data-poi-card]")
+        if (poiCards.length > 0) {
+          poiTl.fromTo(
+            poiCards,
+            {
+              opacity: 0,
+              x: -30,
+              scale: 0.95,
+            },
+            {
+              opacity: 1,
+              x: 0,
+              scale: 1,
+              duration: reduced ? 0 : 0.7,
+              stagger: 0.1,
+              ease: "power3.out",
+            },
+            reduced ? 0 : 0.3,
+          )
+        }
+
+        if (addressRef.current) {
+          poiTl.fromTo(
+            addressRef.current,
+            { opacity: 0, y: 30 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: reduced ? 0 : 0.7,
+              ease: "power3.out",
+            },
+            reduced ? 0 : 0.9,
+          )
+        }
+      }
+
+      // ----------------------------------------------------------
+      // GLOBE — fade + scale in cuando la section entra al viewport
+      // ----------------------------------------------------------
+      if (globeRef.current) {
+        gsap.fromTo(
+          globeRef.current,
+          {
+            opacity: 0,
+            scale: 0.7,
+          },
+          {
+            opacity: 1,
+            scale: 1,
+            duration: reduced ? 0 : 1.8,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: "top 70%",
+              once: true,
+            },
+          },
+        )
+      }
+    }, sectionRef)
+
+    return () => {
+      ctx.revert()
+    }
   }, [])
 
   return (
-    <section id="ubicacion" ref={sectionRef} className="relative py-16 bg-gray-50">
-      <div className="container mx-auto px-4 lg:px-8">
+    <section id="ubicacion" ref={sectionRef} className="relative py-16 bg-gray-50 overflow-hidden">
+      <div
+        ref={globeRef}
+        className="absolute -right-32 -bottom-24 lg:-right-40 lg:-bottom-32 w-[560px] lg:w-[720px] will-change-transform"
+        aria-hidden="true"
+      >
+        <GlobePolaroids />
+      </div>
+      <div className="relative container mx-auto px-4 lg:px-8">
         {/* Header */}
-        <div
-          className={`text-center mb-16 transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
-        >
-          <span className="text-black text-sm font-semibold tracking-wider uppercase">Ubicación</span>
+        <div ref={headerRef} className="text-center mb-16" style={{ perspective: "1000px" }}>
+          <span
+            data-eyebrow
+            className="text-black text-sm font-semibold tracking-wider uppercase"
+          >
+            Ubicación
+          </span>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 text-balance text-black">
             En el corazón de <span className="text-black">todo</span>
           </h2>
@@ -79,7 +226,8 @@ export function LocationSection() {
         <div className="grid lg:grid-cols-2 gap-12 items-start">
           {/* Map */}
           <div
-            className={`relative aspect-square rounded-xl overflow-hidden bg-gray-100 transition-all duration-1000 delay-300 ${isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}
+            ref={mapRef}
+            className="relative aspect-square rounded-xl overflow-hidden bg-gray-100 will-change-transform"
           >
             <iframe
               src={brand.mapsEmbedUrl}
@@ -99,10 +247,8 @@ export function LocationSection() {
           </div>
 
           {/* Nearby Places */}
-          <div ref={poisRef} className="space-y-6">
-            <h3
-              className={`text-2xl font-bold mb-8 text-black transition-all duration-1000 delay-300 ${isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"}`}
-            >
+          <div ref={poisWrapperRef} className="space-y-6">
+            <h3 ref={poisHeadingRef} className="text-2xl font-bold mb-8 text-black">
               Puntos de Interés
             </h3>
             {brand.nearbyPlaces.map((place, index) => {
@@ -135,7 +281,8 @@ export function LocationSection() {
 
             {/* Address */}
             <div
-              className={`mt-12 p-6 bg-white border border-gray-300 rounded-lg transition-all duration-1000 delay-800 ${isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"}`}
+              ref={addressRef}
+              className="mt-12 p-6 bg-white border border-gray-300 rounded-lg"
             >
               <h4 className="font-semibold mb-2 text-black">Dirección</h4>
               <p className="text-gray-700">{brand.location.address}</p>

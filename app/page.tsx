@@ -8,6 +8,7 @@ import { TypologiesSection } from "@/components/typologies-section"
 import { LocationSection } from "@/components/location-section"
 import { ContactSection } from "@/components/contact-section"
 import { Navigation } from "@/components/navigation"
+import { Footer } from "@/components/footer"
 import { WhatsAppButton } from "@/components/whatsapp-button"
 
 export default function Page() {
@@ -25,6 +26,7 @@ export default function Page() {
         <LocationSection />
         <ContactSection />
       </main>
+      <Footer />
       <WhatsAppButton />
     </>
   )

@@ -2,11 +2,12 @@
 
 import { useState, useEffect, useRef } from "react"
 import { Check, X, AlertCircle } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
+import SplitType from "split-type"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { brand, type UnitStatus, type Unit } from "@/config/brand"
-import { useReducedMotion } from "@/hooks/use-reduced-motion"
+import { WarmMesh } from "@/components/ui/warm-mesh"
+import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap-utils"
 
 const statusConfig: Record<UnitStatus, { label: string; color: string }> = {
   available: { label: "Disponible", color: "bg-primary text-primary-foreground" },
@@ -17,30 +18,177 @@ const statusConfig: Record<UnitStatus, { label: string; color: string }> = {
 export function UnitsSection() {
   const [selectedRooms, setSelectedRooms] = useState<number | null>(null)
   const [hoveredUnit, setHoveredUnit] = useState<string | null>(null)
-  const [isVisible, setIsVisible] = useState(false)
   const [showReservedAlert, setShowReservedAlert] = useState<string | null>(null)
   const sectionRef = useRef<HTMLElement>(null)
+  const headerRef = useRef<HTMLDivElement>(null)
+  const filtersRef = useRef<HTMLDivElement>(null)
+  const tableWrapperRef = useRef<HTMLDivElement>(null)
+  const legendRef = useRef<HTMLDivElement>(null)
   const hasInteracted = useRef(false)
-  const prefersReducedMotion = useReducedMotion()
-
-  const enterDuration = prefersReducedMotion ? 0 : 0.3
-  const exitDuration = prefersReducedMotion ? 0 : 0.2
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
+    const reduced = prefersReducedMotion()
+
+    const ctx = gsap.context(() => {
+      // ----------------------------------------------------------
+      // HEADER
+      // ----------------------------------------------------------
+      if (headerRef.current) {
+        const eyebrow = headerRef.current.querySelector<HTMLElement>("[data-eyebrow]")
+        const h2 = headerRef.current.querySelector<HTMLHeadingElement>("h2")
+
+        const splitH2 =
+          h2 && !reduced ? new SplitType(h2, { types: "words" }) : null
+
+        const headerTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: headerRef.current,
+            start: "top 78%",
+            once: true,
+          },
+          defaults: { ease: "expo.out" },
+        })
+
+        if (eyebrow) {
+          headerTl.fromTo(
+            eyebrow,
+            { opacity: 0, y: 20 },
+            { opacity: 1, y: 0, duration: reduced ? 0 : 0.6 },
+            0,
+          )
         }
-      },
-      { threshold: 0.2 },
-    )
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current)
+        if (splitH2?.words && splitH2.words.length > 0) {
+          headerTl.fromTo(
+            splitH2.words,
+            { opacity: 0, y: 50, rotateX: -45 },
+            {
+              opacity: 1,
+              y: 0,
+              rotateX: 0,
+              duration: 1.0,
+              stagger: 0.07,
+            },
+            0.15,
+          )
+        }
+      }
+
+      // ----------------------------------------------------------
+      // FILTERS — stagger desde abajo con back ease
+      // ----------------------------------------------------------
+      if (filtersRef.current) {
+        const buttons = filtersRef.current.querySelectorAll("button")
+        if (buttons.length > 0) {
+          gsap.fromTo(
+            buttons,
+            {
+              opacity: 0,
+              y: 30,
+              scale: 0.85,
+            },
+            {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              duration: reduced ? 0 : 0.7,
+              ease: "back.out(1.6)",
+              stagger: 0.08,
+              scrollTrigger: {
+                trigger: filtersRef.current,
+                start: "top 82%",
+                once: true,
+              },
+            },
+          )
+        }
+      }
+
+      // ----------------------------------------------------------
+      // TABLE WRAPPER — clip-path reveal + rows stagger
+      // ----------------------------------------------------------
+      if (tableWrapperRef.current) {
+        const rows = tableWrapperRef.current.querySelectorAll<HTMLElement>("tbody tr")
+
+        const tableTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: tableWrapperRef.current,
+            start: "top 80%",
+            once: true,
+          },
+          defaults: { ease: "expo.out" },
+        })
+
+        // Container reveal
+        tableTl.fromTo(
+          tableWrapperRef.current,
+          {
+            clipPath: "inset(0% 0% 100% 0%)",
+            opacity: 0,
+            scale: 0.97,
+          },
+          {
+            clipPath: "inset(0% 0% 0% 0%)",
+            opacity: 1,
+            scale: 1,
+            duration: reduced ? 0 : 1.1,
+            ease: "power3.out",
+          },
+          0,
+        )
+
+        // Rows cascade in
+        if (rows.length > 0) {
+          tableTl.fromTo(
+            rows,
+            {
+              opacity: 0,
+              x: -30,
+            },
+            {
+              opacity: 1,
+              x: 0,
+              duration: reduced ? 0 : 0.5,
+              stagger: 0.06,
+              ease: "power2.out",
+            },
+            reduced ? 0 : 0.4,
+          )
+        }
+      }
+
+      // ----------------------------------------------------------
+      // LEGEND — fade in stagger
+      // ----------------------------------------------------------
+      if (legendRef.current) {
+        const items = legendRef.current.querySelectorAll<HTMLElement>("[data-legend-item]")
+        if (items.length > 0) {
+          gsap.fromTo(
+            items,
+            {
+              opacity: 0,
+              y: 15,
+            },
+            {
+              opacity: 1,
+              y: 0,
+              duration: reduced ? 0 : 0.5,
+              ease: "power3.out",
+              stagger: 0.1,
+              scrollTrigger: {
+                trigger: legendRef.current,
+                start: "top 90%",
+                once: true,
+              },
+            },
+          )
+        }
+      }
+    }, sectionRef)
+
+    return () => {
+      ctx.revert()
     }
-
-    return () => observer.disconnect()
   }, [])
 
   const handleConsult = (unit: Unit) => {
@@ -72,20 +220,22 @@ export function UnitsSection() {
   const filteredUnits = selectedRooms ? brand.units.filter((unit) => unit.rooms === selectedRooms) : brand.units
 
   return (
-    <section id="unidades" ref={sectionRef} className="relative py-16 bg-gray-50">
-      <div className="container mx-auto px-4 lg:px-8">
-        <div
-          className={`text-center mb-16 transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
-        >
-          <span className="text-black text-sm font-semibold tracking-wider uppercase">Disponibilidad</span>
+    <section id="unidades" ref={sectionRef} className="relative py-16 bg-gray-50 overflow-hidden">
+      <WarmMesh />
+      <div className="relative container mx-auto px-4 lg:px-8">
+        <div ref={headerRef} className="text-center mb-16" style={{ perspective: "1000px" }}>
+          <span
+            data-eyebrow
+            className="text-black text-sm font-semibold tracking-wider uppercase"
+          >
+            Disponibilidad
+          </span>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 text-balance text-black">
             Tu espacio <span className="text-black">perfecto</span>
           </h2>
         </div>
 
-        <div
-          className={`flex justify-center gap-3 mb-12 transition-all duration-1000 delay-200 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
-        >
+        <div ref={filtersRef} className="flex justify-center gap-3 mb-12">
           <Button
             variant={selectedRooms === null ? "default" : "outline"}
             onClick={() => { hasInteracted.current = true; setSelectedRooms(null) }}
@@ -122,7 +272,8 @@ export function UnitsSection() {
         </div>
 
         <div
-          className={`bg-white border border-gray-300 rounded-xl overflow-hidden transition-all duration-1000 delay-400 ${isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}
+          ref={tableWrapperRef}
+          className="bg-white border border-gray-300 rounded-xl overflow-hidden will-change-transform"
         >
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -138,18 +289,14 @@ export function UnitsSection() {
                 </tr>
               </thead>
               <tbody>
-                <AnimatePresence mode="popLayout">
                 {filteredUnits.map((unit) => {
                   const unitKey = `${unit.floor}-${unit.unit}`
                   const status = statusConfig[unit.status]
                   const showAlert = showReservedAlert === unitKey
 
                   return (
-                    <motion.tr
+                    <tr
                       key={unitKey}
-                      initial={hasInteracted.current ? { opacity: 0 } : false}
-                      animate={{ opacity: 1, transition: { duration: enterDuration, ease: "easeOut" } }}
-                      exit={{ opacity: 0, transition: { duration: exitDuration, ease: "easeOut" } }}
                       className="border-t border-gray-200 transition-colors duration-300 hover:bg-[oklch(0.92_0.02_80_/_0.08)]"
                       onMouseEnter={() => setHoveredUnit(unitKey)}
                       onMouseLeave={() => setHoveredUnit(null)}
@@ -206,20 +353,17 @@ export function UnitsSection() {
                           </Button>
                         )}
                       </td>
-                    </motion.tr>
+                    </tr>
                   )
                 })}
-                </AnimatePresence>
               </tbody>
             </table>
           </div>
         </div>
 
-        <div
-          className={`flex flex-wrap justify-center gap-6 mt-8 transition-all duration-1000 delay-600 ${isVisible ? "opacity-100" : "opacity-0"}`}
-        >
+        <div ref={legendRef} className="flex flex-wrap justify-center gap-6 mt-8">
           {Object.entries(statusConfig).map(([key, config]) => (
-            <div key={key} className="flex items-center gap-2">
+            <div key={key} data-legend-item className="flex items-center gap-2">
               <div className={`w-3 h-3 rounded-full ${config.color.split(" ")[0]}`} />
               <span className="text-sm text-gray-600">{config.label}</span>
             </div>

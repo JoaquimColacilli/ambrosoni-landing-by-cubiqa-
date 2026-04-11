@@ -24,6 +24,27 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
     // stays in sync with Lenis's smooth scroll position
     lenis.on("scroll", ScrollTrigger.update)
 
+    // Refresh ScrollTrigger whenever the document height changes (images
+    // loading, canvas mounting, etc.). Without this, trigger points are
+    // calculated against a stale DOM and animations never fire.
+    const refreshTriggers = () => ScrollTrigger.refresh()
+    let refreshTimeout: ReturnType<typeof setTimeout> | null = null
+    const scheduleRefresh = () => {
+      if (refreshTimeout) clearTimeout(refreshTimeout)
+      refreshTimeout = setTimeout(refreshTriggers, 100)
+    }
+
+    // Refresh on window load (all images decoded)
+    if (document.readyState === "complete") {
+      scheduleRefresh()
+    } else {
+      window.addEventListener("load", scheduleRefresh)
+    }
+
+    // Refresh on body size changes (canvas mounting, lazy components)
+    const resizeObserver = new ResizeObserver(scheduleRefresh)
+    resizeObserver.observe(document.body)
+
     // Use GSAP ticker as the single RAF driver for Lenis
     // (replaces the manual requestAnimationFrame loop)
     const tickerCallback = (time: number) => {
@@ -42,6 +63,9 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
     mediaQuery.addEventListener("change", handleChange)
 
     return () => {
+      if (refreshTimeout) clearTimeout(refreshTimeout)
+      window.removeEventListener("load", scheduleRefresh)
+      resizeObserver.disconnect()
       mediaQuery.removeEventListener("change", handleChange)
       gsap.ticker.remove(tickerCallback)
       lenis.off("scroll", ScrollTrigger.update as any)

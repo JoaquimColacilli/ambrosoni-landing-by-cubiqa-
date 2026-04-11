@@ -3,13 +3,14 @@
 import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
-import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Mail, Phone, MapPin } from "lucide-react"
+import SplitType from "split-type"
 import { brand } from "@/config/brand"
-import { useReducedMotion } from "@/hooks/use-reduced-motion"
+import { AntiGravityCanvas } from "@/components/ui/particle-effect-for-hero"
+import { gsap, prefersReducedMotion } from "@/lib/gsap-utils"
 
 export function ContactSection() {
   const [formData, setFormData] = useState({
@@ -18,41 +19,217 @@ export function ContactSection() {
     phone: "",
     message: "",
   })
-  const [isVisible, setIsVisible] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
-  const prefersReducedMotion = useReducedMotion()
-
-  const fieldVariants = (index: number) => ({
-    initial: {
-      opacity: 0,
-      transform: "translateY(15px)",
-    },
-    whileInView: {
-      opacity: 1,
-      transform: "translateY(0px)",
-      transition: {
-        duration: prefersReducedMotion ? 0 : 0.4,
-        ease: [0.23, 1, 0.32, 1],
-        delay: prefersReducedMotion ? 0 : index * 0.06,
-      },
-    },
-  })
+  const headerRef = useRef<HTMLDivElement>(null)
+  const leftColRef = useRef<HTMLDivElement>(null)
+  const formCardRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
+    const reduced = prefersReducedMotion()
+
+    const ctx = gsap.context(() => {
+      // ----------------------------------------------------------
+      // HEADER
+      // ----------------------------------------------------------
+      if (headerRef.current) {
+        const eyebrow = headerRef.current.querySelector<HTMLElement>("[data-eyebrow]")
+        const h2 = headerRef.current.querySelector<HTMLHeadingElement>("h2")
+        const paragraph = headerRef.current.querySelector<HTMLParagraphElement>("p")
+
+        const splitH2 =
+          h2 && !reduced ? new SplitType(h2, { types: "words" }) : null
+
+        const headerTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: headerRef.current,
+            start: "top 78%",
+            once: true,
+          },
+          defaults: { ease: "expo.out" },
+        })
+
+        if (eyebrow) {
+          headerTl.fromTo(
+            eyebrow,
+            { opacity: 0, y: 20 },
+            { opacity: 1, y: 0, duration: reduced ? 0 : 0.6 },
+            0,
+          )
         }
-      },
-      { threshold: 0.2 },
-    )
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current)
+        if (splitH2?.words && splitH2.words.length > 0) {
+          headerTl.fromTo(
+            splitH2.words,
+            { opacity: 0, y: 50, rotateX: -45 },
+            {
+              opacity: 1,
+              y: 0,
+              rotateX: 0,
+              duration: 1.0,
+              stagger: 0.07,
+            },
+            0.15,
+          )
+        }
+
+        if (paragraph) {
+          headerTl.fromTo(
+            paragraph,
+            { opacity: 0, y: 24, filter: "blur(6px)" },
+            {
+              opacity: 1,
+              y: 0,
+              filter: "blur(0px)",
+              duration: reduced ? 0 : 0.8,
+              ease: "power3.out",
+            },
+            reduced ? 0 : 0.85,
+          )
+        }
+      }
+
+      // ----------------------------------------------------------
+      // LEFT COLUMN — info cards + office hours
+      // ----------------------------------------------------------
+      if (leftColRef.current) {
+        const h3 = leftColRef.current.querySelector<HTMLHeadingElement>("h3")
+        const intro = leftColRef.current.querySelector<HTMLParagraphElement>("[data-intro]")
+        const infoCards = leftColRef.current.querySelectorAll<HTMLElement>("[data-info-card]")
+        const hoursBox = leftColRef.current.querySelector<HTMLElement>("[data-hours-box]")
+
+        const leftTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: leftColRef.current,
+            start: "top 80%",
+            once: true,
+          },
+          defaults: { ease: "expo.out" },
+        })
+
+        if (h3) {
+          leftTl.fromTo(
+            h3,
+            { opacity: 0, x: -30 },
+            { opacity: 1, x: 0, duration: reduced ? 0 : 0.7 },
+            0,
+          )
+        }
+
+        if (intro) {
+          leftTl.fromTo(
+            intro,
+            { opacity: 0, y: 20, filter: "blur(6px)" },
+            {
+              opacity: 1,
+              y: 0,
+              filter: "blur(0px)",
+              duration: reduced ? 0 : 0.7,
+              ease: "power3.out",
+            },
+            reduced ? 0 : 0.2,
+          )
+        }
+
+        if (infoCards.length > 0) {
+          leftTl.fromTo(
+            infoCards,
+            { opacity: 0, x: -40, scale: 0.92 },
+            {
+              opacity: 1,
+              x: 0,
+              scale: 1,
+              duration: reduced ? 0 : 0.7,
+              stagger: 0.1,
+              ease: "back.out(1.4)",
+            },
+            reduced ? 0 : 0.4,
+          )
+        }
+
+        if (hoursBox) {
+          leftTl.fromTo(
+            hoursBox,
+            { opacity: 0, y: 30 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: reduced ? 0 : 0.7,
+              ease: "power3.out",
+            },
+            reduced ? 0 : 0.9,
+          )
+        }
+      }
+
+      // ----------------------------------------------------------
+      // FORM CARD — clip-path reveal + inputs stagger
+      // ----------------------------------------------------------
+      if (formCardRef.current) {
+        const fields = formCardRef.current.querySelectorAll<HTMLElement>("[data-form-field]")
+        const submitBtn = formCardRef.current.querySelector<HTMLButtonElement>("button[type='submit']")
+
+        const formTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: formCardRef.current,
+            start: "top 80%",
+            once: true,
+          },
+          defaults: { ease: "expo.out" },
+        })
+
+        formTl.fromTo(
+          formCardRef.current,
+          {
+            opacity: 0,
+            x: 40,
+            scale: 0.97,
+          },
+          {
+            opacity: 1,
+            x: 0,
+            scale: 1,
+            duration: reduced ? 0 : 1.0,
+            ease: "power3.out",
+          },
+          0,
+        )
+
+        if (fields.length > 0) {
+          formTl.fromTo(
+            fields,
+            { opacity: 0, y: 25, filter: "blur(5px)" },
+            {
+              opacity: 1,
+              y: 0,
+              filter: "blur(0px)",
+              duration: reduced ? 0 : 0.6,
+              stagger: 0.08,
+              ease: "power3.out",
+            },
+            reduced ? 0 : 0.35,
+          )
+        }
+
+        if (submitBtn) {
+          formTl.fromTo(
+            submitBtn,
+            { opacity: 0, y: 20, scale: 0.92 },
+            {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              duration: reduced ? 0 : 0.6,
+              ease: "back.out(1.6)",
+            },
+            reduced ? 0 : 0.85,
+          )
+        }
+      }
+    }, sectionRef)
+
+    return () => {
+      ctx.revert()
     }
-
-    return () => observer.disconnect()
   }, [])
 
   useEffect(() => {
@@ -69,7 +246,6 @@ export function ContactSection() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     console.log("Form submitted:", formData)
-    // Reset form after submission
     setFormData({
       name: "",
       email: "",
@@ -79,64 +255,66 @@ export function ContactSection() {
   }
 
   return (
-    <section id="contacto" ref={sectionRef} className="relative py-16 bg-gray-50">
-      <div className="container mx-auto px-4 lg:px-8">
-        <div
-          className={`text-center mb-16 transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
-        >
-          <span className="text-black text-sm font-semibold tracking-wider uppercase">Contacto</span>
+    <section id="contacto" ref={sectionRef} className="relative py-16 overflow-hidden">
+      <AntiGravityCanvas invert />
+      <div className="container mx-auto px-4 lg:px-8 relative z-10">
+        <div ref={headerRef} className="text-center mb-16" style={{ perspective: "1000px" }}>
+          <span
+            data-eyebrow
+            className="text-black/60 text-sm font-semibold tracking-wider uppercase"
+          >
+            Contacto
+          </span>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 text-balance text-black">
             Hagamos realidad <span className="text-black">tu proyecto</span>
           </h2>
-          <p className="text-lg text-gray-700 max-w-2xl mx-auto text-pretty">
+          <p className="text-lg text-black/70 max-w-2xl mx-auto text-pretty">
             Nuestro equipo está listo para asesorarte en cada paso
           </p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
-          <div
-            className={`space-y-8 transition-all duration-1000 delay-300 ${isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"}`}
-          >
+          <div ref={leftColRef} className="space-y-8">
             <div>
               <h3 className="text-2xl font-bold mb-6 text-black">Información de Contacto</h3>
-              <p className="text-gray-700 mb-8 leading-relaxed">
+              <p data-intro className="text-black/70 mb-8 leading-relaxed">
                 Estamos disponibles para responder todas tus consultas sobre el proyecto. Agendá una visita virtual o
                 presencial.
               </p>
             </div>
 
             <div className="space-y-6">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-black/10 flex items-center justify-center flex-shrink-0">
+              <div data-info-card className="flex items-start gap-4 will-change-transform">
+                <div className="w-12 h-12 rounded-full bg-black/5 backdrop-blur-sm border border-black/10 flex items-center justify-center flex-shrink-0">
                   <Mail className="text-black" size={20} />
                 </div>
                 <div>
                   <h4 className="font-semibold mb-1 text-black">Email</h4>
-                  <a href={`mailto:${brand.email}`} className="text-gray-700 hover:text-black transition-colors">
+                  <a href={`mailto:${brand.email}`} className="text-black/70 hover:text-black transition-colors">
                     {brand.email}
                   </a>
                 </div>
               </div>
 
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-black/10 flex items-center justify-center flex-shrink-0">
+              <div data-info-card className="flex items-start gap-4 will-change-transform">
+                <div className="w-12 h-12 rounded-full bg-black/5 backdrop-blur-sm border border-black/10 flex items-center justify-center flex-shrink-0">
                   <Phone className="text-black" size={20} />
                 </div>
                 <div>
                   <h4 className="font-semibold mb-1 text-black">Teléfono</h4>
-                  <a href={`tel:${brand.phones[0].number}`} className="text-gray-700 hover:text-black transition-colors">
+                  <a href={`tel:${brand.phones[0].number}`} className="text-black/70 hover:text-black transition-colors">
                     {brand.phones[0].number}
                   </a>
                 </div>
               </div>
 
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-black/10 flex items-center justify-center flex-shrink-0">
+              <div data-info-card className="flex items-start gap-4 will-change-transform">
+                <div className="w-12 h-12 rounded-full bg-black/5 backdrop-blur-sm border border-black/10 flex items-center justify-center flex-shrink-0">
                   <MapPin className="text-black" size={20} />
                 </div>
                 <div>
                   <h4 className="font-semibold mb-1 text-black">Oficina</h4>
-                  <p className="text-gray-700">
+                  <p className="text-black/70">
                     {brand.location.address}
                     <br />
                     {brand.location.area}
@@ -146,9 +324,12 @@ export function ContactSection() {
             </div>
 
             {/* Office Hours */}
-            <div className="p-6 bg-gray-100 border border-gray-300 rounded-lg">
+            <div
+              data-hours-box
+              className="p-6 bg-white/50 backdrop-blur-md border border-black/10 rounded-lg"
+            >
               <h4 className="font-semibold mb-3 text-black">Horarios de Atención</h4>
-              <div className="space-y-2 text-sm text-gray-700">
+              <div className="space-y-2 text-sm text-black/70">
                 <p>{brand.officeHours.weekdays}</p>
                 <p>{brand.officeHours.saturday}</p>
                 <p>{brand.officeHours.sunday}</p>
@@ -157,14 +338,12 @@ export function ContactSection() {
           </div>
 
           <div
-            className={`bg-gray-50 border border-gray-300 rounded-xl p-8 transition-all duration-1000 delay-500 ${isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"}`}
+            ref={formCardRef}
+            className="bg-white/50 backdrop-blur-md border border-black/10 rounded-xl p-8 will-change-transform"
           >
             <form onSubmit={handleSubmit} className="space-y-6">
-              <motion.div
-                {...fieldVariants(0)}
-                viewport={{ once: true }}
-              >
-                <label htmlFor="name" className="block text-sm font-medium mb-2 text-gray-900">
+              <div data-form-field>
+                <label htmlFor="name" className="block text-sm font-medium mb-2 text-black/80">
                   Nombre completo
                 </label>
                 <Input
@@ -173,16 +352,13 @@ export function ContactSection() {
                   placeholder="Juan Pérez"
                   value={formData.name}
                   onChange={(e: any) => setFormData({ ...formData, name: e.target.value })}
-                  className="bg-transparent border-gray-300 focus:border-black text-gray-900 placeholder:text-gray-500"
+                  className="bg-white/60 border-black/20 focus:border-black text-black placeholder:text-black/40"
                   required
                 />
-              </motion.div>
+              </div>
 
-              <motion.div
-                {...fieldVariants(1)}
-                viewport={{ once: true }}
-              >
-                <label htmlFor="email" className="block text-sm font-medium mb-2 text-gray-900">
+              <div data-form-field>
+                <label htmlFor="email" className="block text-sm font-medium mb-2 text-black/80">
                   Email
                 </label>
                 <Input
@@ -191,16 +367,13 @@ export function ContactSection() {
                   placeholder="juan@ejemplo.com"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="bg-transparent border-gray-300 focus:border-black text-gray-900 placeholder:text-gray-500"
+                  className="bg-white/60 border-black/20 focus:border-black text-black placeholder:text-black/40"
                   required
                 />
-              </motion.div>
+              </div>
 
-              <motion.div
-                {...fieldVariants(2)}
-                viewport={{ once: true }}
-              >
-                <label htmlFor="phone" className="block text-sm font-medium mb-2 text-gray-900">
+              <div data-form-field>
+                <label htmlFor="phone" className="block text-sm font-medium mb-2 text-black/80">
                   Teléfono
                 </label>
                 <Input
@@ -209,16 +382,13 @@ export function ContactSection() {
                   placeholder="+54 11 1234-5678"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="bg-transparent border-gray-300 focus:border-black text-gray-900 placeholder:text-gray-500"
+                  className="bg-white/60 border-black/20 focus:border-black text-black placeholder:text-black/40"
                   required
                 />
-              </motion.div>
+              </div>
 
-              <motion.div
-                {...fieldVariants(3)}
-                viewport={{ once: true }}
-              >
-                <label htmlFor="message" className="block text-sm font-medium mb-2 text-gray-900">
+              <div data-form-field>
+                <label htmlFor="message" className="block text-sm font-medium mb-2 text-black/80">
                   Mensaje
                 </label>
                 <Textarea
@@ -226,12 +396,12 @@ export function ContactSection() {
                   placeholder="Contanos sobre tu interés en el proyecto..."
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className="bg-transparent border-gray-300 focus:border-black min-h-32 text-gray-900 placeholder:text-gray-500"
+                  className="bg-white/60 border-black/20 focus:border-black text-black placeholder:text-black/40 min-h-32"
                   required
                 />
-              </motion.div>
+              </div>
 
-              <Button type="submit" className="w-full bg-[#1a1a1a] text-white hover:bg-gray-800 active:scale-[0.97] transition-transform duration-100" size="lg">
+              <Button type="submit" className="w-full bg-black text-white hover:bg-black/90 active:scale-[0.97] transition-transform duration-100" size="lg">
                 Enviar Consulta
               </Button>
             </form>

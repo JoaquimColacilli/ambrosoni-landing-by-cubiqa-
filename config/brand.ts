@@ -94,8 +94,7 @@ export const brand = {
   template: "NOIR",
 
   // --- Logo ---
-  // TODO: logo AMBROSONI pendiente de Cubiqa
-  logo: "/images/arbuilding-logo.png",
+  logo: "/AMBROSONI/LOGO_sin_fondo.png",
   logoAlt: "AR Building — AMBROSONI",
 
   // --- Contacto ---
@@ -295,7 +294,7 @@ export const brand = {
         "/images/View_04_01.jpg", // TODO: asset AMBROSONI pendiente
         "/images/View_01_01.jpg", // TODO: asset AMBROSONI pendiente
         "/images/View_02_01.jpg", // TODO: asset AMBROSONI pendiente
-        "/images/cbq_gbd_ath_View_03.jpg", // TODO: asset AMBROSONI pendiente
+        "/images/cbq_gbd_ath_View_09.jpg", // TODO: asset AMBROSONI pendiente
         "/images/cbq_gbd_ath_View_12.jpg", // TODO: asset AMBROSONI pendiente
       ],
     },
@@ -342,7 +341,7 @@ export const brand = {
       coveredArea: 0, // TODO: dato real pendiente de Cubiqa
       bedrooms: 1, // TODO: dato real pendiente de Cubiqa
       bathrooms: 1, // TODO: dato real pendiente de Cubiqa
-      planImage: "/images/plans/ambrosoni-2amb.jpg", // TODO: asset AMBROSONI pendiente
+      planImage: "/plano_example.jpg", // TODO: plano 2 ambientes AMBROSONI pendiente — placeholder de Cubiqa
       description: "Unidad funcional ideal para parejas o inversores", // TODO: copy pendiente de cliente
     },
     {
@@ -352,7 +351,7 @@ export const brand = {
       coveredArea: 0, // TODO: dato real pendiente de Cubiqa
       bedrooms: 2, // TODO: dato real pendiente de Cubiqa
       bathrooms: 1, // TODO: dato real pendiente de Cubiqa
-      planImage: "/images/plans/ambrosoni-3amb.jpg", // TODO: asset AMBROSONI pendiente
+      planImage: "/plano_example.jpg", // TODO: plano 3 ambientes AMBROSONI pendiente — placeholder de Cubiqa
       description: "Amplitud y funcionalidad para familias", // TODO: copy pendiente de cliente
     },
     {
@@ -362,8 +361,38 @@ export const brand = {
       coveredArea: 0, // TODO: dato real pendiente de Cubiqa
       bedrooms: 3, // TODO: dato real pendiente de Cubiqa
       bathrooms: 2, // TODO: dato real pendiente de Cubiqa
-      planImage: "/images/plans/ambrosoni-4amb.jpg", // TODO: asset AMBROSONI pendiente
+      planImage: "/plano_example.jpg", // TODO: plano 4 ambientes AMBROSONI pendiente — placeholder de Cubiqa
       description: "El espacio premium para tu familia", // TODO: copy pendiente de cliente
+    },
+    {
+      id: "2-ambientes-loft",
+      name: "2 Ambientes Loft",
+      totalArea: 0, // TODO: dato real pendiente de Cubiqa
+      coveredArea: 0, // TODO: dato real pendiente de Cubiqa
+      bedrooms: 1, // TODO: dato real pendiente de Cubiqa
+      bathrooms: 1, // TODO: dato real pendiente de Cubiqa
+      planImage: "/plano_example.jpg", // TODO: plano 2 ambientes loft AMBROSONI pendiente — placeholder de Cubiqa
+      description: "Diseño abierto con doble altura y mezzanine", // TODO: copy pendiente de cliente
+    },
+    {
+      id: "3-ambientes-premium",
+      name: "3 Ambientes Premium",
+      totalArea: 0, // TODO: dato real pendiente de Cubiqa
+      coveredArea: 0, // TODO: dato real pendiente de Cubiqa
+      bedrooms: 2, // TODO: dato real pendiente de Cubiqa
+      bathrooms: 2, // TODO: dato real pendiente de Cubiqa
+      planImage: "/plano_example.jpg", // TODO: plano 3 ambientes premium AMBROSONI pendiente — placeholder de Cubiqa
+      description: "Suite principal con vestidor y baño en suite", // TODO: copy pendiente de cliente
+    },
+    {
+      id: "4-ambientes-penthouse",
+      name: "Penthouse",
+      totalArea: 0, // TODO: dato real pendiente de Cubiqa
+      coveredArea: 0, // TODO: dato real pendiente de Cubiqa
+      bedrooms: 3, // TODO: dato real pendiente de Cubiqa
+      bathrooms: 3, // TODO: dato real pendiente de Cubiqa
+      planImage: "/plano_example.jpg", // TODO: plano penthouse AMBROSONI pendiente — placeholder de Cubiqa
+      description: "Unidad exclusiva con terraza privada y vistas panorámicas", // TODO: copy pendiente de cliente
     },
   ] satisfies Typology[],
 } as const
