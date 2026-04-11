@@ -1,83 +1,108 @@
 "use client"
 
-import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion"
+import { useRef } from "react"
+import { gsap, useGSAP, prefersReducedMotion, isTouchDevice } from "@/lib/gsapConfig"
 
-/**
- * AtmosphericLayer — capa fija de luz atmosférica que atraviesa toda la página.
- * Tres beams de luz cálida con blend mode plus-lighter (aditivo, visible sobre
- * cualquier background), movimiento sutil atado al scroll global.
- * Decorativo — pointer-events-none, aria-hidden.
- */
+// AtmosphericLayer — fixed full-page light beams driven by a single GSAP
+// ScrollTrigger scrub. Skipped entirely on touch devices: Safari iOS
+// recomposes filter:blur + mixBlendMode:multiply on every scroll event, and
+// the backing-store readback tanks FPS on iPhone in the sections above the
+// fold (hero, concept, immersive). Desktop keeps the full effect.
 export function AtmosphericLayer() {
-  const prefersReduced = useReducedMotion()
-  const { scrollYProgress } = useScroll()
+  if (isTouchDevice()) return null
 
-  // Beam principal: baja suavemente con el scroll
-  const beamY1 = useTransform(scrollYProgress, [0, 1], ["-20%", "120%"])
+  const wrapperRef = useRef<HTMLDivElement>(null)
+  const beam1Ref = useRef<HTMLDivElement>(null)
+  const beam2Ref = useRef<HTMLDivElement>(null)
+  const beam3Ref = useRef<HTMLDivElement>(null)
 
-  // Beam secundario: movimiento opuesto más lento (paralaje atmosférico)
-  const beamY2 = useTransform(scrollYProgress, [0, 1], ["10%", "80%"])
+  useGSAP(
+    () => {
+      if (prefersReducedMotion()) {
+        gsap.set(beam1Ref.current, { yPercent: 30, opacity: 0.55 })
+        gsap.set(beam2Ref.current, { yPercent: 20, opacity: 0.4 })
+        gsap.set(beam3Ref.current, { yPercent: 60, opacity: 0.25 })
+        return
+      }
 
-  // Beam terciario: lado derecho, aparece desde la mitad inferior del scroll
-  const beamY3 = useTransform(scrollYProgress, [0, 1], ["30%", "100%"])
+      // Mobile uses scrub:0.5 (matches getScrubValue) so the tween lags the
+      // scroll event stream — far fewer repaints under native momentum.
+      const isMobile = window.matchMedia("(max-width: 768px)").matches
+      const scrub = isMobile ? 0.5 : true
 
-  // Opacidad del beam principal: respira a lo largo del scroll
-  const beamOpacity = useTransform(
-    scrollYProgress,
-    [0, 0.15, 0.85, 1],
-    [0.35, 0.5, 0.5, 0.35],
-  )
+      gsap.set(beam1Ref.current, { yPercent: -20, opacity: 0.35 })
+      gsap.set(beam2Ref.current, { yPercent: 10, opacity: 0.5 })
+      gsap.set(beam3Ref.current, { yPercent: 30, opacity: 0 })
 
-  // Opacidad del beam terciario: crece en la mitad inferior del scroll
-  const beamOpacity3 = useTransform(
-    scrollYProgress,
-    [0, 0.3, 0.6, 1],
-    [0, 0.15, 0.28, 0.2],
+      const tl = gsap.timeline({
+        defaults: { ease: "none" },
+        scrollTrigger: {
+          trigger: document.body,
+          start: "top top",
+          end: "bottom bottom",
+          scrub,
+        },
+      })
+
+      // Beam 1 — linear y from -20% to 120%, opacity breathes 0.35→0.5→0.35
+      tl.to(beam1Ref.current, { yPercent: 120, duration: 1 }, 0)
+      tl.to(beam1Ref.current, { opacity: 0.5, duration: 0.15 }, 0)
+      tl.to(beam1Ref.current, { opacity: 0.5, duration: 0.7 }, 0.15)
+      tl.to(beam1Ref.current, { opacity: 0.35, duration: 0.15 }, 0.85)
+
+      // Beam 2 — linear y, static opacity
+      tl.to(beam2Ref.current, { yPercent: 80, duration: 1 }, 0)
+
+      // Beam 3 — linear y + opacity fade-in that peaks in the lower half
+      tl.to(beam3Ref.current, { yPercent: 100, duration: 1 }, 0)
+      tl.to(beam3Ref.current, { opacity: 0.15, duration: 0.3 }, 0)
+      tl.to(beam3Ref.current, { opacity: 0.28, duration: 0.3 }, 0.3)
+      tl.to(beam3Ref.current, { opacity: 0.2, duration: 0.4 }, 0.6)
+    },
+    { scope: wrapperRef },
   )
 
   return (
     <div
+      ref={wrapperRef}
       className="pointer-events-none fixed inset-0 z-[5] overflow-hidden"
       aria-hidden="true"
     >
       {/* Beam principal — vertical, centrado */}
-      <motion.div
+      <div
+        ref={beam1Ref}
         className="absolute left-1/2 -translate-x-1/2 w-[700px] h-[900px]"
         style={{
           background:
             "radial-gradient(ellipse at center, oklch(0.80 0.07 65 / 0.55) 0%, oklch(0.83 0.05 68 / 0.22) 40%, transparent 75%)",
           filter: "blur(90px)",
           mixBlendMode: "multiply",
-          y: prefersReduced ? "30%" : beamY1,
-          opacity: prefersReduced ? 0.55 : beamOpacity,
           willChange: "transform, opacity",
         }}
       />
 
-      {/* Beam secundario — off-center izquierda, movimiento opuesto */}
-      <motion.div
+      {/* Beam secundario — off-center izquierda */}
+      <div
+        ref={beam2Ref}
         className="absolute left-[20%] w-[500px] h-[700px]"
         style={{
           background:
             "radial-gradient(ellipse at center, oklch(0.82 0.06 72 / 0.35) 0%, transparent 70%)",
           filter: "blur(110px)",
           mixBlendMode: "multiply",
-          y: prefersReduced ? "20%" : beamY2,
-          opacity: prefersReduced ? 0.4 : 0.5,
           willChange: "transform",
         }}
       />
 
-      {/* Beam terciario — lado derecho, aparece en la mitad inferior */}
-      <motion.div
+      {/* Beam terciario — lado derecho */}
+      <div
+        ref={beam3Ref}
         className="absolute right-[15%] w-[550px] h-[750px]"
         style={{
           background:
             "radial-gradient(ellipse at center, oklch(0.72 0.10 45 / 0.40) 0%, transparent 70%)",
           filter: "blur(100px)",
           mixBlendMode: "multiply",
-          y: prefersReduced ? "60%" : beamY3,
-          opacity: prefersReduced ? 0.25 : beamOpacity3,
           willChange: "transform, opacity",
         }}
       />
