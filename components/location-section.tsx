@@ -6,7 +6,8 @@ import SplitType from "split-type"
 import { brand } from "@/config/brand"
 import { gsap, prefersReducedMotion, isTouchDevice, useGSAP } from "@/lib/gsapConfig"
 import { SpotlightCard } from "@/components/ui/spotlight-card"
-import { GlobeOrStatic } from "@/components/ui/globe-or-static"
+import Image from "next/image"
+import { GlobePolaroids } from "@/components/ui/cobe-globe-polaroids"
 
 const iconMap: Record<string, LucideIcon> = { MapPin, Car, Train }
 
@@ -202,7 +203,19 @@ export function LocationSection() {
         className="absolute -right-32 -bottom-24 lg:-right-40 lg:-bottom-32 w-[560px] lg:w-[720px] will-change-transform"
         aria-hidden="true"
       >
-        <GlobeOrStatic />
+        {/* Mobile: static image. Desktop: interactive cobe globe. */}
+        <div className="relative aspect-square md:hidden">
+          <Image
+            src="/world_png.png"
+            alt="Ubicación"
+            fill
+            className="object-contain opacity-60"
+            sizes="560px"
+          />
+        </div>
+        <div className="hidden md:block">
+          <GlobePolaroids />
+        </div>
       </div>
       <div className="relative container mx-auto px-4 lg:px-8">
         {/* Header */}
