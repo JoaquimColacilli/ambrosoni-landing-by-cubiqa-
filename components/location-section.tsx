@@ -6,7 +6,7 @@ import SplitType from "split-type"
 import { brand } from "@/config/brand"
 import { gsap, prefersReducedMotion, useGSAP } from "@/lib/gsapConfig"
 import { SpotlightCard } from "@/components/ui/spotlight-card"
-import { GlobePolaroids } from "@/components/ui/cobe-globe-polaroids"
+import { GlobeOrStatic } from "@/components/ui/globe-or-static"
 
 const iconMap: Record<string, LucideIcon> = { MapPin, Car, Train }
 
@@ -201,7 +201,7 @@ export function LocationSection() {
         className="absolute -right-32 -bottom-24 lg:-right-40 lg:-bottom-32 w-[560px] lg:w-[720px] will-change-transform"
         aria-hidden="true"
       >
-        <GlobePolaroids />
+        <GlobeOrStatic />
       </div>
       <div className="relative container mx-auto px-4 lg:px-8">
         {/* Header */}
