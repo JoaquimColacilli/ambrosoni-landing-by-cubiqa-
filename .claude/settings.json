@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /c/dev/AMBROSONI/public -type f \\\\\\( -name \"*.jpg\" -o -name \"*.png\" -o -name \"*.webp\" \\\\\\) -exec ls -lh {} \\\\;)",
+      "Bash(awk '{print $5, $9}')",
+      "Bash(find /c/dev/AMBROSONI/public/images -type f \\\\\\( -name \"*.jpg\" -o -name \"*.png\" -o -name \"*.webp\" \\\\\\) -exec ls -lh {} \\\\;)",
+      "Bash(awk '{size = $5; gsub\\(/K|M/, \"\", size\\); num = \\(index\\($5, \"M\"\\) > 0\\) ? size * 1024 : size; print \\(num > 300 ? \"OVER300: \" : \"OK: \"\\), $5, $9}')",
+      "Bash(awk '{print $7, $11}')",
+      "Bash(ls -lh /c/dev/AMBROSONI/public/images/*.jpg)",
+      "Bash(awk '{printf \"%-20s %s\\\\n\", $5, $9}')",
+      "Bash(npx tsc:*)",
+      "Bash(rm -rf .next)",
+      "Bash(npx next:*)",
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(rm -f build.err)"
+    ]
+  }
+}
