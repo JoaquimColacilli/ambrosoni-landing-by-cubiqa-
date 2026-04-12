@@ -1,9 +1,10 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { Waves, Dumbbell, Trees, Users, Car, Shield, Flame, X, Maximize2, type LucideIcon } from "lucide-react"
 import Image from "next/image"
 import SplitType from "split-type"
+import useEmblaCarousel from "embla-carousel-react"
 import { brand } from "@/config/brand"
 import { SpotlightCard } from "@/components/ui/spotlight-card"
 import { DotMatrix } from "@/components/ui/dot-matrix"
@@ -15,9 +16,29 @@ export function AmenitiesSection() {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null)
   const [energyCount, setEnergyCount] = useState(0)
   const [selectedAmenityIndex, setSelectedAmenityIndex] = useState<number | null>(null)
+  const [carouselIndex, setCarouselIndex] = useState(0)
   const sectionRef = useRef<HTMLElement>(null)
   const headerRef = useRef<HTMLDivElement>(null)
   const gridRef = useRef<HTMLDivElement>(null)
+
+  // Embla carousel for mobile only (rendered inside md:hidden)
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: true,
+    align: "start",
+    skipSnaps: false,
+  })
+
+  const onCarouselSelect = useCallback(() => {
+    if (!emblaApi) return
+    setCarouselIndex(emblaApi.selectedScrollSnap())
+  }, [emblaApi])
+
+  useEffect(() => {
+    if (!emblaApi) return
+    onCarouselSelect()
+    emblaApi.on("select", onCarouselSelect)
+    return () => { emblaApi.off("select", onCarouselSelect) }
+  }, [emblaApi, onCarouselSelect])
   const sustainableRef = useRef<HTMLDivElement>(null)
 
   useGSAP(
@@ -288,7 +309,8 @@ export function AmenitiesSection() {
           </p>
         </div>
 
-        <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Desktop grid — hidden on mobile */}
+        <div ref={gridRef} className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {brand.amenities.map((amenity, index) => {
             const Icon = iconMap[amenity.iconName] ?? Shield
             const isHovered = hoveredCard === index
@@ -327,6 +349,51 @@ export function AmenitiesSection() {
               </div>
             )
           })}
+        </div>
+
+        {/* Mobile carousel — hidden on md+ */}
+        <div className="md:hidden">
+          <div className="overflow-hidden" ref={emblaRef}>
+            <div className="flex gap-4">
+              {brand.amenities.map((amenity, index) => {
+                const Icon = iconMap[amenity.iconName] ?? Shield
+                return (
+                  <div
+                    key={index}
+                    className="relative h-64 min-w-[85%] flex-shrink-0 cursor-pointer"
+                    onClick={() => openModal(index)}
+                  >
+                    <div className="relative w-full h-64 rounded-xl overflow-hidden">
+                      <Image src={amenity.image || "/placeholder.svg"} alt={amenity.title} fill className="object-cover" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                      <div className="absolute inset-0 p-6 flex flex-col items-center justify-end text-center">
+                        <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center mb-3">
+                          <Icon className="text-white" size={28} />
+                        </div>
+                        <h3 className="text-lg font-bold mb-1 text-white">{amenity.title}</h3>
+                        <p className="text-xs text-white/90">{amenity.description}</p>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+          {/* Dots */}
+          <div className="flex justify-center gap-2 mt-4">
+            {brand.amenities.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => emblaApi?.scrollTo(index)}
+                className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                  index === carouselIndex
+                    ? "bg-black scale-110"
+                    : "bg-gray-300"
+                }`}
+                aria-label={`Ir a amenidad ${index + 1}`}
+              />
+            ))}
+          </div>
         </div>
 
         <div
