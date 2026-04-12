@@ -5,7 +5,7 @@ import { Maximize2 } from "lucide-react"
 import SplitType from "split-type"
 import { brand } from "@/config/brand"
 import { NetworkNodes } from "@/components/ui/network-nodes"
-import { gsap, prefersReducedMotion, useGSAP } from "@/lib/gsapConfig"
+import { gsap, prefersReducedMotion, isTouchDevice, useGSAP } from "@/lib/gsapConfig"
 
 export function ImmersiveSection() {
   const [selectedTour, setSelectedTour] = useState(brand.tours360[0]?.id ?? "")
@@ -28,6 +28,7 @@ export function ImmersiveSection() {
 
   useGSAP(
     () => {
+      if (isTouchDevice()) return
       const reduced = prefersReducedMotion()
 
       // ----------------------------------------------------------

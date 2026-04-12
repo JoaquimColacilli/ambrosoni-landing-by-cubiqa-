@@ -5,7 +5,7 @@ import { ChevronDown } from "lucide-react"
 import SplitType from "split-type"
 import { brand } from "@/config/brand"
 import { useMagnetic } from "@/hooks/use-magnetic"
-import { gsap, getScrubValue, useGSAP } from "@/lib/gsapConfig"
+import { gsap, getScrubValue, isTouchDevice, useGSAP } from "@/lib/gsapConfig"
 
 export function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -287,13 +287,10 @@ export function HeroSection() {
       )
 
       // --------------------------------------------------------------
-      // SCROLL-LINKED — parallax + fade-out. Not inside matchMedia
-      // because the behavior is the same across breakpoints; willChange
-      // stays set on these elements because the scrub can fire at any time.
+      // SCROLL-LINKED — parallax + fade-out. Skipped on touch devices
+      // so GSAP ticker stays idle during scroll after the entry completes.
       // --------------------------------------------------------------
-      if (sectionRef.current) {
-        // scrub:0.5 on mobile decouples the tween from iOS's native momentum
-        // scroll event stream — far fewer repaints per flick.
+      if (!isTouchDevice() && sectionRef.current) {
         const scrub = getScrubValue()
 
         if (imageWrapperRef.current) {

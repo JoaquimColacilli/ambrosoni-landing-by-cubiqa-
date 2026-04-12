@@ -5,7 +5,7 @@ import SplitType from "split-type"
 import { brand } from "@/config/brand"
 import { GooeyText } from "@/components/ui/gooey-text"
 import { FloatingPaths } from "@/components/ui/background-paths"
-import { gsap, ScrollTrigger, getScrubValue, prefersReducedMotion, useGSAP } from "@/lib/gsapConfig"
+import { gsap, ScrollTrigger, getScrubValue, prefersReducedMotion, isTouchDevice, useGSAP } from "@/lib/gsapConfig"
 
 export function ConceptSection() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -22,6 +22,10 @@ export function ConceptSection() {
 
   useGSAP(
     () => {
+      if (isTouchDevice()) {
+        setCounts(brand.stats.map((s) => s.value))
+        return
+      }
       const reduced = prefersReducedMotion()
 
       // Split the static top line "CONVERTIMOS CONCEPTOS EN"

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { brand, type UnitStatus, type Unit } from "@/config/brand"
 import { WarmMesh } from "@/components/ui/warm-mesh"
-import { gsap, prefersReducedMotion, useGSAP } from "@/lib/gsapConfig"
+import { gsap, prefersReducedMotion, isTouchDevice, useGSAP } from "@/lib/gsapConfig"
 
 const statusConfig: Record<UnitStatus, { label: string; color: string }> = {
   available: { label: "Disponible", color: "bg-primary text-primary-foreground" },
@@ -28,6 +28,7 @@ export function UnitsSection() {
 
   useGSAP(
     () => {
+      if (isTouchDevice()) return
       const reduced = prefersReducedMotion()
 
       // ----------------------------------------------------------

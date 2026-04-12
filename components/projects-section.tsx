@@ -7,7 +7,7 @@ import SplitType from "split-type"
 import { brand, type GalleryCategory } from "@/config/brand"
 import { SpotlightCard } from "@/components/ui/spotlight-card"
 import { GridPattern } from "@/components/ui/grid-pattern"
-import { gsap, prefersReducedMotion, useGSAP } from "@/lib/gsapConfig"
+import { gsap, prefersReducedMotion, isTouchDevice, useGSAP } from "@/lib/gsapConfig"
 
 const iconMap: Record<string, LucideIcon> = { Building2, Sparkles }
 
@@ -21,6 +21,7 @@ export function ProjectsSection() {
   // context (ScrollTriggers included) on unmount.
   useGSAP(
     () => {
+      if (isTouchDevice()) return
       const reduced = prefersReducedMotion()
 
       // ----------------------------------------------------------

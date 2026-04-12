@@ -10,7 +10,7 @@ import { Mail, Phone, MapPin } from "lucide-react"
 import SplitType from "split-type"
 import { brand } from "@/config/brand"
 import { AntiGravityCanvas } from "@/components/ui/particle-effect-for-hero"
-import { gsap, prefersReducedMotion, useGSAP } from "@/lib/gsapConfig"
+import { gsap, prefersReducedMotion, isTouchDevice, useGSAP } from "@/lib/gsapConfig"
 
 export function ContactSection() {
   const [formData, setFormData] = useState({
@@ -26,6 +26,7 @@ export function ContactSection() {
 
   useGSAP(
     () => {
+      if (isTouchDevice()) return
       const reduced = prefersReducedMotion()
 
       // ----------------------------------------------------------

@@ -4,7 +4,7 @@ import { useRef } from "react"
 import { MapPin, Clock, Car, Train, type LucideIcon } from "lucide-react"
 import SplitType from "split-type"
 import { brand } from "@/config/brand"
-import { gsap, prefersReducedMotion, useGSAP } from "@/lib/gsapConfig"
+import { gsap, prefersReducedMotion, isTouchDevice, useGSAP } from "@/lib/gsapConfig"
 import { SpotlightCard } from "@/components/ui/spotlight-card"
 import { GlobeOrStatic } from "@/components/ui/globe-or-static"
 
@@ -21,6 +21,7 @@ export function LocationSection() {
 
   useGSAP(
     () => {
+      if (isTouchDevice()) return
       const reduced = prefersReducedMotion()
 
       // ----------------------------------------------------------

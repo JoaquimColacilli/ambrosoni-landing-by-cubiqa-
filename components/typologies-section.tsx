@@ -74,6 +74,7 @@ export function TypologiesSection() {
 
   useGSAP(
     () => {
+      if (isTouchDevice()) return
       const reduced = prefersReducedMotion()
 
       // ----------------------------------------------------------

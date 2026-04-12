@@ -5,7 +5,7 @@ import Image from "next/image"
 import { Instagram, Mail, MapPin, Phone } from "lucide-react"
 import { brand } from "@/config/brand"
 import { NoiseGrainStars } from "@/components/ui/noise-grain-stars"
-import { gsap, prefersReducedMotion, useGSAP } from "@/lib/gsapConfig"
+import { gsap, prefersReducedMotion, isTouchDevice, useGSAP } from "@/lib/gsapConfig"
 
 export function Footer() {
   const year = new Date().getFullYear()
@@ -13,6 +13,7 @@ export function Footer() {
 
   useGSAP(
     () => {
+      if (isTouchDevice()) return
       const reduced = prefersReducedMotion()
       if (!footerRef.current) return
 

@@ -8,7 +8,7 @@ import useEmblaCarousel from "embla-carousel-react"
 import { brand } from "@/config/brand"
 import { SpotlightCard } from "@/components/ui/spotlight-card"
 import { DotMatrix } from "@/components/ui/dot-matrix"
-import { gsap, ScrollTrigger, prefersReducedMotion, useGSAP } from "@/lib/gsapConfig"
+import { gsap, ScrollTrigger, prefersReducedMotion, isTouchDevice, useGSAP } from "@/lib/gsapConfig"
 
 const iconMap: Record<string, LucideIcon> = { Waves, Dumbbell, Trees, Users, Car, Shield, Flame }
 
@@ -43,6 +43,10 @@ export function AmenitiesSection() {
 
   useGSAP(
     () => {
+      if (isTouchDevice()) {
+        setEnergyCount(100)
+        return
+      }
       const reduced = prefersReducedMotion()
 
       // ----------------------------------------------------------
