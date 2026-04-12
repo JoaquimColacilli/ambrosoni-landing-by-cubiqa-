@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef } from "react"
-import { gsap, getScrubValue, prefersReducedMotion, useGSAP } from "@/lib/gsapConfig"
+import { gsap, getScrubValue, prefersReducedMotion, isTouchDevice, useGSAP } from "@/lib/gsapConfig"
 
 interface GeometricShapesProps {
   className?: string
@@ -36,6 +36,7 @@ export function GeometricShapes({ className = "" }: GeometricShapesProps) {
 
   useGSAP(
     () => {
+      if (isTouchDevice()) return
       const reduced = prefersReducedMotion()
       if (!wrapperRef.current) return
 

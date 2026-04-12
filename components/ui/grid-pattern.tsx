@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import { gsap, prefersReducedMotion, useGSAP } from "@/lib/gsapConfig"
+import { gsap, prefersReducedMotion, isTouchDevice, useGSAP } from "@/lib/gsapConfig"
 
 interface GridPatternProps {
   className?: string
@@ -14,6 +14,7 @@ export function GridPattern({ className = "" }: GridPatternProps) {
 
   useGSAP(
     () => {
+      if (isTouchDevice()) return
       const reduced = prefersReducedMotion()
       if (!wrapperRef.current || !svgRef.current) return
 
@@ -36,6 +37,7 @@ export function GridPattern({ className = "" }: GridPatternProps) {
   )
 
   useEffect(() => {
+    if (isTouchDevice()) return
     const handleMove = (e: MouseEvent) => {
       if (!wrapperRef.current || !cursorLightRef.current) return
       const rect = wrapperRef.current.getBoundingClientRect()

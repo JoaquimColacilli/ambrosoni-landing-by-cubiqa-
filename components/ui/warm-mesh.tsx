@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef } from "react"
-import { gsap, prefersReducedMotion, useGSAP } from "@/lib/gsapConfig"
+import { gsap, prefersReducedMotion, isTouchDevice, useGSAP } from "@/lib/gsapConfig"
 
 interface WarmMeshProps {
   className?: string
@@ -31,6 +31,13 @@ export function WarmMesh({ className = "", variant = "a" }: WarmMeshProps) {
 
   useGSAP(
     () => {
+      // Touch: show immediately (CSS has opacity-0, one-shot gsap.set flips
+      // it without creating a ScrollTrigger or any ongoing ticker work).
+      if (isTouchDevice()) {
+        if (wrapperRef.current) gsap.set(wrapperRef.current, { opacity: 1 })
+        return
+      }
+
       const reduced = prefersReducedMotion()
       if (!wrapperRef.current) return
 

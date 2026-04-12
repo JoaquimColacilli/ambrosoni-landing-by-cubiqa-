@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef } from "react"
-import { gsap, useGSAP, prefersReducedMotion } from "@/lib/gsapConfig"
+import { gsap, useGSAP, prefersReducedMotion, isTouchDevice } from "@/lib/gsapConfig"
 
 // FloatingPaths — 20 SVG stroke paths with a looping dashoffset shimmer plus a
 // breathing opacity. Migrated from framer-motion to GSAP so that in sections
@@ -31,7 +31,7 @@ export function FloatingPaths({
 
   useGSAP(
     () => {
-      if (!svgRef.current || prefersReducedMotion()) return
+      if (!svgRef.current || isTouchDevice() || prefersReducedMotion()) return
 
       const pathEls = svgRef.current.querySelectorAll<SVGPathElement>("[data-floating-path]")
 
