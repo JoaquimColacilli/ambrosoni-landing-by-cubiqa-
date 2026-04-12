@@ -10,7 +10,7 @@ import { useReducedMotion } from "@/hooks/use-reduced-motion"
 import { brand } from "@/config/brand"
 import { SpotlightCard } from "@/components/ui/spotlight-card"
 import { WarmMesh } from "@/components/ui/warm-mesh"
-import { gsap, prefersReducedMotion, useGSAP } from "@/lib/gsapConfig"
+import { gsap, prefersReducedMotion, isTouchDevice, useGSAP } from "@/lib/gsapConfig"
 
 export function TypologiesSection() {
   const [selectedPlanImage, setSelectedPlanImage] = useState<string | null>(null)
@@ -230,7 +230,9 @@ export function TypologiesSection() {
   const closeLightbox = () => {
     setSelectedPlanImage(null)
     setSelectedPlanAlt("")
-    // overflow restored in AnimatePresence onExitComplete to avoid scroll during fade-out
+    // Touch: restore overflow immediately (no exit animation).
+    // Desktop: restored in AnimatePresence onExitComplete to avoid scroll during fade-out.
+    if (isTouchDevice()) document.body.style.overflow = "unset"
   }
 
   useEffect(() => {
@@ -290,6 +292,7 @@ export function TypologiesSection() {
                         src={typology.planImage || "/placeholder.svg"}
                         alt={`Plano de tipología ${typology.name}, ${typology.coveredArea}m² cubiertos`}
                         fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                         className="object-cover transition-transform duration-700 group-hover:scale-105"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -368,28 +371,11 @@ export function TypologiesSection() {
         </div>
       </div>
 
-      {/* Lightbox Modal (inline, pattern copied from projects-section) */}
-      <AnimatePresence onExitComplete={() => { document.body.style.overflow = "unset" }}>
-        {selectedPlanImage && (
-          <motion.div
-            key="typologies-lightbox"
-            initial={{ opacity: 0, transform: "scale(0.96)" }}
-            animate={{
-              opacity: 1,
-              transform: "scale(1)",
-              transition: {
-                duration: prefersReducedMotionHook ? 0 : 0.25,
-                ease: [0.23, 1, 0.32, 1],
-              },
-            }}
-            exit={{
-              opacity: 0,
-              transform: "scale(0.98)",
-              transition: {
-                duration: prefersReducedMotionHook ? 0 : 0.18,
-                ease: [0.23, 1, 0.32, 1],
-              },
-            }}
+      {/* Lightbox Modal — touch: instant show/hide (no JS ticker during
+           image decode); desktop: framer-motion animated entry/exit. */}
+      {isTouchDevice() ? (
+        selectedPlanImage && (
+          <div
             className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4"
             onClick={closeLightbox}
           >
@@ -400,7 +386,6 @@ export function TypologiesSection() {
             >
               <X size={32} />
             </button>
-
             <div
               className="relative w-full max-w-6xl h-full flex flex-col items-center justify-center py-20"
               onClick={(e) => e.stopPropagation()}
@@ -408,21 +393,77 @@ export function TypologiesSection() {
               <div className="text-center mb-6">
                 <h3 className="text-2xl font-bold text-white">{selectedPlanAlt}</h3>
               </div>
-
               <div className="relative w-full flex-1 max-h-[calc(100vh-200px)] flex items-center justify-center">
                 <div className="relative w-full h-full rounded-lg overflow-hidden bg-black">
                   <Image
                     src={selectedPlanImage || "/placeholder.svg"}
                     alt={selectedPlanAlt}
                     fill
+                    sizes="(max-width: 768px) 100vw, 80vw"
                     className="object-contain"
+                    priority
                   />
                 </div>
               </div>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
+        )
+      ) : (
+        <AnimatePresence onExitComplete={() => { document.body.style.overflow = "unset" }}>
+          {selectedPlanImage && (
+            <motion.div
+              key="typologies-lightbox"
+              initial={{ opacity: 0, transform: "scale(0.96)" }}
+              animate={{
+                opacity: 1,
+                transform: "scale(1)",
+                transition: {
+                  duration: prefersReducedMotionHook ? 0 : 0.25,
+                  ease: [0.23, 1, 0.32, 1],
+                },
+              }}
+              exit={{
+                opacity: 0,
+                transform: "scale(0.98)",
+                transition: {
+                  duration: prefersReducedMotionHook ? 0 : 0.18,
+                  ease: [0.23, 1, 0.32, 1],
+                },
+              }}
+              className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4"
+              onClick={closeLightbox}
+            >
+              <button
+                onClick={closeLightbox}
+                className="absolute top-6 right-6 text-white hover:text-gray-300 transition-colors z-50 p-2 hover:bg-white/10 rounded-full"
+                aria-label="Cerrar"
+              >
+                <X size={32} />
+              </button>
+              <div
+                className="relative w-full max-w-6xl h-full flex flex-col items-center justify-center py-20"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="text-center mb-6">
+                  <h3 className="text-2xl font-bold text-white">{selectedPlanAlt}</h3>
+                </div>
+                <div className="relative w-full flex-1 max-h-[calc(100vh-200px)] flex items-center justify-center">
+                  <div className="relative w-full h-full rounded-lg overflow-hidden bg-black">
+                    <Image
+                      src={selectedPlanImage || "/placeholder.svg"}
+                      alt={selectedPlanAlt}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 80vw"
+                      className="object-contain"
+                      priority
+                    />
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
     </section>
   )
 }
