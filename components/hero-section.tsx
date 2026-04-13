@@ -71,6 +71,7 @@ export function HeroSection() {
             if (imageRef.current) gsap.set(imageRef.current, { scale: 1 })
             if (splitTitle?.chars) {
               gsap.set(splitTitle.chars, { opacity: 1, yPercent: 0, rotateX: 0 })
+              if (titleRef.current) gsap.set(titleRef.current, { opacity: 1 })
             } else if (titleRef.current) {
               gsap.set(titleRef.current, { opacity: 1, y: 0 })
             }
@@ -202,6 +203,9 @@ export function HeroSection() {
               charTo.rotateX = 0
             }
             tl.fromTo(splitTitle.chars, charFrom, charTo, 0.6)
+            // Chars are now at opacity:0 (immediateRender). Reveal the h1
+            // container so the chars become visible when they animate in.
+            if (titleRef.current) gsap.set(titleRef.current, { opacity: 1 })
           } else if (titleRef.current) {
             tl.fromTo(
               titleRef.current,
@@ -346,7 +350,7 @@ export function HeroSection() {
       className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background"
     >
       {/* Background Image */}
-      <div ref={imageWrapperRef} className="absolute inset-0">
+      <div ref={imageWrapperRef} className="absolute inset-0 opacity-0">
         {/* Dark overlay for text readability */}
         <div className="absolute inset-0 bg-black/40 z-10" />
         <img
@@ -361,7 +365,7 @@ export function HeroSection() {
       <div ref={contentRef} className="relative z-20 container mx-auto px-4 text-center">
         <h1
           ref={titleRef}
-          className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold mb-6 tracking-tight text-balance text-white px-4"
+          className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold mb-6 tracking-tight text-balance text-white px-4 opacity-0"
         >
           EXPERIENCIAS
           <br />
@@ -369,7 +373,7 @@ export function HeroSection() {
         </h1>
         <p
           ref={subtitleRef}
-          className="text-xl md:text-2xl text-white max-w-2xl mx-auto mb-12 text-pretty"
+          className="text-xl md:text-2xl text-white max-w-2xl mx-auto mb-12 text-pretty opacity-0"
         >
           Convertimos conceptos en realidades inmersivas antes de que existan
         </p>
@@ -383,7 +387,7 @@ export function HeroSection() {
             onMouseMove={primaryMagnetic.handleMouseMove}
             onMouseLeave={primaryMagnetic.handleMouseLeave}
             href="#experiencia"
-            className="group px-8 py-4 bg-white text-black rounded-lg font-semibold hover:bg-white/90 active:scale-[0.97] transition-transform duration-300 ease-out animate-glow-pulse"
+            className="group px-8 py-4 bg-white text-black rounded-lg font-semibold hover:bg-white/90 active:scale-[0.97] transition-transform duration-300 ease-out animate-glow-pulse opacity-0"
           >
             {brand.cta.primary}
             <span className="inline-block ml-2 transition-transform duration-300 group-hover:translate-x-1">→</span>
@@ -394,7 +398,7 @@ export function HeroSection() {
             onMouseMove={secondaryMagnetic.handleMouseMove}
             onMouseLeave={secondaryMagnetic.handleMouseLeave}
             href="#contacto"
-            className="px-8 py-4 bg-transparent border-2 border-white text-white rounded-lg font-semibold hover:bg-white hover:text-black active:scale-[0.97] transition-transform duration-300 ease-out"
+            className="px-8 py-4 bg-transparent border-2 border-white text-white rounded-lg font-semibold hover:bg-white hover:text-black active:scale-[0.97] transition-transform duration-300 ease-out opacity-0"
           >
             {brand.cta.secondary}
           </a>
@@ -404,7 +408,7 @@ export function HeroSection() {
       {/* Scroll Indicator */}
       <div
         ref={scrollIndicatorRef}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 animate-bounce"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 animate-bounce opacity-0"
       >
         <ChevronDown className="text-white" size={32} />
       </div>
