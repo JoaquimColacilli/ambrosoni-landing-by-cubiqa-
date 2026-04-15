@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useRef } from "react"
 import { ChevronDown } from "lucide-react"
 import SplitType from "split-type"
 import { brand } from "@/config/brand"
@@ -349,44 +349,6 @@ export function HeroSection() {
   // Wire CSS reveal for the divider under the title (touch only; desktop
   // renders the line full-width without animation).
   useScrollReveal(sectionRef)
-
-  // Touch-only subtle parallax on the bg image. Passive scroll listener,
-  // rAF-throttled, 15px cap. Runs after GSAP entry completes without
-  // fighting it (entry cleans its transforms onComplete).
-  useEffect(() => {
-    if (typeof window === "undefined") return
-    const isTouch = window.matchMedia("(hover: none) and (pointer: coarse)").matches
-    if (!isTouch) return
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    if (reduced) return
-
-    const wrap = imageWrapperRef.current
-    const section = sectionRef.current
-    if (!wrap || !section) return
-
-    const MAX = 15
-    let rafId: number | null = null
-
-    const update = () => {
-      rafId = null
-      const rect = section.getBoundingClientRect()
-      const progress = Math.max(0, Math.min(1, -rect.top / Math.max(1, rect.height)))
-      wrap.style.transform = `translate3d(0, ${progress * MAX}px, 0)`
-    }
-
-    const onScroll = () => {
-      if (rafId !== null) return
-      rafId = requestAnimationFrame(update)
-    }
-
-    window.addEventListener("scroll", onScroll, { passive: true })
-
-    return () => {
-      window.removeEventListener("scroll", onScroll)
-      if (rafId !== null) cancelAnimationFrame(rafId)
-      wrap.style.transform = ""
-    }
-  }, [])
 
   return (
     <section

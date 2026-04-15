@@ -34,15 +34,6 @@ export type Stat = {
   label: string
 }
 
-export type Amenity = {
-  id: string
-  iconName: string // nombre del icono de lucide-react (se resuelve en el componente)
-  title: string
-  description: string
-  details: string
-  image: string
-}
-
 export type UnitStatus = "available" | "reserved" | "sold"
 
 export type Unit = {
@@ -154,7 +145,6 @@ export const brand = {
     { label: "Concepto", href: "#concepto" },
     { label: "Experiencia 360°", href: "#experiencia" },
     { label: "Galería", href: "#galeria" },
-    { label: "Amenidades", href: "#amenidades" },
     { label: "Unidades", href: "#unidades" },
     { label: "Tipologías", href: "#tipologias" },
     { label: "Ubicación", href: "#ubicacion" },
@@ -189,58 +179,6 @@ export const brand = {
     },
   ] satisfies Stat[],
 
-  // --- Amenities ---
-  amenities: [
-    {
-      id: "pileta",
-      iconName: "Waves",
-      title: "Pileta", // TODO: contenido real pendiente de Cubiqa
-      description: "Pileta descubierta con solarium y deck de madera", // TODO: contenido real pendiente de Cubiqa
-      details: "Zona de descanso con reposeras y duchas", // TODO: contenido real pendiente de Cubiqa
-      image: "/images/amb-06.jpg",
-    },
-    {
-      id: "gimnasio",
-      iconName: "Dumbbell",
-      title: "Gimnasio", // TODO: contenido real pendiente de Cubiqa
-      description: "Equipamiento completo para entrenamiento", // TODO: contenido real pendiente de Cubiqa
-      details: "Zona de pesas, cardio y funcional", // TODO: contenido real pendiente de Cubiqa
-      image: "/images/amb-05.jpg",
-    },
-    {
-      id: "sum",
-      iconName: "Users",
-      title: "SUM", // TODO: contenido real pendiente de Cubiqa
-      description: "Salón de usos múltiples para eventos", // TODO: contenido real pendiente de Cubiqa
-      details: "Capacidad para 40 personas, cocina integrada", // TODO: contenido real pendiente de Cubiqa
-      image: "/images/amb-03.jpg",
-    },
-    {
-      id: "cochera",
-      iconName: "Car",
-      title: "Cocheras", // TODO: contenido real pendiente de Cubiqa
-      description: "Cocheras cubiertas con acceso directo", // TODO: contenido real pendiente de Cubiqa
-      details: "Seguridad 24/7 y acceso por control remoto", // TODO: contenido real pendiente de Cubiqa
-      image: "/images/amb-11.jpg",
-    },
-    {
-      id: "seguridad",
-      iconName: "Shield",
-      title: "Seguridad", // TODO: contenido real pendiente de Cubiqa
-      description: "Vigilancia perimetral y control de accesos", // TODO: contenido real pendiente de Cubiqa
-      details: "Cámaras HD, portero eléctrico, cerco perimetral", // TODO: contenido real pendiente de Cubiqa
-      image: "/images/amb-12.jpg",
-    },
-    {
-      id: "parrillas",
-      iconName: "Flame",
-      title: "Parrillas", // TODO: contenido real pendiente de Cubiqa
-      description: "Sector de parrillas con quincho cubierto", // TODO: contenido real pendiente de Cubiqa
-      details: "Dos parrillas equipadas con mesada y bacha", // TODO: contenido real pendiente de Cubiqa
-      image: "/images/amb-13.jpg",
-    },
-  ] satisfies Amenity[],
-
   // --- Unidades disponibles ---
   units: [
     { floor: 6, unit: "A", rooms: 2, sqm: 55, status: "available", price: "USD 85.000" }, // TODO: dato real pendiente de Cubiqa
@@ -274,8 +212,8 @@ export const brand = {
       url: null, // TODO: URL Kuula pendiente de Cubiqa
     },
     {
-      id: "amenities",
-      title: "Amenities",
+      id: "espacios-comunes",
+      title: "Espacios Comunes",
       description: "Espacios comunes diseñados para disfrutar", // TODO: copy pendiente de cliente
       url: null, // TODO: URL Kuula pendiente de Cubiqa
     },
@@ -299,12 +237,12 @@ export const brand = {
       ],
     },
     {
-      id: "amenities",
-      name: "Amenities",
+      id: "espacios-comunes",
+      name: "Espacios Comunes",
       iconName: "Sparkles",
       subtitle: "Experiencias que elevan tu estilo de vida", // TODO: copy pendiente de cliente
       description:
-        "Espacios comunes pensados para el disfrute y el bienestar. Cada amenity está diseñado para enriquecer tu día a día.", // TODO: copy pendiente de cliente
+        "Espacios comunes pensados para el disfrute y el bienestar. Cada espacio está diseñado para enriquecer tu día a día.", // TODO: copy pendiente de cliente
       images: [
         "/images/amb-05.jpg",
         "/images/amb-06.jpg",

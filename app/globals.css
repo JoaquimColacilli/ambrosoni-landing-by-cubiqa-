@@ -292,7 +292,10 @@
 @media (hover: none) and (pointer: coarse) {
   [data-reveal] {
     opacity: 0;
-    will-change: opacity, transform;
+    /* No blanket will-change here — it pins a compositor layer per element
+     * from mount, and with 20+ reveals on a page that's too many layers for
+     * iOS Safari. will-change is applied below only while the animation runs
+     * and cleared via .is-revealed-done on animationend. */
   }
   [data-reveal="fade-up"]        { transform: translate3d(0, 24px, 0); }
   [data-reveal="slide-in-left"]  { transform: translate3d(-40px, 0, 0); }
@@ -301,6 +304,7 @@
   [data-reveal="reveal-line"]    { opacity: 1; transform: scaleX(0); transform-origin: left center; }
 
   [data-reveal].is-revealed {
+    will-change: opacity, transform;
     animation-duration: 600ms;
     animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
     animation-fill-mode: forwards;
