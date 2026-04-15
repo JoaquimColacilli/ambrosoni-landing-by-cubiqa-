@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { brand, type UnitStatus, type Unit } from "@/config/brand"
 import { WarmMesh } from "@/components/ui/warm-mesh"
+import { useScrollReveal } from "@/hooks/useScrollReveal"
 import { gsap, prefersReducedMotion, isTouchDevice, useGSAP } from "@/lib/gsapConfig"
 
 const statusConfig: Record<UnitStatus, { label: string; color: string }> = {
@@ -189,6 +190,9 @@ export function UnitsSection() {
     { scope: sectionRef },
   )
 
+  // Touch-only CSS reveal (header + filters + table wrapper + legend).
+  useScrollReveal(sectionRef)
+
   const handleConsult = (unit: Unit) => {
     const unitInfo = `Piso ${unit.floor}, Unidad ${unit.unit} - ${unit.rooms} ambientes, ${unit.sqm}m² - ${unit.price}`
 
@@ -224,17 +228,29 @@ export function UnitsSection() {
         <div ref={headerRef} className="text-center mb-16" style={{ perspective: "1000px" }}>
           <span
             data-eyebrow
+            data-reveal="fade-up"
             className="text-black text-sm font-semibold tracking-wider uppercase"
           >
             Disponibilidad
           </span>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 text-balance text-black">
+          <h2
+            data-reveal="fade-up"
+            style={{ ["--reveal-delay" as string]: "80ms" }}
+            className="text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 text-balance text-black"
+          >
             Tu espacio <span className="text-black">perfecto</span>
           </h2>
+          <div
+            data-reveal="reveal-line"
+            style={{ ["--reveal-delay" as string]: "180ms" }}
+            className="h-px w-16 bg-black/30 mx-auto"
+            aria-hidden="true"
+          />
         </div>
 
         <div ref={filtersRef} className="flex justify-center gap-3 mb-12">
           <Button
+            data-reveal="fade-up"
             variant={selectedRooms === null ? "default" : "outline"}
             onClick={() => { hasInteracted.current = true; setSelectedRooms(null) }}
             className={
@@ -246,6 +262,8 @@ export function UnitsSection() {
             Todos
           </Button>
           <Button
+            data-reveal="fade-up"
+            style={{ ["--reveal-delay" as string]: "80ms" }}
             variant={selectedRooms === 2 ? "default" : "outline"}
             onClick={() => { hasInteracted.current = true; setSelectedRooms(2) }}
             className={
@@ -257,6 +275,8 @@ export function UnitsSection() {
             2 Ambientes
           </Button>
           <Button
+            data-reveal="fade-up"
+            style={{ ["--reveal-delay" as string]: "160ms" }}
             variant={selectedRooms === 3 ? "default" : "outline"}
             onClick={() => { hasInteracted.current = true; setSelectedRooms(3) }}
             className={
@@ -271,6 +291,8 @@ export function UnitsSection() {
 
         <div
           ref={tableWrapperRef}
+          data-reveal="fade-up"
+          style={{ ["--reveal-delay" as string]: "120ms" }}
           className="bg-white border border-gray-300 rounded-xl overflow-hidden will-change-transform"
         >
           <div className="overflow-x-auto">
@@ -360,8 +382,14 @@ export function UnitsSection() {
         </div>
 
         <div ref={legendRef} className="flex flex-wrap justify-center gap-6 mt-8">
-          {Object.entries(statusConfig).map(([key, config]) => (
-            <div key={key} data-legend-item className="flex items-center gap-2">
+          {Object.entries(statusConfig).map(([key, config], i) => (
+            <div
+              key={key}
+              data-legend-item
+              data-reveal="fade-up"
+              style={{ ["--reveal-delay" as string]: `${i * 80}ms` }}
+              className="flex items-center gap-2"
+            >
               <div className={`w-3 h-3 rounded-full ${config.color.split(" ")[0]}`} />
               <span className="text-sm text-gray-600">{config.label}</span>
             </div>

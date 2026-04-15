@@ -4,6 +4,7 @@ import { useRef } from "react"
 import { MapPin, Clock, Car, Train, type LucideIcon } from "lucide-react"
 import SplitType from "split-type"
 import { brand } from "@/config/brand"
+import { useScrollReveal } from "@/hooks/useScrollReveal"
 import { gsap, prefersReducedMotion, isTouchDevice, useGSAP } from "@/lib/gsapConfig"
 import { SpotlightCard } from "@/components/ui/spotlight-card"
 import Image from "next/image"
@@ -196,6 +197,9 @@ export function LocationSection() {
     { scope: sectionRef },
   )
 
+  // Touch-only CSS reveal (header fade-up + map scale-in + POI stagger).
+  useScrollReveal(sectionRef)
+
   return (
     <section id="ubicacion" ref={sectionRef} className="relative py-16 bg-gray-50 overflow-hidden">
       <div
@@ -222,14 +226,23 @@ export function LocationSection() {
         <div ref={headerRef} className="text-center mb-16" style={{ perspective: "1000px" }}>
           <span
             data-eyebrow
+            data-reveal="fade-up"
             className="text-black text-sm font-semibold tracking-wider uppercase"
           >
             Ubicación
           </span>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 text-balance text-black">
+          <h2
+            data-reveal="fade-up"
+            style={{ ["--reveal-delay" as string]: "80ms" }}
+            className="text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 text-balance text-black"
+          >
             En el corazón de <span className="text-black">todo</span>
           </h2>
-          <p className="text-lg text-gray-700 max-w-2xl mx-auto text-pretty">
+          <p
+            data-reveal="fade-up"
+            style={{ ["--reveal-delay" as string]: "160ms" }}
+            className="text-lg text-gray-700 max-w-2xl mx-auto text-pretty"
+          >
             Conectividad premium en la zona más exclusiva de la ciudad
           </p>
         </div>
@@ -238,6 +251,7 @@ export function LocationSection() {
           {/* Map */}
           <div
             ref={mapRef}
+            data-reveal="scale-in"
             className="relative aspect-square rounded-xl overflow-hidden bg-gray-100 will-change-transform"
           >
             <iframe
@@ -259,14 +273,22 @@ export function LocationSection() {
 
           {/* Nearby Places */}
           <div ref={poisWrapperRef} className="space-y-6">
-            <h3 ref={poisHeadingRef} className="text-2xl font-bold mb-8 text-black">
+            <h3
+              ref={poisHeadingRef}
+              data-reveal="slide-in-right"
+              className="text-2xl font-bold mb-8 text-black"
+            >
               Puntos de Interés
             </h3>
             {brand.nearbyPlaces.map((place, index) => {
               const Icon = iconMap[place.iconName] ?? MapPin
               return (
-                <SpotlightCard
+                <div
                   key={index}
+                  data-reveal="slide-in-left"
+                  style={{ ["--reveal-delay" as string]: `${index * 80}ms` }}
+                >
+                <SpotlightCard
                   className="bg-white border border-gray-300 rounded-lg"
                   spotlightSize={350}
                 >
@@ -287,12 +309,14 @@ export function LocationSection() {
                     </div>
                   </div>
                 </SpotlightCard>
+                </div>
               )
             })}
 
             {/* Address */}
             <div
               ref={addressRef}
+              data-reveal="fade-up"
               className="mt-12 p-6 bg-white border border-gray-300 rounded-lg"
             >
               <h4 className="font-semibold mb-2 text-black">Dirección</h4>

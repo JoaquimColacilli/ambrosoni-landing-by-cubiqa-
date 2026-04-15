@@ -8,6 +8,7 @@ import useEmblaCarousel from "embla-carousel-react"
 import { brand } from "@/config/brand"
 import { SpotlightCard } from "@/components/ui/spotlight-card"
 import { DotMatrix } from "@/components/ui/dot-matrix"
+import { useScrollReveal } from "@/hooks/useScrollReveal"
 import { gsap, ScrollTrigger, prefersReducedMotion, isTouchDevice, useGSAP } from "@/lib/gsapConfig"
 
 const iconMap: Record<string, LucideIcon> = { Waves, Dumbbell, Trees, Users, Car, Shield, Flame }
@@ -43,10 +44,8 @@ export function AmenitiesSection() {
 
   useGSAP(
     () => {
-      if (isTouchDevice()) {
-        setEnergyCount(100)
-        return
-      }
+      // Touch: CSS reveal + IO counter below drive the mobile entrance.
+      if (isTouchDevice()) return
       const reduced = prefersReducedMotion()
 
       // ----------------------------------------------------------
@@ -260,6 +259,55 @@ export function AmenitiesSection() {
     { scope: sectionRef },
   )
 
+  // Touch-only CSS reveal (header, sustainable card, stat blocks).
+  useScrollReveal(sectionRef)
+
+  // Touch-only energy counter: IntersectionObserver + rAF ease-out-cubic.
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    const isTouch = window.matchMedia("(hover: none) and (pointer: coarse)").matches
+    if (!isTouch) return
+    const node = sustainableRef.current
+    if (!node) return
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    if (reduced) {
+      setEnergyCount(100)
+      return
+    }
+
+    let rafId: number | null = null
+    let cancelled = false
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return
+          io.unobserve(node)
+          const start = performance.now()
+          const duration = 1800
+          const tick = (now: number) => {
+            if (cancelled) return
+            const t = Math.min(1, (now - start) / duration)
+            const eased = 1 - Math.pow(1 - t, 3)
+            setEnergyCount(Math.round(100 * eased))
+            if (t < 1) rafId = requestAnimationFrame(tick)
+            else setEnergyCount(100)
+          }
+          rafId = requestAnimationFrame(tick)
+        })
+      },
+      { rootMargin: "0px 0px -10% 0px", threshold: 0.1 },
+    )
+    io.observe(node)
+
+    return () => {
+      cancelled = true
+      if (rafId !== null) cancelAnimationFrame(rafId)
+      io.disconnect()
+    }
+  }, [])
+
   const openModal = (index: number) => {
     setSelectedAmenityIndex(index)
     document.body.style.overflow = "hidden"
@@ -301,14 +349,23 @@ export function AmenitiesSection() {
         <div ref={headerRef} className="text-center mb-16" style={{ perspective: "1000px" }}>
           <span
             data-eyebrow
+            data-reveal="fade-up"
             className="text-black text-sm font-semibold tracking-wider uppercase"
           >
             Amenidades
           </span>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 text-balance text-black">
+          <h2
+            data-reveal="fade-up"
+            style={{ ["--reveal-delay" as string]: "80ms" }}
+            className="text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 text-balance text-black"
+          >
             Vivir como <span className="text-black">experiencia</span>
           </h2>
-          <p className="text-lg text-gray-700 max-w-2xl mx-auto text-pretty">
+          <p
+            data-reveal="fade-up"
+            style={{ ["--reveal-delay" as string]: "160ms" }}
+            className="text-lg text-gray-700 max-w-2xl mx-auto text-pretty"
+          >
             Cada detalle pensado para elevar tu calidad de vida
           </p>
         </div>
@@ -402,23 +459,44 @@ export function AmenitiesSection() {
 
         <div
           ref={sustainableRef}
+          data-reveal="fade-up"
           className="mt-16 bg-black text-white rounded-2xl p-12 will-change-transform"
           style={{ perspective: "1000px" }}
         >
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div data-sustain-left>
-              <h3 className="text-3xl md:text-4xl font-bold mb-4">Diseño Sustentable</h3>
-              <p className="text-lg text-gray-300 leading-relaxed">
+              <h3
+                data-reveal="fade-up"
+                style={{ ["--reveal-delay" as string]: "120ms" }}
+                className="text-3xl md:text-4xl font-bold mb-4"
+              >
+                Diseño Sustentable
+              </h3>
+              <p
+                data-reveal="fade-up"
+                style={{ ["--reveal-delay" as string]: "200ms" }}
+                className="text-lg text-gray-300 leading-relaxed"
+              >
                 Cada amenidad fue diseñada con criterios de eficiencia energética y respeto por el medio ambiente,
                 combinando lujo con responsabilidad.
               </p>
             </div>
             <div className="grid grid-cols-2 gap-4 text-center">
-              <div data-sustain-stat className="bg-white/10 rounded-lg p-6">
+              <div
+                data-sustain-stat
+                data-reveal="scale-in"
+                style={{ ["--reveal-delay" as string]: "280ms" }}
+                className="bg-white/10 rounded-lg p-6"
+              >
                 <div className="text-4xl font-bold mb-2">{energyCount}%</div>
                 <div className="text-sm text-gray-300">Energía Renovable</div>
               </div>
-              <div data-sustain-stat className="bg-white/10 rounded-lg p-6">
+              <div
+                data-sustain-stat
+                data-reveal="scale-in"
+                style={{ ["--reveal-delay" as string]: "360ms" }}
+                className="bg-white/10 rounded-lg p-6"
+              >
                 <div className="text-4xl font-bold mb-2">A+</div>
                 <div className="text-sm text-gray-300">Certificación</div>
               </div>

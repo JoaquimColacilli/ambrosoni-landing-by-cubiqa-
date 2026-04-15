@@ -5,6 +5,7 @@ import { Maximize2 } from "lucide-react"
 import SplitType from "split-type"
 import { brand } from "@/config/brand"
 import { NetworkNodes } from "@/components/ui/network-nodes"
+import { useScrollReveal } from "@/hooks/useScrollReveal"
 import { gsap, prefersReducedMotion, isTouchDevice, useGSAP } from "@/lib/gsapConfig"
 
 export function ImmersiveSection() {
@@ -260,6 +261,10 @@ export function ImmersiveSection() {
     { scope: sectionRef },
   )
 
+  // Touch-only CSS reveal (header fade-up + tabs stagger + tour scale-in +
+  // tech card slide-in-right).
+  useScrollReveal(sectionRef)
+
   const toggleFullscreen = () => {
     const container = iframeRef.current
     if (!container) return
@@ -293,24 +298,35 @@ export function ImmersiveSection() {
         <div ref={headerRef} className="text-center mb-16" style={{ perspective: "1000px" }}>
           <span
             data-eyebrow
+            data-reveal="fade-up"
             className="text-black text-sm font-semibold tracking-wider uppercase"
           >
             Experiencia Inmersiva
           </span>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 text-balance text-black">
+          <h2
+            data-reveal="fade-up"
+            style={{ ["--reveal-delay" as string]: "80ms" }}
+            className="text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 text-balance text-black"
+          >
             Caminá por tu futuro hogar
             <br />
             <span className="text-black">antes de que exista</span>
           </h2>
-          <p className="text-lg text-gray-700 max-w-2xl mx-auto text-pretty">
+          <p
+            data-reveal="fade-up"
+            style={{ ["--reveal-delay" as string]: "160ms" }}
+            className="text-lg text-gray-700 max-w-2xl mx-auto text-pretty"
+          >
             Explorá cada rincón con nuestra tecnología de recorrido virtual 360°
           </p>
         </div>
 
         <div ref={tabsRef} className="flex flex-wrap justify-center gap-3 mb-12">
-          {brand.tours360.map((tour) => (
+          {brand.tours360.map((tour, i) => (
             <button
               key={tour.id}
+              data-reveal="fade-up"
+              style={{ ["--reveal-delay" as string]: `${i * 70}ms` }}
               onClick={() => setSelectedTour(tour.id)}
               className={`px-6 py-3 rounded-full font-medium transition-all duration-300 ${
                 selectedTour === tour.id
@@ -324,15 +340,19 @@ export function ImmersiveSection() {
         </div>
 
         <div ref={tourWrapperRef}>
-          <div ref={tourTitleRef} className="mb-6 text-center">
+          <div ref={tourTitleRef} data-reveal="fade-up" className="mb-6 text-center">
             <h3 className="text-3xl md:text-4xl font-bold text-black mb-2">{currentTour.title}</h3>
             <p className="text-gray-600 text-lg">{currentTour.description}</p>
           </div>
 
           <div
             ref={setFrameRefs}
+            data-reveal="scale-in"
+            style={{
+              ["--reveal-delay" as string]: "120ms",
+              height: fullscreenTourId === selectedTour ? "100vh" : "640px",
+            }}
             className="relative rounded-xl overflow-hidden bg-gray-100 border-2 border-gray-200 will-change-transform"
-            style={{ height: fullscreenTourId === selectedTour ? "100vh" : "640px" }}
           >
             {currentTour.url ? (
               <>
@@ -371,7 +391,7 @@ export function ImmersiveSection() {
           </div>
         </div>
 
-        <div ref={helpTextRef} className="text-center my-12">
+        <div ref={helpTextRef} data-reveal="fade-up" className="text-center my-12">
           <p className="text-gray-600 text-sm">
             Navegá entre los diferentes espacios usando los controles del visor. Hacé clic y arrastrá para explorar en
             360°
@@ -380,6 +400,7 @@ export function ImmersiveSection() {
 
         <div
           ref={techCardRef}
+          data-reveal="slide-in-right"
           className="mt-16 bg-[#1a1a1a] text-white rounded-2xl p-12 will-change-transform"
           style={{ perspective: "1000px" }}
         >

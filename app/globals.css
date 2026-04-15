@@ -253,3 +253,76 @@
     );
   }
 }
+
+/* ============================================================================
+ * Touch-only scroll-reveal system (iOS / Android).
+ * Desktop is driven by GSAP; on touch devices GSAP is gated off, so these
+ * CSS-native animations + IntersectionObserver deliver the entrance motion
+ * with GPU-composited properties (opacity + transform only).
+ *
+ * Usage: add `data-reveal="<effect>"` on any element inside a section that
+ * wires useScrollReveal(sectionRef). Optional stagger via
+ * style={{ "--reveal-delay": "120ms" }} on each child.
+ * ========================================================================= */
+@keyframes ar-fade-up {
+  from { opacity: 0; transform: translate3d(0, 24px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+@keyframes ar-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes ar-slide-in-left {
+  from { opacity: 0; transform: translate3d(-40px, 0, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+@keyframes ar-slide-in-right {
+  from { opacity: 0; transform: translate3d(40px, 0, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+@keyframes ar-scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes ar-reveal-line {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  [data-reveal] {
+    opacity: 0;
+    will-change: opacity, transform;
+  }
+  [data-reveal="fade-up"]        { transform: translate3d(0, 24px, 0); }
+  [data-reveal="slide-in-left"]  { transform: translate3d(-40px, 0, 0); }
+  [data-reveal="slide-in-right"] { transform: translate3d(40px, 0, 0); }
+  [data-reveal="scale-in"]       { transform: scale(0.95); }
+  [data-reveal="reveal-line"]    { opacity: 1; transform: scaleX(0); transform-origin: left center; }
+
+  [data-reveal].is-revealed {
+    animation-duration: 600ms;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    animation-fill-mode: forwards;
+    animation-delay: var(--reveal-delay, 0ms);
+  }
+  [data-reveal="fade-up"].is-revealed        { animation-name: ar-fade-up; }
+  [data-reveal="fade-in"].is-revealed        { animation-name: ar-fade-in; }
+  [data-reveal="slide-in-left"].is-revealed  { animation-name: ar-slide-in-left; }
+  [data-reveal="slide-in-right"].is-revealed { animation-name: ar-slide-in-right; }
+  [data-reveal="scale-in"].is-revealed       { animation-name: ar-scale-in; }
+  [data-reveal="reveal-line"].is-revealed    { animation-name: ar-reveal-line; }
+
+  [data-reveal].is-revealed-done {
+    will-change: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+    will-change: auto !important;
+  }
+}

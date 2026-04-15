@@ -7,6 +7,7 @@ import SplitType from "split-type"
 import { brand, type GalleryCategory } from "@/config/brand"
 import { SpotlightCard } from "@/components/ui/spotlight-card"
 import { GridPattern } from "@/components/ui/grid-pattern"
+import { useScrollReveal } from "@/hooks/useScrollReveal"
 import { gsap, prefersReducedMotion, isTouchDevice, useGSAP } from "@/lib/gsapConfig"
 
 const iconMap: Record<string, LucideIcon> = { Building2, Sparkles }
@@ -218,6 +219,9 @@ export function ProjectsSection() {
     { scope: sectionRef },
   )
 
+  // Touch-only CSS reveal for header + alternating slide-in per block.
+  useScrollReveal(sectionRef)
+
   const openModal = (category: GalleryCategory, imageIndex = 0) => {
     setSelectedCategory(category)
     setCurrentImageIndex(imageIndex)
@@ -261,16 +265,25 @@ export function ProjectsSection() {
         <div ref={headerRef} className="text-center mb-20" style={{ perspective: "1000px" }}>
           <span
             data-eyebrow
+            data-reveal="fade-up"
             className="text-black text-sm font-semibold tracking-[0.2em] uppercase"
           >
             El Proyecto
           </span>
-          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold mt-6 mb-8 text-balance text-black leading-tight">
+          <h2
+            data-reveal="fade-up"
+            style={{ ["--reveal-delay" as string]: "80ms" }}
+            className="text-5xl md:text-6xl lg:text-7xl font-bold mt-6 mb-8 text-balance text-black leading-tight"
+          >
             Desarrollos que transforman
             <br />
             la forma de vivir
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto text-pretty leading-relaxed">
+          <p
+            data-reveal="fade-up"
+            style={{ ["--reveal-delay" as string]: "160ms" }}
+            className="text-xl text-gray-600 max-w-3xl mx-auto text-pretty leading-relaxed"
+          >
             Cada detalle pensado para crear espacios excepcionales que elevan la calidad de vida
           </p>
         </div>
@@ -279,12 +292,18 @@ export function ProjectsSection() {
           {brand.gallery.map((category, index) => {
             const Icon = iconMap[category.iconName] ?? Building2
             const isEven = index % 2 === 0
+            // Alternating slide direction per block on touch; desktop uses GSAP.
+            const imageReveal = isEven ? "slide-in-left" : "slide-in-right"
+            const textReveal = isEven ? "slide-in-right" : "slide-in-left"
 
             return (
               <div key={category.id} data-category-block>
                 <div className={`grid lg:grid-cols-2 gap-12 items-center ${!isEven ? "lg:grid-flow-dense" : ""}`}>
                   {/* Image Grid */}
-                  <div className={`${!isEven ? "lg:col-start-2" : ""}`}>
+                  <div
+                    data-reveal={imageReveal}
+                    className={`${!isEven ? "lg:col-start-2" : ""}`}
+                  >
                     <div className="grid grid-cols-2 gap-4">
                       {/* Main large image */}
                       <div data-img-big className="col-span-2 will-change-transform">
@@ -335,8 +354,9 @@ export function ProjectsSection() {
                   {/* Content */}
                   <div
                     data-text-side
+                    data-reveal={textReveal}
+                    style={{ ["--reveal-delay" as string]: "120ms", perspective: "1000px" }}
                     className={`space-y-6 ${!isEven ? "lg:col-start-1 lg:row-start-1" : ""}`}
-                    style={{ perspective: "1000px" }}
                   >
                     <div
                       data-category-badge

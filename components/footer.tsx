@@ -5,6 +5,7 @@ import Image from "next/image"
 import { Instagram, Mail, MapPin, Phone } from "lucide-react"
 import { brand } from "@/config/brand"
 import { NoiseGrainStars } from "@/components/ui/noise-grain-stars"
+import { useScrollReveal } from "@/hooks/useScrollReveal"
 import { gsap, prefersReducedMotion, isTouchDevice, useGSAP } from "@/lib/gsapConfig"
 
 export function Footer() {
@@ -66,6 +67,9 @@ export function Footer() {
     { scope: footerRef },
   )
 
+  // Touch-only CSS reveal (columns stagger fade-up + divider reveal-line).
+  useScrollReveal(footerRef)
+
   return (
     <footer
       ref={footerRef}
@@ -75,7 +79,11 @@ export function Footer() {
       <div className="relative container mx-auto px-4 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Brand */}
-          <div data-footer-col className="space-y-4 will-change-transform">
+          <div
+            data-footer-col
+            data-reveal="fade-up"
+            className="space-y-4 will-change-transform"
+          >
             <div className="flex items-center gap-3">
               <div className="relative w-12 h-12 shrink-0">
                 <Image
@@ -100,7 +108,12 @@ export function Footer() {
           </div>
 
           {/* Navigation */}
-          <div data-footer-col className="will-change-transform">
+          <div
+            data-footer-col
+            data-reveal="fade-up"
+            style={{ ["--reveal-delay" as string]: "100ms" }}
+            className="will-change-transform"
+          >
             <h3 className="text-sm font-semibold uppercase tracking-wider text-white/80 mb-4">
               Navegación
             </h3>
@@ -119,7 +132,12 @@ export function Footer() {
           </div>
 
           {/* Contact */}
-          <div data-footer-col className="will-change-transform">
+          <div
+            data-footer-col
+            data-reveal="fade-up"
+            style={{ ["--reveal-delay" as string]: "200ms" }}
+            className="will-change-transform"
+          >
             <h3 className="text-sm font-semibold uppercase tracking-wider text-white/80 mb-4">
               Contacto
             </h3>
@@ -156,7 +174,12 @@ export function Footer() {
           </div>
 
           {/* Hours + Social */}
-          <div data-footer-col className="will-change-transform">
+          <div
+            data-footer-col
+            data-reveal="fade-up"
+            style={{ ["--reveal-delay" as string]: "300ms" }}
+            className="will-change-transform"
+          >
             <h3 className="text-sm font-semibold uppercase tracking-wider text-white/80 mb-4">
               Horarios
             </h3>
@@ -177,10 +200,20 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Divider + copyright */}
+        {/* Divider reveal-line — scales in under the columns before the copyright text */}
+        <div
+          data-reveal="reveal-line"
+          style={{ ["--reveal-delay" as string]: "420ms" }}
+          className="mt-12 h-px w-full bg-white/10"
+          aria-hidden="true"
+        />
+
+        {/* Copyright */}
         <div
           data-footer-bottom
-          className="mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/40 will-change-transform"
+          data-reveal="fade-up"
+          style={{ ["--reveal-delay" as string]: "520ms" }}
+          className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/40 will-change-transform"
         >
           <p>
             © {year} {brand.company}. Todos los derechos reservados.

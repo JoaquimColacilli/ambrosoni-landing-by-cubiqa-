@@ -10,6 +10,7 @@ import { useReducedMotion } from "@/hooks/use-reduced-motion"
 import { brand } from "@/config/brand"
 import { SpotlightCard } from "@/components/ui/spotlight-card"
 import { WarmMesh } from "@/components/ui/warm-mesh"
+import { useScrollReveal } from "@/hooks/useScrollReveal"
 import { gsap, prefersReducedMotion, isTouchDevice, useGSAP } from "@/lib/gsapConfig"
 
 export function TypologiesSection() {
@@ -222,6 +223,9 @@ export function TypologiesSection() {
     { scope: sectionRef },
   )
 
+  // Touch-only CSS reveal (header fade-up + carousel wrapper scale-in).
+  useScrollReveal(sectionRef)
+
   const openLightbox = (planImage: string, planAlt: string) => {
     setSelectedPlanImage(planImage)
     setSelectedPlanAlt(planAlt)
@@ -255,19 +259,28 @@ export function TypologiesSection() {
         <div ref={headerRef} className="text-center mb-16" style={{ perspective: "1000px" }}>
           <span
             data-eyebrow
+            data-reveal="fade-up"
             className="text-black text-sm font-semibold tracking-wider uppercase"
           >
             Tipologías
           </span>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 text-balance text-black">
+          <h2
+            data-reveal="fade-up"
+            style={{ ["--reveal-delay" as string]: "80ms" }}
+            className="text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 text-balance text-black"
+          >
             Conocé las <span className="text-black">unidades</span>
           </h2>
-          <p className="text-lg text-gray-700 max-w-2xl mx-auto text-pretty">
+          <p
+            data-reveal="fade-up"
+            style={{ ["--reveal-delay" as string]: "160ms" }}
+            className="text-lg text-gray-700 max-w-2xl mx-auto text-pretty"
+          >
             Descubrí las tipologías disponibles en {brand.project}
           </p>
         </div>
 
-        <div ref={carouselWrapperRef} className="relative">
+        <div ref={carouselWrapperRef} data-reveal="scale-in" className="relative">
           {/* Carousel */}
           <div className="overflow-hidden" ref={emblaRef}>
             <div className="flex -ml-4">

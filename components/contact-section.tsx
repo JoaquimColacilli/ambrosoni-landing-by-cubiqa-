@@ -10,6 +10,7 @@ import { Mail, Phone, MapPin } from "lucide-react"
 import SplitType from "split-type"
 import { brand } from "@/config/brand"
 import { AntiGravityCanvas } from "@/components/ui/particle-effect-for-hero"
+import { useScrollReveal } from "@/hooks/useScrollReveal"
 import { gsap, prefersReducedMotion, isTouchDevice, useGSAP } from "@/lib/gsapConfig"
 
 export function ContactSection() {
@@ -230,6 +231,10 @@ export function ContactSection() {
     { scope: sectionRef },
   )
 
+  // Touch-only CSS reveal (header fade-up + info col slide-in-left +
+  // form slide-in-right + inputs stagger).
+  useScrollReveal(sectionRef)
+
   useEffect(() => {
     const messageTextarea = document.getElementById("message") as HTMLTextAreaElement
     if (messageTextarea) {
@@ -259,20 +264,29 @@ export function ContactSection() {
         <div ref={headerRef} className="text-center mb-16" style={{ perspective: "1000px" }}>
           <span
             data-eyebrow
+            data-reveal="fade-up"
             className="text-black/60 text-sm font-semibold tracking-wider uppercase"
           >
             Contacto
           </span>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 text-balance text-black">
+          <h2
+            data-reveal="fade-up"
+            style={{ ["--reveal-delay" as string]: "80ms" }}
+            className="text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 text-balance text-black"
+          >
             Hagamos realidad <span className="text-black">tu proyecto</span>
           </h2>
-          <p className="text-lg text-black/70 max-w-2xl mx-auto text-pretty">
+          <p
+            data-reveal="fade-up"
+            style={{ ["--reveal-delay" as string]: "160ms" }}
+            className="text-lg text-black/70 max-w-2xl mx-auto text-pretty"
+          >
             Nuestro equipo está listo para asesorarte en cada paso
           </p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
-          <div ref={leftColRef} className="space-y-8">
+          <div ref={leftColRef} data-reveal="slide-in-left" className="space-y-8">
             <div>
               <h3 className="text-2xl font-bold mb-6 text-black">Información de Contacto</h3>
               <p data-intro className="text-black/70 mb-8 leading-relaxed">
@@ -337,10 +351,12 @@ export function ContactSection() {
 
           <div
             ref={formCardRef}
+            data-reveal="slide-in-right"
+            style={{ ["--reveal-delay" as string]: "120ms" }}
             className="bg-white/50 backdrop-blur-md border border-black/10 rounded-xl p-8 will-change-transform"
           >
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div data-form-field>
+              <div data-form-field data-reveal="fade-up" style={{ ["--reveal-delay" as string]: "260ms" }}>
                 <label htmlFor="name" className="block text-sm font-medium mb-2 text-black/80">
                   Nombre completo
                 </label>
@@ -355,7 +371,7 @@ export function ContactSection() {
                 />
               </div>
 
-              <div data-form-field>
+              <div data-form-field data-reveal="fade-up" style={{ ["--reveal-delay" as string]: "320ms" }}>
                 <label htmlFor="email" className="block text-sm font-medium mb-2 text-black/80">
                   Email
                 </label>
@@ -370,7 +386,7 @@ export function ContactSection() {
                 />
               </div>
 
-              <div data-form-field>
+              <div data-form-field data-reveal="fade-up" style={{ ["--reveal-delay" as string]: "380ms" }}>
                 <label htmlFor="phone" className="block text-sm font-medium mb-2 text-black/80">
                   Teléfono
                 </label>
@@ -385,7 +401,7 @@ export function ContactSection() {
                 />
               </div>
 
-              <div data-form-field>
+              <div data-form-field data-reveal="fade-up" style={{ ["--reveal-delay" as string]: "440ms" }}>
                 <label htmlFor="message" className="block text-sm font-medium mb-2 text-black/80">
                   Mensaje
                 </label>

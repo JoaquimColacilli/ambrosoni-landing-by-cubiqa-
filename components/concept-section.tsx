@@ -1,10 +1,11 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import SplitType from "split-type"
 import { brand } from "@/config/brand"
 import { GooeyText } from "@/components/ui/gooey-text"
 import { FloatingPaths } from "@/components/ui/background-paths"
+import { useScrollReveal } from "@/hooks/useScrollReveal"
 import { gsap, ScrollTrigger, getScrubValue, prefersReducedMotion, isTouchDevice, useGSAP } from "@/lib/gsapConfig"
 
 export function ConceptSection() {
@@ -22,10 +23,10 @@ export function ConceptSection() {
 
   useGSAP(
     () => {
-      if (isTouchDevice()) {
-        setCounts(brand.stats.map((s) => s.value))
-        return
-      }
+      // On touch devices, GSAP is gated off and CSS reveal + IO counter
+      // below handle the entrance. Keep initial counts at 0 so the IO
+      // counter can animate from 0 → target.
+      if (isTouchDevice()) return
       const reduced = prefersReducedMotion()
 
       // Split the static top line "CONVERTIMOS CONCEPTOS EN"
@@ -309,6 +310,57 @@ export function ConceptSection() {
     { scope: sectionRef },
   )
 
+  // Touch-only CSS reveal for header, image and right-column content.
+  useScrollReveal(sectionRef)
+
+  // Touch-only count-up: single IntersectionObserver on the stats container,
+  // ease-out-cubic RAF tween for all brand.stats values at once. Replaces
+  // the GSAP proxy that's gated off on touch.
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    const isTouch = window.matchMedia("(hover: none) and (pointer: coarse)").matches
+    if (!isTouch) return
+    const node = statsRef.current
+    if (!node) return
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    if (reduced) {
+      setCounts(brand.stats.map((s) => s.value))
+      return
+    }
+
+    let rafId: number | null = null
+    let cancelled = false
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return
+          io.unobserve(node)
+          const start = performance.now()
+          const duration = 1800
+          const tick = (now: number) => {
+            if (cancelled) return
+            const t = Math.min(1, (now - start) / duration)
+            const eased = 1 - Math.pow(1 - t, 3)
+            setCounts(brand.stats.map((s) => Math.round(s.value * eased)))
+            if (t < 1) rafId = requestAnimationFrame(tick)
+            else setCounts(brand.stats.map((s) => s.value))
+          }
+          rafId = requestAnimationFrame(tick)
+        })
+      },
+      { rootMargin: "0px 0px -10% 0px", threshold: 0.1 },
+    )
+    io.observe(node)
+
+    return () => {
+      cancelled = true
+      if (rafId !== null) cancelAnimationFrame(rafId)
+      io.disconnect()
+    }
+  }, [])
+
   return (
     <section id="concepto" ref={sectionRef} className="relative py-16 bg-gray-50 overflow-hidden">
       <div className="absolute inset-0 pointer-events-none hidden md:block" aria-hidden="true">
@@ -318,6 +370,7 @@ export function ConceptSection() {
       <div className="relative container mx-auto px-4 lg:px-8">
         <div
           ref={cardRef}
+          data-reveal="fade-up"
           className="bg-[#1a1a1a] text-white rounded-2xl p-10 lg:p-12 mb-16 will-change-transform"
         >
           <div className="max-w-4xl mx-auto text-center">
@@ -357,7 +410,11 @@ export function ConceptSection() {
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Left: Evolution Visualization */}
           <div className="relative">
-            <div ref={imageWrapperRef} className="relative aspect-square will-change-transform">
+            <div
+              ref={imageWrapperRef}
+              data-reveal="scale-in"
+              className="relative aspect-square will-change-transform"
+            >
               <img
                 ref={imageRef}
                 src="/images/design-mode/cbq_gbd_ath_View_10.jpg"
@@ -369,21 +426,44 @@ export function ConceptSection() {
 
           {/* Right: Content */}
           <div ref={rightContentRef} style={{ perspective: "1000px" }}>
-            <span className="text-black text-sm font-semibold tracking-wider uppercase">El Concepto</span>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 text-balance text-black">
+            <span
+              data-reveal="fade-up"
+              className="text-black text-sm font-semibold tracking-wider uppercase"
+            >
+              El Concepto
+            </span>
+            <h2
+              data-reveal="fade-up"
+              style={{ ["--reveal-delay" as string]: "80ms" }}
+              className="text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 text-balance text-black"
+            >
               De la idea a la <span className="text-black">experiencia</span>
             </h2>
-            <p className="text-lg text-gray-700 mb-6 leading-relaxed text-pretty">
+            <p
+              data-reveal="fade-up"
+              style={{ ["--reveal-delay" as string]: "160ms" }}
+              className="text-lg text-gray-700 mb-6 leading-relaxed text-pretty"
+            >
               Cada proyecto comienza con una visión. Transformamos bocetos y conceptos arquitectónicos en experiencias
               inmersivas que permiten vivir los espacios antes de su construcción.
             </p>
-            <p className="text-lg text-gray-700 mb-8 leading-relaxed text-pretty">
+            <p
+              data-reveal="fade-up"
+              style={{ ["--reveal-delay" as string]: "240ms" }}
+              className="text-lg text-gray-700 mb-8 leading-relaxed text-pretty"
+            >
               Nuestra tecnología de visualización 3D y recorridos virtuales 360° revoluciona la forma en que
               desarrolladores y clientes experimentan la arquitectura moderna.
             </p>
             <div ref={statsRef} className="grid grid-cols-3 gap-6">
               {brand.stats.map((stat, i) => (
-                <div key={stat.label} data-stat className="text-center">
+                <div
+                  key={stat.label}
+                  data-stat
+                  data-reveal="fade-up"
+                  style={{ ["--reveal-delay" as string]: `${320 + i * 80}ms` }}
+                  className="text-center"
+                >
                   <div className="text-3xl font-bold text-black mb-2">
                     {counts[i]}
                     {stat.suffix}

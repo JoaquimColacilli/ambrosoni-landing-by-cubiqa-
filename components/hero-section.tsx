@@ -1,10 +1,11 @@
 "use client"
 
-import { useRef } from "react"
+import { useEffect, useRef } from "react"
 import { ChevronDown } from "lucide-react"
 import SplitType from "split-type"
 import { brand } from "@/config/brand"
 import { useMagnetic } from "@/hooks/use-magnetic"
+import { useScrollReveal } from "@/hooks/useScrollReveal"
 import { gsap, getScrubValue, isTouchDevice, useGSAP } from "@/lib/gsapConfig"
 
 export function HeroSection() {
@@ -293,6 +294,7 @@ export function HeroSection() {
       // --------------------------------------------------------------
       // SCROLL-LINKED — parallax + fade-out. Skipped on touch devices
       // so GSAP ticker stays idle during scroll after the entry completes.
+      // Touch devices get a lightweight passive scroll listener below.
       // --------------------------------------------------------------
       if (!isTouchDevice() && sectionRef.current) {
         const scrub = getScrubValue()
@@ -344,6 +346,48 @@ export function HeroSection() {
     { scope: sectionRef },
   )
 
+  // Wire CSS reveal for the divider under the title (touch only; desktop
+  // renders the line full-width without animation).
+  useScrollReveal(sectionRef)
+
+  // Touch-only subtle parallax on the bg image. Passive scroll listener,
+  // rAF-throttled, 15px cap. Runs after GSAP entry completes without
+  // fighting it (entry cleans its transforms onComplete).
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    const isTouch = window.matchMedia("(hover: none) and (pointer: coarse)").matches
+    if (!isTouch) return
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    if (reduced) return
+
+    const wrap = imageWrapperRef.current
+    const section = sectionRef.current
+    if (!wrap || !section) return
+
+    const MAX = 15
+    let rafId: number | null = null
+
+    const update = () => {
+      rafId = null
+      const rect = section.getBoundingClientRect()
+      const progress = Math.max(0, Math.min(1, -rect.top / Math.max(1, rect.height)))
+      wrap.style.transform = `translate3d(0, ${progress * MAX}px, 0)`
+    }
+
+    const onScroll = () => {
+      if (rafId !== null) return
+      rafId = requestAnimationFrame(update)
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true })
+
+    return () => {
+      window.removeEventListener("scroll", onScroll)
+      if (rafId !== null) cancelAnimationFrame(rafId)
+      wrap.style.transform = ""
+    }
+  }, [])
+
   return (
     <section
       ref={sectionRef}
@@ -371,6 +415,12 @@ export function HeroSection() {
           <br />
           <span className="text-white break-words">ARQUITECTÓNICAS</span>
         </h1>
+        <div
+          data-reveal="reveal-line"
+          style={{ ["--reveal-delay" as string]: "200ms" }}
+          className="hidden sm:block h-px w-24 bg-white/40 mx-auto mb-8"
+          aria-hidden="true"
+        />
         <p
           ref={subtitleRef}
           className="text-xl md:text-2xl text-white max-w-2xl mx-auto mb-12 text-pretty opacity-0"
