@@ -1,32 +1,38 @@
-import { useEffect, type RefObject } from "react"
+import { useEffect, useLayoutEffect, type RefObject } from "react"
+
+// Use useLayoutEffect on the client so .js-hidden is applied synchronously
+// before the first paint after hydration. Fall back to useEffect during SSR
+// to silence React's "useLayoutEffect on the server" warning.
+const useIsomorphicLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect
 
 // Scroll-reveal for touch devices only — desktop keeps GSAP.
-// Observes every [data-reveal] element inside `scope` and adds `.is-revealed`
-// when it crosses into view. Fires once per element (no re-trigger on scroll
-// back). Cleans up will-change after the CSS animation finishes so idle
-// elements don't keep a compositor layer pinned.
 //
-// Safety net: because [data-reveal] sets opacity:0 on touch devices, any
-// element that the IntersectionObserver misses (iOS WebKit scroll-momentum
-// race with initial callback, layout shift during font load, etc.) stays
-// invisible forever. To prevent stuck-invisible elements, the hook runs an
-// eager pass on mount (elements already in or above the viewport get revealed
-// immediately) plus a watchdog timer that force-reveals anything still in
-// view after 800 ms even if IO never fired.
+// Inverted-default design: CSS base keeps [data-reveal] elements VISIBLE.
+// This hook is what actually hides below-fold elements (via .js-hidden)
+// and reveals them when they enter the viewport (via .is-revealed). If JS
+// never runs, elements stay visible. There is no stuck-invisible failure
+// mode anymore.
+//
+// Three layers of robustness for the reveal trigger:
+//   1. IntersectionObserver — primary.
+//   2. Passive scroll listener, rAF-throttled — fallback for iOS WebKit
+//      dropping IO callbacks during momentum scroll.
+//   3. Watchdog at 1500ms — final safety net for anything on-screen that
+//      both the IO and the scroll listener somehow missed.
 export function useScrollReveal(
   scope: RefObject<HTMLElement | null>,
   opts?: { enabled?: boolean },
 ) {
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (opts?.enabled === false) return
     if (typeof window === "undefined") return
 
     const root = scope.current
     if (!root) return
 
-    // Gate the whole system on touch — matches the CSS media query that
-    // hides [data-reveal] elements initially. On desktop nothing is hidden
-    // and nothing needs to be observed.
+    // Gate on touch — matches the CSS media query that scopes .js-hidden
+    // and the reveal animation classes.
     const isTouch = window.matchMedia("(hover: none) and (pointer: coarse)").matches
     if (!isTouch) return
 
@@ -35,14 +41,14 @@ export function useScrollReveal(
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches
     if (reduced) {
-      elements.forEach((el) => {
-        el.classList.add("is-revealed", "is-revealed-done")
-      })
+      // Reduced motion: do not hide anything, do not animate. Elements
+      // stay at their visible CSS default.
       return
     }
 
-    const reveal = (el: HTMLElement) => {
+    const animateReveal = (el: HTMLElement) => {
       if (el.classList.contains("is-revealed")) return
+      el.classList.remove("js-hidden")
       el.classList.add("is-revealed")
       el.addEventListener(
         "animationend",
@@ -51,54 +57,82 @@ export function useScrollReveal(
       )
     }
 
-    // Eager pass: any element already in or above the viewport at mount
-    // gets revealed synchronously. Handles the common failure mode where
-    // IO's async initial callback races with iOS scroll momentum and
-    // never fires `isIntersecting: true` for sections the user is already
-    // looking at or has scrolled past.
+    // --- Eager pass (synchronous, pre-paint via useLayoutEffect) ---
+    // Elements already in or above the viewport at mount: leave alone.
+    // They render at their visible CSS default with no animation. Small
+    // aesthetic trade-off (no entry animation for above-fold reveal
+    // elements) in exchange for zero FOUC there.
+    // Below-fold elements: add .js-hidden synchronously before the next
+    // paint so they are hidden until scrolled into view.
     const viewportHeight = window.innerHeight
     const pending: HTMLElement[] = []
-    elements.forEach((el) => {
+    for (const el of elements) {
       const rect = el.getBoundingClientRect()
-      const alreadyVisibleOrPassed = rect.top < viewportHeight * 0.9
-      if (alreadyVisibleOrPassed) {
-        reveal(el)
-      } else {
+      if (rect.top >= viewportHeight * 0.9) {
+        el.classList.add("js-hidden")
         pending.push(el)
       }
-    })
+    }
 
     if (pending.length === 0) return
 
+    // --- Layer 1: IntersectionObserver (primary) ---
     const io = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue
           const el = entry.target as HTMLElement
-          reveal(el)
+          animateReveal(el)
           io.unobserve(el)
-        })
+          const idx = pending.indexOf(el)
+          if (idx >= 0) pending.splice(idx, 1)
+        }
       },
       { rootMargin: "0px 0px -10% 0px", threshold: 0.1 },
     )
+    for (const el of pending) io.observe(el)
 
-    pending.forEach((el) => io.observe(el))
-
-    // Watchdog: 800 ms after mount, sweep anything still unrevealed that's
-    // now on-screen. Catches cases where IO never fires due to layout
-    // shifts from font loading or image decode finishing after mount.
-    const watchdog = window.setTimeout(() => {
-      pending.forEach((el) => {
-        if (el.classList.contains("is-revealed")) return
-        const rect = el.getBoundingClientRect()
-        if (rect.top < window.innerHeight) {
-          reveal(el)
+    // --- Layer 2: passive scroll listener, rAF-throttled ---
+    // Catches elements iOS WebKit drops during momentum scroll. One
+    // getBoundingClientRect per pending element per rAF while scrolling —
+    // composited read, negligible cost at ~9 elements.
+    let rafId: number | null = null
+    const sweepOnScroll = () => {
+      rafId = null
+      if (pending.length === 0) return
+      const triggerY = window.innerHeight * 0.9
+      for (let i = pending.length - 1; i >= 0; i--) {
+        const el = pending[i]
+        if (el.getBoundingClientRect().top < triggerY) {
+          animateReveal(el)
           io.unobserve(el)
+          pending.splice(i, 1)
         }
-      })
-    }, 800)
+      }
+    }
+    const onScroll = () => {
+      if (rafId !== null) return
+      rafId = requestAnimationFrame(sweepOnScroll)
+    }
+    window.addEventListener("scroll", onScroll, { passive: true })
+
+    // --- Layer 3: watchdog (final safety net at 1500ms) ---
+    const watchdog = window.setTimeout(() => {
+      if (pending.length === 0) return
+      const vh = window.innerHeight
+      for (let i = pending.length - 1; i >= 0; i--) {
+        const el = pending[i]
+        if (el.getBoundingClientRect().top < vh) {
+          animateReveal(el)
+          io.unobserve(el)
+          pending.splice(i, 1)
+        }
+      }
+    }, 1500)
 
     return () => {
+      window.removeEventListener("scroll", onScroll)
+      if (rafId !== null) cancelAnimationFrame(rafId)
       window.clearTimeout(watchdog)
       io.disconnect()
     }

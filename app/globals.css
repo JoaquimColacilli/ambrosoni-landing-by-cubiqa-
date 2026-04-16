@@ -291,23 +291,25 @@
 
 @media (hover: none) and (pointer: coarse) {
   [data-reveal] {
-    opacity: 0;
-    /* No blanket will-change here — it pins a compositor layer per element
-     * from mount, and with 20+ reveals on a page that's too many layers for
-     * iOS Safari. will-change is applied below only while the animation runs
-     * and cleared via .is-revealed-done on animationend. */
+    /* Default: VISIBLE. The old blanket opacity:0 here caused stuck-invisible
+     * elements when IntersectionObserver failed to fire in iOS WebKit during
+     * momentum scroll. Now the hide state is owned by .js-hidden, applied
+     * synchronously by useScrollReveal via useLayoutEffect before paint.
+     * If JS never runs (parse error, blocked, etc.), elements stay visible
+     * — there is no stuck-invisible failure mode anymore. */
   }
-  [data-reveal="fade-up"]        { transform: translate3d(0, 24px, 0); }
-  [data-reveal="slide-in-left"]  { transform: translate3d(-40px, 0, 0); }
-  [data-reveal="slide-in-right"] { transform: translate3d(40px, 0, 0); }
-  [data-reveal="scale-in"]       { transform: scale(0.95); }
-  [data-reveal="reveal-line"]    { opacity: 1; transform: scaleX(0); transform-origin: left center; }
+  [data-reveal].js-hidden                      { opacity: 0; }
+  [data-reveal="fade-up"].js-hidden            { transform: translate3d(0, 24px, 0); }
+  [data-reveal="slide-in-left"].js-hidden      { transform: translate3d(-40px, 0, 0); }
+  [data-reveal="slide-in-right"].js-hidden     { transform: translate3d(40px, 0, 0); }
+  [data-reveal="scale-in"].js-hidden           { transform: scale(0.95); }
+  [data-reveal="reveal-line"].js-hidden        { opacity: 1; transform: scaleX(0); transform-origin: left center; }
 
   [data-reveal].is-revealed {
     will-change: opacity, transform;
     animation-duration: 600ms;
     animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-    animation-fill-mode: forwards;
+    animation-fill-mode: both;
     animation-delay: var(--reveal-delay, 0ms);
   }
   [data-reveal="fade-up"].is-revealed        { animation-name: ar-fade-up; }
