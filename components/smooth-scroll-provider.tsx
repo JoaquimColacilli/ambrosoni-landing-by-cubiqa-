@@ -1,8 +1,19 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { createContext, useContext, useEffect, useRef, useCallback } from "react"
 import Lenis from "lenis"
 import { gsap, ScrollTrigger, isTouchDevice } from "@/lib/gsapConfig"
+
+type ScrollTarget = string | number | HTMLElement
+interface SmoothScrollContextValue {
+  scrollTo: (target: ScrollTarget, options?: { offset?: number; duration?: number }) => void
+}
+
+const SmoothScrollContext = createContext<SmoothScrollContextValue | null>(null)
+
+export function useSmoothScroll() {
+  return useContext(SmoothScrollContext)
+}
 
 export function SmoothScrollProvider({ children }: { children: React.ReactNode }) {
   const lenisRef = useRef<Lenis | null>(null)
@@ -79,8 +90,38 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
       gsap.ticker.remove(tickerCallback)
       lenis.off("scroll", ScrollTrigger.update as any)
       lenis.destroy()
+      lenisRef.current = null
     }
   }, [])
 
-  return <>{children}</>
+  const scrollTo = useCallback<SmoothScrollContextValue["scrollTo"]>((target, options) => {
+    const offset = options?.offset ?? 0
+    const duration = options?.duration ?? 1.2
+    const lenis = lenisRef.current
+
+    if (lenis) {
+      lenis.scrollTo(target as any, { offset, duration })
+      return
+    }
+
+    // Touch / SSR fallback: use native smooth scroll
+    let el: HTMLElement | null = null
+    if (typeof target === "string") {
+      el = target === "#" ? document.body : document.querySelector<HTMLElement>(target)
+    } else if (typeof target === "number") {
+      window.scrollTo({ top: target + offset, behavior: "smooth" })
+      return
+    } else {
+      el = target
+    }
+    if (!el) return
+    const top = el.getBoundingClientRect().top + window.scrollY + offset
+    window.scrollTo({ top, behavior: "smooth" })
+  }, [])
+
+  return (
+    <SmoothScrollContext.Provider value={{ scrollTo }}>
+      {children}
+    </SmoothScrollContext.Provider>
+  )
 }

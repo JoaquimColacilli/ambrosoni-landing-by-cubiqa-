@@ -37,7 +37,7 @@ export type Stat = {
 export type UnitStatus = "available" | "reserved" | "sold"
 
 export type Unit = {
-  floor: number
+  floor: string
   unit: string
   rooms: number
   sqm: number
@@ -181,14 +181,14 @@ export const brand = {
 
   // --- Unidades disponibles ---
   units: [
-    { floor: 6, unit: "A", rooms: 2, sqm: 55, status: "available", price: "USD 85.000" }, // TODO: dato real pendiente de Cubiqa
-    { floor: 6, unit: "B", rooms: 3, sqm: 75, status: "reserved", price: "USD 110.000" }, // TODO: dato real pendiente de Cubiqa
-    { floor: 5, unit: "A", rooms: 2, sqm: 55, status: "available", price: "USD 82.000" }, // TODO: dato real pendiente de Cubiqa
-    { floor: 5, unit: "B", rooms: 3, sqm: 75, status: "sold", price: "USD 108.000" }, // TODO: dato real pendiente de Cubiqa
-    { floor: 4, unit: "A", rooms: 2, sqm: 55, status: "available", price: "USD 80.000" }, // TODO: dato real pendiente de Cubiqa
-    { floor: 4, unit: "B", rooms: 4, sqm: 95, status: "available", price: "USD 145.000" }, // TODO: dato real pendiente de Cubiqa
-    { floor: 3, unit: "A", rooms: 3, sqm: 75, status: "reserved", price: "USD 105.000" }, // TODO: dato real pendiente de Cubiqa
-    { floor: 3, unit: "B", rooms: 4, sqm: 95, status: "available", price: "USD 140.000" }, // TODO: dato real pendiente de Cubiqa
+    { floor: "6°", unit: "A", rooms: 2, sqm: 55, status: "available", price: "USD 85.000" }, // TODO: dato real pendiente de Cubiqa
+    { floor: "6°", unit: "B", rooms: 3, sqm: 75, status: "reserved", price: "USD 110.000" }, // TODO: dato real pendiente de Cubiqa
+    { floor: "5°", unit: "A", rooms: 2, sqm: 55, status: "available", price: "USD 82.000" }, // TODO: dato real pendiente de Cubiqa
+    { floor: "5°", unit: "B", rooms: 3, sqm: 75, status: "sold", price: "USD 108.000" }, // TODO: dato real pendiente de Cubiqa
+    { floor: "4°", unit: "A", rooms: 2, sqm: 55, status: "available", price: "USD 80.000" }, // TODO: dato real pendiente de Cubiqa
+    { floor: "4°", unit: "B", rooms: 4, sqm: 95, status: "available", price: "USD 145.000" }, // TODO: dato real pendiente de Cubiqa
+    { floor: "3°", unit: "A", rooms: 3, sqm: 75, status: "reserved", price: "USD 105.000" }, // TODO: dato real pendiente de Cubiqa
+    { floor: "3°", unit: "B", rooms: 4, sqm: 95, status: "available", price: "USD 140.000" }, // TODO: dato real pendiente de Cubiqa
   ] satisfies Unit[],
 
   // --- Tours 360° (recorridos virtuales Kuula) ---

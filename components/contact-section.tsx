@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Mail, Phone, MapPin } from "lucide-react"
+import { Mail, Phone, MapPin, Loader2, CheckCircle2, AlertCircle } from "lucide-react"
 import SplitType from "split-type"
 import { brand } from "@/config/brand"
 import { AntiGravityCanvas } from "@/components/ui/particle-effect-for-hero"
@@ -20,6 +20,9 @@ export function ContactSection() {
     phone: "",
     message: "",
   })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const sectionRef = useRef<HTMLElement>(null)
   const headerRef = useRef<HTMLDivElement>(null)
   const leftColRef = useRef<HTMLDivElement>(null)
@@ -246,15 +249,32 @@ export function ContactSection() {
     }
   }, [])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Form submitted:", formData)
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      message: "",
-    })
+    if (isSubmitting) return
+
+    setIsSubmitting(true)
+    setSubmitError(null)
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      })
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error(body.error || "Error al enviar el formulario")
+      }
+
+      setIsSubmitted(true)
+      setFormData({ name: "", email: "", phone: "", message: "" })
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : "Error desconocido")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -418,8 +438,34 @@ export function ContactSection() {
                 />
               </div>
 
-              <Button type="submit" className="w-full bg-black text-white hover:bg-black/90 active:scale-[0.97] transition-transform duration-100" size="lg">
-                Enviar Consulta
+              {submitError && (
+                <div className="flex items-start gap-2 p-3 rounded-lg bg-red-50 border border-red-200 text-red-800 text-sm">
+                  <AlertCircle size={18} className="flex-shrink-0 mt-0.5" />
+                  <span>{submitError}</span>
+                </div>
+              )}
+
+              {isSubmitted && (
+                <div className="flex items-start gap-2 p-3 rounded-lg bg-green-50 border border-green-200 text-green-800 text-sm">
+                  <CheckCircle2 size={18} className="flex-shrink-0 mt-0.5" />
+                  <span>¡Consulta enviada! Te contactamos a la brevedad.</span>
+                </div>
+              )}
+
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full bg-black text-white hover:bg-black/90 active:scale-[0.97] transition-transform duration-100 disabled:opacity-60 disabled:cursor-not-allowed"
+                size="lg"
+              >
+                {isSubmitting ? (
+                  <span className="inline-flex items-center gap-2">
+                    <Loader2 className="animate-spin" size={18} />
+                    Enviando...
+                  </span>
+                ) : (
+                  "Enviar Consulta"
+                )}
               </Button>
             </form>
           </div>

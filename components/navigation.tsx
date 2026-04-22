@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Menu, X } from "lucide-react"
@@ -8,13 +8,31 @@ import { brand } from "@/config/brand"
 import { motion, AnimatePresence } from "framer-motion"
 import { useReducedMotion } from "@/hooks/use-reduced-motion"
 import { useMagnetic } from "@/hooks/use-magnetic"
+import { useSmoothScroll } from "@/components/smooth-scroll-provider"
 import { gsap, useGSAP } from "@/lib/gsapConfig"
+
+const NAV_OFFSET = -80 // compensar la altura del navbar fijo al scrollear
 
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const prefersReducedMotion = useReducedMotion()
   const desktopCtaMagnetic = useMagnetic<HTMLDivElement>({ strength: 0.35, radius: 100 })
+  const smoothScroll = useSmoothScroll()
+
+  const handleNavClick = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>, href: string, onDone?: () => void) => {
+      if (!href.startsWith("#")) return
+      e.preventDefault()
+      if (href === "#") {
+        smoothScroll?.scrollTo(0)
+      } else {
+        smoothScroll?.scrollTo(href, { offset: NAV_OFFSET })
+      }
+      onDone?.()
+    },
+    [smoothScroll],
+  )
 
   const navRef = useRef<HTMLElement>(null)
   const logoRef = useRef<HTMLAnchorElement>(null)
@@ -241,6 +259,7 @@ export function Navigation() {
             <a
               ref={logoRef}
               href="#"
+              onClick={(e) => handleNavClick(e, "#")}
               className="flex items-center gap-2 sm:gap-3 group min-w-0"
             >
               <div className="relative w-10 h-10 sm:w-12 sm:h-12 shrink-0 transition-transform duration-300 group-hover:scale-110">
@@ -258,6 +277,7 @@ export function Navigation() {
                 <a
                   key={item.href}
                   href={item.href}
+                  onClick={(e) => handleNavClick(e, item.href)}
                   className="text-sm text-white hover:text-white/80 transition-colors duration-300 relative group font-medium"
                 >
                   {item.label}
@@ -277,7 +297,10 @@ export function Navigation() {
               onMouseLeave={desktopCtaMagnetic.handleMouseLeave}
               className="hidden lg:block transition-transform duration-300 ease-out"
             >
-              <Button className="bg-white text-black hover:bg-gray-100 active:scale-[0.97] animate-glow-pulse font-semibold">
+              <Button
+                onClick={() => smoothScroll?.scrollTo("#contacto", { offset: NAV_OFFSET })}
+                className="bg-white text-black hover:bg-gray-100 active:scale-[0.97] animate-glow-pulse font-semibold"
+              >
                 {brand.cta.nav}
               </Button>
             </div>
@@ -313,7 +336,7 @@ export function Navigation() {
             <div className="flex items-center justify-between h-16 sm:h-20 px-4 sm:px-6 border-b border-white/10">
               <a
                 href="#"
-                onClick={() => setIsMobileMenuOpen(false)}
+                onClick={(e) => handleNavClick(e, "#", () => setIsMobileMenuOpen(false))}
                 className="flex items-center gap-2 sm:gap-3 min-w-0"
               >
                 <div className="relative w-10 h-10 sm:w-12 sm:h-12 shrink-0">
@@ -339,7 +362,7 @@ export function Navigation() {
                 <motion.a
                   key={item.href}
                   href={item.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={(e) => handleNavClick(e, item.href, () => setIsMobileMenuOpen(false))}
                   className="text-white text-3xl sm:text-4xl font-bold tracking-tight hover:text-primary transition-colors"
                   variants={menuLinkVariants}
                   initial="hidden"
@@ -362,7 +385,10 @@ export function Navigation() {
               custom={brand.navItems.length}
             >
               <Button
-                onClick={() => setIsMobileMenuOpen(false)}
+                onClick={() => {
+                  setIsMobileMenuOpen(false)
+                  smoothScroll?.scrollTo("#contacto", { offset: NAV_OFFSET })
+                }}
                 className="bg-white text-black hover:bg-gray-100 w-full h-14 text-base font-semibold"
               >
                 {brand.cta.nav}

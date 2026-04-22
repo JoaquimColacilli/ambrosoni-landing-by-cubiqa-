@@ -418,14 +418,14 @@ export function ProjectsSection() {
                 <>
                   <button
                     onClick={prevImage}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 backdrop-blur-sm text-white p-4 rounded-full hover:bg-white/20 transition-all text-2xl font-bold"
+                    className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 backdrop-blur-sm text-white p-4 rounded-full hover:bg-white/20 transition-all text-2xl font-bold items-center justify-center"
                     aria-label="Imagen anterior"
                   >
                     ←
                   </button>
                   <button
                     onClick={nextImage}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 backdrop-blur-sm text-white p-4 rounded-full hover:bg-white/20 transition-all text-2xl font-bold"
+                    className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 backdrop-blur-sm text-white p-4 rounded-full hover:bg-white/20 transition-all text-2xl font-bold items-center justify-center"
                     aria-label="Siguiente imagen"
                   >
                     →
@@ -434,10 +434,28 @@ export function ProjectsSection() {
               )}
             </div>
 
-            <div className="text-center mt-6 text-white">
+            <div className="flex items-center justify-center gap-6 mt-6 text-white">
+              {selectedCategory.images.length > 1 && (
+                <button
+                  onClick={prevImage}
+                  className="md:hidden bg-white/10 backdrop-blur-sm text-white w-11 h-11 rounded-full hover:bg-white/20 transition-all text-xl font-bold flex items-center justify-center"
+                  aria-label="Imagen anterior"
+                >
+                  ←
+                </button>
+              )}
               <p className="text-lg font-medium">
                 {currentImageIndex + 1} / {selectedCategory.images.length}
               </p>
+              {selectedCategory.images.length > 1 && (
+                <button
+                  onClick={nextImage}
+                  className="md:hidden bg-white/10 backdrop-blur-sm text-white w-11 h-11 rounded-full hover:bg-white/20 transition-all text-xl font-bold flex items-center justify-center"
+                  aria-label="Siguiente imagen"
+                >
+                  →
+                </button>
+              )}
             </div>
           </div>
         </div>

@@ -1,13 +1,14 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { Check, X, AlertCircle } from "lucide-react"
+import { Check, X, AlertCircle, Loader2 } from "lucide-react"
 import SplitType from "split-type"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { brand, type UnitStatus, type Unit } from "@/config/brand"
+import { type UnitStatus, type Unit } from "@/config/brand"
 import { WarmMesh } from "@/components/ui/warm-mesh"
 import { useScrollReveal } from "@/hooks/useScrollReveal"
+import { useUnidades } from "@/hooks/use-unidades"
 import { gsap, prefersReducedMotion, isTouchDevice, useGSAP } from "@/lib/gsapConfig"
 
 const statusConfig: Record<UnitStatus, { label: string; color: string }> = {
@@ -17,6 +18,7 @@ const statusConfig: Record<UnitStatus, { label: string; color: string }> = {
 }
 
 export function UnitsSection() {
+  const { unidades, loading, error, reintentar } = useUnidades()
   const [selectedRooms, setSelectedRooms] = useState<number | null>(null)
   const [hoveredUnit, setHoveredUnit] = useState<string | null>(null)
   const [showReservedAlert, setShowReservedAlert] = useState<string | null>(null)
@@ -219,7 +221,7 @@ export function UnitsSection() {
     }
   }
 
-  const filteredUnits = selectedRooms ? brand.units.filter((unit) => unit.rooms === selectedRooms) : brand.units
+  const filteredUnits = selectedRooms ? unidades.filter((unit) => unit.rooms === selectedRooms) : unidades
 
   return (
     <section id="unidades" ref={sectionRef} className="relative py-16 bg-gray-50 overflow-hidden">
@@ -309,8 +311,42 @@ export function UnitsSection() {
                 </tr>
               </thead>
               <tbody>
-                {filteredUnits.map((unit) => {
-                  const unitKey = `${unit.floor}-${unit.unit}`
+                {loading && (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-16 text-center">
+                      <div className="flex items-center justify-center gap-3 text-gray-600">
+                        <Loader2 className="animate-spin" size={20} />
+                        <span className="text-sm">Cargando unidades...</span>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+                {!loading && error && (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-16 text-center">
+                      <div className="flex flex-col items-center justify-center gap-3">
+                        <AlertCircle className="text-gray-500" size={24} />
+                        <span className="text-sm text-gray-700">No pudimos cargar las unidades.</span>
+                        <Button
+                          size="sm"
+                          onClick={reintentar}
+                          className="bg-black text-white hover:bg-gray-800"
+                        >
+                          Reintentar
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+                {!loading && !error && filteredUnits.length === 0 && (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-16 text-center text-sm text-gray-600">
+                      No hay unidades que coincidan con el filtro seleccionado.
+                    </td>
+                  </tr>
+                )}
+                {!loading && !error && filteredUnits.map((unit, i) => {
+                  const unitKey = `${unit.floor}-${unit.unit}-${i}`
                   const status = statusConfig[unit.status]
                   const showAlert = showReservedAlert === unitKey
 
