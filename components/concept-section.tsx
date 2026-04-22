@@ -417,7 +417,7 @@ export function ConceptSection() {
             >
               <img
                 ref={imageRef}
-                src="/images/cbq_ab_am_view_02.jpg"
+                src="/images/cbq_ab_am_view_04.jpg"
                 alt="Concept Evolution"
                 className="w-full h-full object-cover rounded-lg will-change-transform"
               />
