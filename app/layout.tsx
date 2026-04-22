@@ -25,6 +25,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" className="dark overflow-x-hidden">
+      <head>
+        {/* Resource hints: pre-warm conexión a Kuula (iframe 360°) */}
+        <link rel="preconnect" href="https://kuula.co" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://kuula.co" />
+      </head>
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased overflow-x-hidden`}>
         <AtmosphericLayerClient />
         <SmoothScrollProvider>

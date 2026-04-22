@@ -417,7 +417,7 @@ export function ConceptSection() {
             >
               <img
                 ref={imageRef}
-                src="/images/design-mode/cbq_gbd_ath_View_10.jpg"
+                src="/images/cbq_ab_am_view_02.jpg"
                 alt="Concept Evolution"
                 className="w-full h-full object-cover rounded-lg will-change-transform"
               />
@@ -435,25 +435,27 @@ export function ConceptSection() {
             <h2
               data-reveal="fade-up"
               style={{ ["--reveal-delay" as string]: "80ms" }}
-              className="text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 text-balance text-black"
+              className="text-4xl md:text-5xl lg:text-6xl font-bold italic mt-4 mb-6 text-balance text-black"
             >
-              De la idea a la <span className="text-black">experiencia</span>
+              Nueve hogares.
+              <br />
+              <span className="text-black">Un edificio que se siente diferente</span>
             </h2>
             <p
               data-reveal="fade-up"
               style={{ ["--reveal-delay" as string]: "160ms" }}
               className="text-lg text-gray-700 mb-6 leading-relaxed text-pretty"
             >
-              Cada proyecto comienza con una visión. Transformamos bocetos y conceptos arquitectónicos en experiencias
-              inmersivas que permiten vivir los espacios antes de su construcción.
+              Ambrosoni no es un edificio más. Son 9 departamentos en 3 pisos diseñados con una lógica distinta: menos
+              unidades, más atención a cada detalle. Espacios amplios, luz natural, terminaciones de calidad y cocheras
+              propias para que nada falte.
             </p>
             <p
               data-reveal="fade-up"
               style={{ ["--reveal-delay" as string]: "240ms" }}
               className="text-lg text-gray-700 mb-8 leading-relaxed text-pretty"
             >
-              Nuestra tecnología de visualización 3D y recorridos virtuales 360° revoluciona la forma en que
-              desarrolladores y clientes experimentan la arquitectura moderna.
+              Porque cuando el edificio es chico, cada familia importa.
             </p>
             <div ref={statsRef} className="grid grid-cols-3 gap-6">
               {brand.stats.map((stat, i) => (

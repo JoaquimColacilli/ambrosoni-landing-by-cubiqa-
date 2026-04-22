@@ -12,7 +12,7 @@ import { gsap, prefersReducedMotion, isTouchDevice, useGSAP } from "@/lib/gsapCo
 
 const statusConfig: Record<UnitStatus, { label: string; color: string }> = {
   available: { label: "Disponible", color: "bg-primary text-primary-foreground" },
-  reserved: { label: "Reservado", color: "bg-yellow-500 text-black" },
+  reserved: { label: "Reservado", color: "bg-[oklch(0.80_0.05_80)] text-black" },
   sold: { label: "Vendido", color: "bg-muted text-muted-foreground" },
 }
 
@@ -350,15 +350,15 @@ export function UnitsSection() {
                             <Button
                               size="sm"
                               onClick={() => handleConsult(unit)}
-                              className="bg-amber-600 text-white hover:bg-amber-700 font-medium cursor-pointer"
+                              className="bg-[oklch(0.40_0.04_80)] text-white hover:bg-[oklch(0.32_0.04_80)] font-medium cursor-pointer"
                             >
                               Consultar
                             </Button>
                             {showAlert && (
                               <div className="absolute top-full left-0 mt-2 w-64 z-10">
-                                <Alert className="bg-yellow-500/10 border-yellow-500">
-                                  <AlertCircle className="h-4 w-4 text-yellow-500" />
-                                  <AlertDescription className="text-xs text-yellow-500">
+                                <Alert className="bg-[oklch(0.92_0.02_80)]/40 border-[oklch(0.60_0.05_80)]">
+                                  <AlertCircle className="h-4 w-4 text-[oklch(0.40_0.04_80)]" />
+                                  <AlertDescription className="text-xs text-[oklch(0.30_0.04_80)]">
                                     Unidad reservada. Te contactaremos para informarte sobre disponibilidad.
                                   </AlertDescription>
                                 </Alert>

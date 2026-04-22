@@ -306,7 +306,7 @@ export function ImmersiveSection() {
           <h2
             data-reveal="fade-up"
             style={{ ["--reveal-delay" as string]: "80ms" }}
-            className="text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 text-balance text-black"
+            className="text-4xl md:text-5xl lg:text-6xl font-bold italic mt-4 mb-6 text-balance text-black"
           >
             Caminá por tu futuro hogar
             <br />
@@ -317,7 +317,8 @@ export function ImmersiveSection() {
             style={{ ["--reveal-delay" as string]: "160ms" }}
             className="text-lg text-gray-700 max-w-2xl mx-auto text-pretty"
           >
-            Explorá cada rincón con nuestra tecnología de recorrido virtual 360°
+            Con nuestro recorrido 360° podés entrar a cada ambiente, ver cómo entra la luz, imaginar dónde va el sillón
+            y sentir el espacio como si ya fuera tuyo. Todo antes de firmar.
           </p>
         </div>
 
@@ -405,11 +406,13 @@ export function ImmersiveSection() {
           style={{ perspective: "1000px" }}
         >
           <div className="max-w-3xl mx-auto text-center">
-            <h3 className="text-3xl md:text-4xl font-bold mb-4">Tecnología de Visualización Avanzada</h3>
+            <h3 className="text-3xl md:text-4xl font-bold mb-4">El espacio que tu familia necesita.</h3>
+            <p className="text-lg text-gray-300 leading-relaxed mb-4">
+              Cada unidad fue pensada para que la distribución tenga sentido: dormitorios con luz, living que invita a
+              quedarse, cocina integrada y balcón para tomar el aire. Todo con cochera incluida.
+            </p>
             <p className="text-lg text-gray-300 leading-relaxed">
-              Utilizamos las últimas herramientas de renderizado y realidad virtual para crear experiencias inmersivas
-              que te permiten explorar cada detalle de tu futuro hogar antes de que se construya. Nuestros recorridos
-              360° te dan la libertad de moverte por los espacios como si ya estuvieras ahí.
+              Elegís la tipología que se adapta a tu momento de vida.
             </p>
           </div>
         </div>

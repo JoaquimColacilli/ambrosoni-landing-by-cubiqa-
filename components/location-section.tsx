@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef } from "react"
-import { MapPin, Clock, Car, Train, type LucideIcon } from "lucide-react"
+import { MapPin, Clock, Car, Train, Bus, Trees, Utensils, Stethoscope, type LucideIcon } from "lucide-react"
 import SplitType from "split-type"
 import { brand } from "@/config/brand"
 import { useScrollReveal } from "@/hooks/useScrollReveal"
@@ -10,7 +10,7 @@ import { SpotlightCard } from "@/components/ui/spotlight-card"
 import Image from "next/image"
 import { GlobePolaroids } from "@/components/ui/cobe-globe-polaroids"
 
-const iconMap: Record<string, LucideIcon> = { MapPin, Car, Train }
+const iconMap: Record<string, LucideIcon> = { MapPin, Car, Train, Bus, Trees, Utensils, Stethoscope }
 
 export function LocationSection() {
   const sectionRef = useRef<HTMLElement>(null)

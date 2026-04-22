@@ -14,6 +14,7 @@ export function HeroSection() {
   const imageRef = useRef<HTMLImageElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
+  const dividerRef = useRef<HTMLDivElement>(null)
   const subtitleRef = useRef<HTMLParagraphElement>(null)
   const ctasRef = useRef<HTMLDivElement>(null)
   const scrollIndicatorRef = useRef<HTMLDivElement>(null)
@@ -76,6 +77,7 @@ export function HeroSection() {
             } else if (titleRef.current) {
               gsap.set(titleRef.current, { opacity: 1, y: 0 })
             }
+            if (dividerRef.current) gsap.set(dividerRef.current, { opacity: 1, scaleX: 1 })
             if (subtitleRef.current) gsap.set(subtitleRef.current, { opacity: 1, y: 0 })
             if (buttons.length > 0) {
               gsap.set(buttons, { opacity: 1, y: 0, scale: 1 })
@@ -225,6 +227,26 @@ export function HeroSection() {
             )
           }
 
+          // -- 2.5. Divider line: scaleX reveal from center ------------
+          if (dividerRef.current) {
+            tl.fromTo(
+              dividerRef.current,
+              { opacity: 0, scaleX: 0, transformOrigin: "center", willChange: "transform, opacity" },
+              {
+                opacity: 1,
+                scaleX: 1,
+                duration: 0.8 * factor,
+                ease: "power3.out",
+                onComplete: () => {
+                  if (dividerRef.current) {
+                    gsap.set(dividerRef.current, { clearProps: "willChange,transform" })
+                  }
+                },
+              },
+              1.2,
+            )
+          }
+
           // -- 3. Subtitle: opacity + y only (no filter blur) -----------
           if (subtitleRef.current) {
             tl.fromTo(
@@ -346,8 +368,6 @@ export function HeroSection() {
     { scope: sectionRef },
   )
 
-  // Wire CSS reveal for the divider under the title (touch only; desktop
-  // renders the line full-width without animation).
   useScrollReveal(sectionRef)
 
   return (
@@ -361,7 +381,7 @@ export function HeroSection() {
         <div className="absolute inset-0 bg-black/40 z-10" />
         <img
           ref={imageRef}
-          src="/images/design-mode/cbq_gbd_ath_View_10.jpg"
+          src="/images/cbq_ab_am_view_01.jpg"
           alt="Hero Architecture"
           className="w-full h-full object-cover"
         />
@@ -373,21 +393,20 @@ export function HeroSection() {
           ref={titleRef}
           className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold mb-6 tracking-tight text-balance text-white px-4 opacity-0"
         >
-          EXPERIENCIAS
+          Tu próximo capítulo
           <br />
-          <span className="text-white break-words">ARQUITECTÓNICAS</span>
+          <span className="text-white break-words">empieza en San Fernando.</span>
         </h1>
         <div
-          data-reveal="reveal-line"
-          style={{ ["--reveal-delay" as string]: "200ms" }}
-          className="hidden sm:block h-px w-24 bg-white/40 mx-auto mb-8"
+          ref={dividerRef}
+          className="hidden sm:block h-px w-24 bg-white/40 mx-auto mb-8 opacity-0"
           aria-hidden="true"
         />
         <p
           ref={subtitleRef}
           className="text-xl md:text-2xl text-white max-w-2xl mx-auto mb-12 text-pretty opacity-0"
         >
-          Convertimos conceptos en realidades inmersivas antes de que existan
+          Diseño, ubicación y calidad de vida en un solo lugar.
         </p>
         <div
           ref={ctasRef}

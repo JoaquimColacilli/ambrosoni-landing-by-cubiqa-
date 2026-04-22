@@ -274,14 +274,17 @@ export function ContactSection() {
             style={{ ["--reveal-delay" as string]: "80ms" }}
             className="text-4xl md:text-5xl lg:text-6xl font-bold mt-4 mb-6 text-balance text-black"
           >
-            Hagamos realidad <span className="text-black">tu proyecto</span>
+            Tu hogar en San Fernando
+            <br />
+            <span className="text-black">empieza con una consulta.</span>
           </h2>
           <p
             data-reveal="fade-up"
             style={{ ["--reveal-delay" as string]: "160ms" }}
             className="text-lg text-black/70 max-w-2xl mx-auto text-pretty"
           >
-            Nuestro equipo está listo para asesorarte en cada paso
+            Completá el formulario y un asesor se contacta para contarte todo: precios, tipologías disponibles, formas
+            de pago y cómo reservar tu unidad.
           </p>
         </div>
 

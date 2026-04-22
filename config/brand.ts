@@ -192,30 +192,25 @@ export const brand = {
   ] satisfies Unit[],
 
   // --- Tours 360° (recorridos virtuales Kuula) ---
+  // Formato /share/collection/{ID} es el embed oficial; /post/ bloquea iframes via X-Frame-Options
   tours360: [
     {
-      id: "2-ambientes",
-      title: "2 Ambientes",
-      description: "Unidad funcional con balcón y vista abierta", // TODO: copy pendiente de cliente
-      url: null, // TODO: URL Kuula pendiente de Cubiqa
+      id: "depto-a",
+      title: "Depto A",
+      description: "3 Ambientes",
+      url: "https://kuula.co/share/collection/7Mntx?logo=1&info=1&fs=1&vr=0&thumbs=0&inst=es&title=0&desc=0",
     },
     {
-      id: "3-ambientes",
-      title: "3 Ambientes",
-      description: "Amplitud y funcionalidad para familias", // TODO: copy pendiente de cliente
-      url: null, // TODO: URL Kuula pendiente de Cubiqa
+      id: "depto-b",
+      title: "Depto B",
+      description: "2 Ambientes",
+      url: "https://kuula.co/share/collection/7MntQ?logo=1&info=1&fs=1&vr=0&thumbs=0&inst=es&title=0&desc=0",
     },
     {
-      id: "4-ambientes",
-      title: "4 Ambientes",
-      description: "El espacio premium para tu familia", // TODO: copy pendiente de cliente
-      url: null, // TODO: URL Kuula pendiente de Cubiqa
-    },
-    {
-      id: "espacios-comunes",
-      title: "Espacios Comunes",
-      description: "Espacios comunes diseñados para disfrutar", // TODO: copy pendiente de cliente
-      url: null, // TODO: URL Kuula pendiente de Cubiqa
+      id: "depto-c",
+      title: "Depto C",
+      description: "3 Ambientes",
+      url: "https://kuula.co/share/collection/7M64p?logo=1&info=1&fs=1&vr=0&thumbs=0&inst=es&title=0&desc=0",
     },
   ] satisfies Tour360[],
 
@@ -229,11 +224,12 @@ export const brand = {
       description:
         "Cada unidad combina diseño contemporáneo con funcionalidad. Amplios ambientes con luz natural y terminaciones de primera calidad.", // TODO: copy pendiente de cliente
       images: [
-        "/images/amb-04.jpg",
-        "/images/amb-01.jpg",
-        "/images/amb-02.jpg",
-        "/images/amb-09.jpg",
-        "/images/amb-10.jpg",
+        "/images/cbq_ab_am_view_01.jpg",
+        "/images/cbq_ab_am_view_02.jpg",
+        "/images/cbq_ab_am_view_03.jpg",
+        "/images/cbq_ab_am_view_04.jpg",
+        "/images/cbq_ab_am_view_05.jpg",
+        "/images/cbq_ab_am_view_06.jpg",
       ],
     },
     {
@@ -244,22 +240,24 @@ export const brand = {
       description:
         "Espacios comunes pensados para el disfrute y el bienestar. Cada espacio está diseñado para enriquecer tu día a día.", // TODO: copy pendiente de cliente
       images: [
-        "/images/amb-05.jpg",
-        "/images/amb-06.jpg",
-        "/images/amb-07.jpg",
-        "/images/amb-08.jpg",
-        "/images/amb-14.jpg",
+        "/images/cbq_ab_am_view_06.jpg",
+        "/images/cbq_ab_am_view_05.jpg",
+        "/images/cbq_ab_am_view_04.jpg",
+        "/images/cbq_ab_am_view_03.jpg",
+        "/images/cbq_ab_am_view_02.jpg",
+        "/images/cbq_ab_am_view_01.jpg",
       ],
     },
   ] satisfies GalleryCategory[],
 
   // --- POIs cercanos al proyecto ---
   nearbyPlaces: [
-    // TODO: POIs cercanos a AMBROSONI pendientes — no conozco el barrio, placeholders genéricos
-    { name: "Centro Comercial", distance: "1.0km", time: "12 min", iconName: "MapPin" }, // TODO: POI real pendiente
-    { name: "Estación de Tren", distance: "800m", time: "10 min", iconName: "Train" }, // TODO: POI real pendiente
-    { name: "Centro de Salud", distance: "1.5km", time: "6 min", iconName: "Car" }, // TODO: POI real pendiente
-    { name: "Parque / Plaza", distance: "500m", time: "6 min", iconName: "MapPin" }, // TODO: POI real pendiente
+    { name: "Plaza Dorrego", distance: "En la puerta del edificio", time: "1 min", iconName: "Trees" },
+    { name: "Estación Victoria", distance: "Tren Mitre", time: "5 min", iconName: "Train" },
+    { name: "Av. Presidente Perón", distance: "Acceso a autopista y centro", time: "2 min", iconName: "Car" },
+    { name: "Colectivos 60, 203, 365 y 371", distance: "Paradas en la puerta", time: "1 min", iconName: "Bus" },
+    { name: "Gastronomía y comercios", distance: "A la redonda del edificio", time: "3 min", iconName: "Utensils" },
+    { name: "Centro médico privado", distance: "Sobre Ing. White", time: "2 min", iconName: "Stethoscope" },
   ] satisfies NearbyPlace[],
 
   // --- Horarios de atención comercial ---
