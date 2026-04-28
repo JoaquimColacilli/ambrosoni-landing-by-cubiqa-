@@ -13,7 +13,6 @@ export function ConceptSection() {
   const cardRef = useRef<HTMLDivElement>(null)
   const h2Ref = useRef<HTMLHeadingElement>(null)
   const gooeyWrapperRef = useRef<HTMLSpanElement>(null)
-  const subtitleRef = useRef<HTMLParagraphElement>(null)
   const imageWrapperRef = useRef<HTMLDivElement>(null)
   const imageRef = useRef<HTMLImageElement>(null)
   const rightContentRef = useRef<HTMLDivElement>(null)
@@ -121,20 +120,6 @@ export function ConceptSection() {
           )
         }
 
-        // 5. Subtitle fades in
-        if (subtitleRef.current) {
-          cardTl.fromTo(
-            subtitleRef.current,
-            { opacity: 0, y: 20 },
-            {
-              opacity: 1,
-              y: 0,
-              duration: reduced ? 0 : 0.8,
-              ease: "power3.out",
-            },
-            reduced ? 0 : 1.3,
-          )
-        }
       }
 
       // --------------------------------------------------------------
@@ -376,7 +361,7 @@ export function ConceptSection() {
           <div className="max-w-4xl mx-auto text-center">
             <h2
               ref={h2Ref}
-              className="font-bold mb-6 text-balance leading-[1.05]"
+              className="font-bold text-balance leading-[1.05]"
               style={{ perspective: "800px" }}
             >
               <span data-concept-top className="block text-4xl md:text-5xl lg:text-6xl">
@@ -398,12 +383,6 @@ export function ConceptSection() {
                 />
               </span>
             </h2>
-            <p
-              ref={subtitleRef}
-              className="text-lg md:text-xl text-gray-300 leading-relaxed text-pretty"
-            >
-              Somos un estudio de Arquitectura y visualización con sede en Buenos Aires, Argentina.
-            </p>
           </div>
         </div>
 
