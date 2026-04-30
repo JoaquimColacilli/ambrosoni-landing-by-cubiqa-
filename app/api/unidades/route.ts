@@ -22,6 +22,17 @@ function parseNumber(value: unknown, fallback = 0): number {
   return fallback
 }
 
+// Parsea decimales tolerando formato es-AR ("7,5m²") y en-US ("7.5m²").
+function parseDecimal(value: unknown, fallback = 0): number {
+  if (typeof value === "number") return value
+  if (typeof value === "string") {
+    const cleaned = value.replace(/[^0-9,.\-]/g, "").replace(",", ".")
+    const n = parseFloat(cleaned)
+    return Number.isNaN(n) ? fallback : n
+  }
+  return fallback
+}
+
 export async function GET() {
   const token = process.env.AIRTABLE_TOKEN
   const baseId = process.env.AIRTABLE_BASE_ID
@@ -57,7 +68,8 @@ export async function GET() {
           floor: String(record.fields["Piso"] ?? "").trim(),
           unit: String(record.fields["Unidad"] ?? "").trim(),
           rooms: parseNumber(record.fields["Ambientes"]),
-          sqm: parseNumber(record.fields["Superficie Cubierta"] ?? record.fields["m²"]),
+          coveredSqm: parseDecimal(record.fields["Superficie Cubierta"] ?? record.fields["m²"]),
+          uncoveredSqm: parseDecimal(record.fields["Superficie Descubierta"]),
           status,
           price: String(record.fields["Precio"] ?? "Consultar"),
         }

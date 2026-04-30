@@ -45,34 +45,6 @@ export function TypologiesSection() {
     return () => { emblaApi.off("select", onSelect) }
   }, [emblaApi, onSelect])
 
-  // Keep nav arrows vertically centered on the plan image area, not on the
-  // full card (which includes stats + padding below). Measures the first
-  // plan-image wrapper and sets --nav-top on the carousel wrapper.
-  useEffect(() => {
-    if (!carouselWrapperRef.current) return
-
-    const updateNavTop = () => {
-      const wrapper = carouselWrapperRef.current
-      if (!wrapper) return
-      const firstImage = wrapper.querySelector<HTMLElement>("[data-plan-image]")
-      if (!firstImage) return
-      const wrapperRect = wrapper.getBoundingClientRect()
-      const imageRect = firstImage.getBoundingClientRect()
-      const centerY = imageRect.top - wrapperRect.top + imageRect.height / 2
-      wrapper.style.setProperty("--nav-top", `${centerY}px`)
-    }
-
-    updateNavTop()
-    const ro = new ResizeObserver(updateNavTop)
-    ro.observe(carouselWrapperRef.current)
-    window.addEventListener("resize", updateNavTop)
-
-    return () => {
-      ro.disconnect()
-      window.removeEventListener("resize", updateNavTop)
-    }
-  }, [])
-
   useGSAP(
     () => {
       if (isTouchDevice()) return
@@ -281,20 +253,22 @@ export function TypologiesSection() {
         </div>
 
         <div ref={carouselWrapperRef} data-reveal="scale-in" className="relative">
-          {/* Carousel */}
-          <div className="overflow-hidden" ref={emblaRef}>
+          {/* Carousel — mx leaves a gutter at each side of the viewport so the
+              nav arrows have breathing room outside the card area. py adds
+              vertical breathing room so card shadow/border isn't clipped. */}
+          <div className="overflow-hidden mx-12 lg:mx-16 py-2" ref={emblaRef}>
             <div className="flex -ml-4">
               {brand.typologies.map((typology) => (
                 <div
                   key={typology.id}
                   data-typology-card
-                  className="flex-none basis-full md:basis-1/2 lg:basis-1/3 pl-4 will-change-transform"
+                  className="flex-none basis-full md:basis-1/2 lg:basis-1/2 pl-4 will-change-transform"
                 >
                   <SpotlightCard className="bg-white border border-gray-300 rounded-xl">
                     {/* Plan Image */}
                     <div
                       data-plan-image
-                      className="relative aspect-[4/3] cursor-pointer overflow-hidden"
+                      className="relative aspect-[4/3] cursor-pointer overflow-hidden bg-white"
                       onClick={() =>
                         openLightbox(
                           typology.planImage,
@@ -306,17 +280,17 @@ export function TypologiesSection() {
                         src={typology.planImage || "/placeholder.svg"}
                         alt={`Plano de tipología ${typology.name}, ${typology.coveredArea}m² cubiertos`}
                         fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        className="object-contain p-4 transition-transform duration-700 group-hover:scale-105"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                      <div className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <div className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         <Maximize className="text-white" size={18} />
                       </div>
                     </div>
 
                     {/* Card Content */}
-                    <div className="p-6">
+                    <div className="px-6 pt-6 pb-7">
                       <h3 className="text-xl font-bold text-black mb-3">{typology.name}</h3>
                       {typology.description && (
                         <p className="text-sm text-gray-600 mb-4">{typology.description}</p>
@@ -346,12 +320,12 @@ export function TypologiesSection() {
             </div>
           </div>
 
-          {/* Navigation Buttons — centered on the plan image via --nav-top CSS var */}
+          {/* Navigation Buttons — vertically centered on the wrapper (full
+              card), positioned in the mx gutter outside the carousel viewport. */}
           <button
             data-nav-btn
             onClick={scrollPrev}
-            style={{ top: "var(--nav-top, 50%)" }}
-            className="absolute left-0 -translate-y-1/2 -translate-x-4 bg-black text-white p-3 rounded-full hover:bg-gray-800 active:scale-95 transition-all shadow-lg hidden md:flex items-center justify-center z-10"
+            className="absolute top-1/2 left-0 -translate-y-1/2 bg-black text-white p-3 rounded-full hover:bg-gray-800 active:scale-95 transition-all shadow-lg hidden md:flex items-center justify-center z-10"
             aria-label="Tipología anterior"
           >
             <ChevronLeft size={20} />
@@ -359,8 +333,7 @@ export function TypologiesSection() {
           <button
             data-nav-btn
             onClick={scrollNext}
-            style={{ top: "var(--nav-top, 50%)" }}
-            className="absolute right-0 -translate-y-1/2 translate-x-4 bg-black text-white p-3 rounded-full hover:bg-gray-800 active:scale-95 transition-all shadow-lg hidden md:flex items-center justify-center z-10"
+            className="absolute top-1/2 right-0 -translate-y-1/2 bg-black text-white p-3 rounded-full hover:bg-gray-800 active:scale-95 transition-all shadow-lg hidden md:flex items-center justify-center z-10"
             aria-label="Tipología siguiente"
           >
             <ChevronRight size={20} />

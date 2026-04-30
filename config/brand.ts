@@ -40,7 +40,8 @@ export type Unit = {
   floor: string
   unit: string
   rooms: number
-  sqm: number
+  coveredSqm: number // Superficie cubierta
+  uncoveredSqm: number // Superficie descubierta (terraza/balcón)
   status: UnitStatus
   price: string
 }
@@ -179,17 +180,8 @@ export const brand = {
     },
   ] satisfies Stat[],
 
-  // --- Unidades disponibles ---
-  units: [
-    { floor: "6°", unit: "A", rooms: 2, sqm: 55, status: "available", price: "USD 85.000" }, // TODO: dato real pendiente de Cubiqa
-    { floor: "6°", unit: "B", rooms: 3, sqm: 75, status: "reserved", price: "USD 110.000" }, // TODO: dato real pendiente de Cubiqa
-    { floor: "5°", unit: "A", rooms: 2, sqm: 55, status: "available", price: "USD 82.000" }, // TODO: dato real pendiente de Cubiqa
-    { floor: "5°", unit: "B", rooms: 3, sqm: 75, status: "sold", price: "USD 108.000" }, // TODO: dato real pendiente de Cubiqa
-    { floor: "4°", unit: "A", rooms: 2, sqm: 55, status: "available", price: "USD 80.000" }, // TODO: dato real pendiente de Cubiqa
-    { floor: "4°", unit: "B", rooms: 4, sqm: 95, status: "available", price: "USD 145.000" }, // TODO: dato real pendiente de Cubiqa
-    { floor: "3°", unit: "A", rooms: 3, sqm: 75, status: "reserved", price: "USD 105.000" }, // TODO: dato real pendiente de Cubiqa
-    { floor: "3°", unit: "B", rooms: 4, sqm: 95, status: "available", price: "USD 140.000" }, // TODO: dato real pendiente de Cubiqa
-  ] satisfies Unit[],
+  // --- Unidades disponibles (fallback estático; en runtime las hidrata Airtable) ---
+  units: [] satisfies Unit[],
 
   // --- Tours 360° (recorridos virtuales Kuula) ---
   // Formato /share/collection/{ID} es el embed oficial; /post/ bloquea iframes via X-Frame-Options
@@ -269,66 +261,41 @@ export const brand = {
   } satisfies OfficeHours,
 
   // --- Tipologías (carrusel de planos) ---
+  // 15 deptos en 3 pisos × 5 unidades por piso (tipologías A–E en Airtable).
+  // Los PDFs originales viven en /public/AMBROSONI/Depto N Ambrosoni.pdf;
+  // los PNGs se generan con scripts/pdf-to-png.mjs (pdfjs-dist + Playwright).
+  // Mapeo deducido: Depto 1 = A/B (mirror), Depto 2 = D/E (mirror), Depto 3 = C.
+  // m² tomados de Airtable. TODO: confirmar el mapeo PDF↔tipología con AR Building.
   typologies: [
     {
-      id: "2-ambientes",
-      name: "2 Ambientes",
-      totalArea: 0, // TODO: dato real pendiente de Cubiqa
-      coveredArea: 0, // TODO: dato real pendiente de Cubiqa
-      bedrooms: 1, // TODO: dato real pendiente de Cubiqa
-      bathrooms: 1, // TODO: dato real pendiente de Cubiqa
-      planImage: "/plano_example.jpg", // TODO: plano 2 ambientes AMBROSONI pendiente — placeholder de Cubiqa
-      description: "Unidad funcional ideal para parejas o inversores", // TODO: copy pendiente de cliente
+      id: "depto-1",
+      name: "Depto 1",
+      totalArea: 81, // 65 cub + 16 desc (tipología A/B)
+      coveredArea: 65,
+      bedrooms: 2,
+      bathrooms: 2,
+      planImage: "/AMBROSONI/depto-1-plano.png",
+      description: "",
     },
     {
-      id: "3-ambientes",
-      name: "3 Ambientes",
-      totalArea: 0, // TODO: dato real pendiente de Cubiqa
-      coveredArea: 0, // TODO: dato real pendiente de Cubiqa
-      bedrooms: 2, // TODO: dato real pendiente de Cubiqa
-      bathrooms: 1, // TODO: dato real pendiente de Cubiqa
-      planImage: "/plano_example.jpg", // TODO: plano 3 ambientes AMBROSONI pendiente — placeholder de Cubiqa
-      description: "Amplitud y funcionalidad para familias", // TODO: copy pendiente de cliente
+      id: "depto-2",
+      name: "Depto 2",
+      totalArea: 65, // 53 cub + 12 desc (tipología D/E)
+      coveredArea: 53,
+      bedrooms: 1,
+      bathrooms: 2,
+      planImage: "/AMBROSONI/depto-2-plano.png",
+      description: "",
     },
     {
-      id: "4-ambientes",
-      name: "4 Ambientes",
-      totalArea: 0, // TODO: dato real pendiente de Cubiqa
-      coveredArea: 0, // TODO: dato real pendiente de Cubiqa
-      bedrooms: 3, // TODO: dato real pendiente de Cubiqa
-      bathrooms: 2, // TODO: dato real pendiente de Cubiqa
-      planImage: "/plano_example.jpg", // TODO: plano 4 ambientes AMBROSONI pendiente — placeholder de Cubiqa
-      description: "El espacio premium para tu familia", // TODO: copy pendiente de cliente
-    },
-    {
-      id: "2-ambientes-loft",
-      name: "2 Ambientes Loft",
-      totalArea: 0, // TODO: dato real pendiente de Cubiqa
-      coveredArea: 0, // TODO: dato real pendiente de Cubiqa
-      bedrooms: 1, // TODO: dato real pendiente de Cubiqa
-      bathrooms: 1, // TODO: dato real pendiente de Cubiqa
-      planImage: "/plano_example.jpg", // TODO: plano 2 ambientes loft AMBROSONI pendiente — placeholder de Cubiqa
-      description: "Diseño abierto con doble altura y mezzanine", // TODO: copy pendiente de cliente
-    },
-    {
-      id: "3-ambientes-premium",
-      name: "3 Ambientes Premium",
-      totalArea: 0, // TODO: dato real pendiente de Cubiqa
-      coveredArea: 0, // TODO: dato real pendiente de Cubiqa
-      bedrooms: 2, // TODO: dato real pendiente de Cubiqa
-      bathrooms: 2, // TODO: dato real pendiente de Cubiqa
-      planImage: "/plano_example.jpg", // TODO: plano 3 ambientes premium AMBROSONI pendiente — placeholder de Cubiqa
-      description: "Suite principal con vestidor y baño en suite", // TODO: copy pendiente de cliente
-    },
-    {
-      id: "4-ambientes-penthouse",
-      name: "Penthouse",
-      totalArea: 0, // TODO: dato real pendiente de Cubiqa
-      coveredArea: 0, // TODO: dato real pendiente de Cubiqa
-      bedrooms: 3, // TODO: dato real pendiente de Cubiqa
-      bathrooms: 3, // TODO: dato real pendiente de Cubiqa
-      planImage: "/plano_example.jpg", // TODO: plano penthouse AMBROSONI pendiente — placeholder de Cubiqa
-      description: "Unidad exclusiva con terraza privada y vistas panorámicas", // TODO: copy pendiente de cliente
+      id: "depto-3",
+      name: "Depto 3",
+      totalArea: 60, // 53 cub + 7.5 desc (tipología C, redondeado)
+      coveredArea: 53,
+      bedrooms: 1,
+      bathrooms: 2,
+      planImage: "/AMBROSONI/depto-3-plano.png",
+      description: "",
     },
   ] satisfies Typology[],
 } as const

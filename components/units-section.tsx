@@ -196,7 +196,10 @@ export function UnitsSection() {
   useScrollReveal(sectionRef)
 
   const handleConsult = (unit: Unit) => {
-    const unitInfo = `Piso ${unit.floor}, Unidad ${unit.unit} - ${unit.rooms} ambientes, ${unit.sqm}m² - ${unit.price}`
+    const sqmInfo = unit.uncoveredSqm > 0
+      ? `${unit.coveredSqm}m² cubiertos + ${unit.uncoveredSqm}m² descubiertos`
+      : `${unit.coveredSqm}m² cubiertos`
+    const unitInfo = `Piso ${unit.floor}, Unidad ${unit.unit} - ${unit.rooms} ambientes, ${sqmInfo} - ${unit.price}`
 
     if (unit.status === "reserved") {
       setShowReservedAlert(`${unit.floor}-${unit.unit}`)
@@ -304,7 +307,8 @@ export function UnitsSection() {
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Piso</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Unidad</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Ambientes</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">m²</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Sup. cubierta</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Sup. descubierta</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Precio</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Estado</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Acción</th>
@@ -313,7 +317,7 @@ export function UnitsSection() {
               <tbody>
                 {loading && (
                   <tr>
-                    <td colSpan={7} className="px-6 py-16 text-center">
+                    <td colSpan={8} className="px-6 py-16 text-center">
                       <div className="flex items-center justify-center gap-3 text-gray-600">
                         <Loader2 className="animate-spin" size={20} />
                         <span className="text-sm">Cargando unidades...</span>
@@ -323,7 +327,7 @@ export function UnitsSection() {
                 )}
                 {!loading && error && (
                   <tr>
-                    <td colSpan={7} className="px-6 py-16 text-center">
+                    <td colSpan={8} className="px-6 py-16 text-center">
                       <div className="flex flex-col items-center justify-center gap-3">
                         <AlertCircle className="text-gray-500" size={24} />
                         <span className="text-sm text-gray-700">No pudimos cargar las unidades.</span>
@@ -340,7 +344,7 @@ export function UnitsSection() {
                 )}
                 {!loading && !error && filteredUnits.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="px-6 py-16 text-center text-sm text-gray-600">
+                    <td colSpan={8} className="px-6 py-16 text-center text-sm text-gray-600">
                       No hay unidades que coincidan con el filtro seleccionado.
                     </td>
                   </tr>
@@ -360,7 +364,10 @@ export function UnitsSection() {
                       <td className="px-6 py-4 font-medium text-gray-900">{unit.floor}</td>
                       <td className="px-6 py-4 font-medium text-gray-900">{unit.unit}</td>
                       <td className="px-6 py-4 text-gray-900">{unit.rooms}</td>
-                      <td className="px-6 py-4 text-gray-900">{unit.sqm}</td>
+                      <td className="px-6 py-4 text-gray-900">{unit.coveredSqm}m²</td>
+                      <td className="px-6 py-4 text-gray-900">
+                        {unit.uncoveredSqm > 0 ? `${unit.uncoveredSqm}m²` : "—"}
+                      </td>
                       <td className="px-6 py-4 font-semibold text-gray-900">{unit.price}</td>
                       <td className="px-6 py-4">
                         <span
