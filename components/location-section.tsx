@@ -243,7 +243,7 @@ export function LocationSection() {
             style={{ ["--reveal-delay" as string]: "160ms" }}
             className="text-lg text-gray-700 max-w-2xl mx-auto text-pretty"
           >
-            Conectividad premium en la zona más exclusiva de la ciudad
+            Conectividad Premium en una zona privilegiada de San Fernando
           </p>
         </div>
 

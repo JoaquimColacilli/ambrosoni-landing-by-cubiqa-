@@ -1,12 +1,11 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useRef } from "react"
 import SplitType from "split-type"
-import { brand } from "@/config/brand"
 import { GooeyText } from "@/components/ui/gooey-text"
 import { FloatingPaths } from "@/components/ui/background-paths"
 import { useScrollReveal } from "@/hooks/useScrollReveal"
-import { gsap, ScrollTrigger, getScrubValue, prefersReducedMotion, isTouchDevice, useGSAP } from "@/lib/gsapConfig"
+import { gsap, getScrubValue, prefersReducedMotion, isTouchDevice, useGSAP } from "@/lib/gsapConfig"
 
 export function ConceptSection() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -16,15 +15,9 @@ export function ConceptSection() {
   const imageWrapperRef = useRef<HTMLDivElement>(null)
   const imageRef = useRef<HTMLImageElement>(null)
   const rightContentRef = useRef<HTMLDivElement>(null)
-  const statsRef = useRef<HTMLDivElement>(null)
-
-  const [counts, setCounts] = useState<number[]>(Array(brand.stats.length).fill(0))
 
   useGSAP(
     () => {
-      // On touch devices, GSAP is gated off and CSS reveal + IO counter
-      // below handle the entrance. Keep initial counts at 0 so the IO
-      // counter can animate from 0 → target.
       if (isTouchDevice()) return
       const reduced = prefersReducedMotion()
 
@@ -179,7 +172,7 @@ export function ConceptSection() {
       }
 
       // --------------------------------------------------------------
-      // RIGHT CONTENT — eyebrow, h2 word reveal, paragraphs, stats
+      // RIGHT CONTENT — eyebrow, h2 word reveal, paragraphs
       // --------------------------------------------------------------
       if (rightContentRef.current) {
         const rightTl = gsap.timeline({
@@ -236,60 +229,6 @@ export function ConceptSection() {
           )
         }
 
-        // Stats cards fade up + scale
-        if (statsRef.current) {
-          const cards = statsRef.current.querySelectorAll<HTMLElement>("[data-stat]")
-          if (cards.length > 0) {
-            rightTl.fromTo(
-              cards,
-              { opacity: 0, y: 30, scale: 0.85 },
-              {
-                opacity: 1,
-                y: 0,
-                scale: 1,
-                duration: reduced ? 0 : 0.7,
-                stagger: 0.1,
-                ease: "back.out(1.6)",
-              },
-              reduced ? 0 : 1.1,
-            )
-          }
-        }
-      }
-
-      // --------------------------------------------------------------
-      // STATS COUNT-UP — GSAP-driven, triggered once stats are visible
-      // --------------------------------------------------------------
-      if (statsRef.current) {
-        ScrollTrigger.create({
-          trigger: statsRef.current,
-          start: "top 85%",
-          once: true,
-          onEnter: () => {
-            brand.stats.forEach((stat, i) => {
-              const proxy = { val: 0 }
-              gsap.to(proxy, {
-                val: stat.value,
-                duration: reduced ? 0 : 2.0,
-                ease: "power2.out",
-                onUpdate: () => {
-                  setCounts((prev) => {
-                    const next = [...prev]
-                    next[i] = Math.floor(proxy.val)
-                    return next
-                  })
-                },
-                onComplete: () => {
-                  setCounts((prev) => {
-                    const next = [...prev]
-                    next[i] = stat.value
-                    return next
-                  })
-                },
-              })
-            })
-          },
-        })
       }
     },
     { scope: sectionRef },
@@ -297,54 +236,6 @@ export function ConceptSection() {
 
   // Touch-only CSS reveal for header, image and right-column content.
   useScrollReveal(sectionRef)
-
-  // Touch-only count-up: single IntersectionObserver on the stats container,
-  // ease-out-cubic RAF tween for all brand.stats values at once. Replaces
-  // the GSAP proxy that's gated off on touch.
-  useEffect(() => {
-    if (typeof window === "undefined") return
-    const isTouch = window.matchMedia("(hover: none) and (pointer: coarse)").matches
-    if (!isTouch) return
-    const node = statsRef.current
-    if (!node) return
-
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    if (reduced) {
-      setCounts(brand.stats.map((s) => s.value))
-      return
-    }
-
-    let rafId: number | null = null
-    let cancelled = false
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return
-          io.unobserve(node)
-          const start = performance.now()
-          const duration = 1800
-          const tick = (now: number) => {
-            if (cancelled) return
-            const t = Math.min(1, (now - start) / duration)
-            const eased = 1 - Math.pow(1 - t, 3)
-            setCounts(brand.stats.map((s) => Math.round(s.value * eased)))
-            if (t < 1) rafId = requestAnimationFrame(tick)
-            else setCounts(brand.stats.map((s) => s.value))
-          }
-          rafId = requestAnimationFrame(tick)
-        })
-      },
-      { rootMargin: "0px 0px -10% 0px", threshold: 0.1 },
-    )
-    io.observe(node)
-
-    return () => {
-      cancelled = true
-      if (rafId !== null) cancelAnimationFrame(rafId)
-      io.disconnect()
-    }
-  }, [])
 
   return (
     <section id="concepto" ref={sectionRef} className="relative py-16 bg-gray-50 overflow-hidden">
@@ -416,7 +307,7 @@ export function ConceptSection() {
               style={{ ["--reveal-delay" as string]: "80ms" }}
               className="text-4xl md:text-5xl lg:text-6xl font-bold italic mt-4 mb-6 text-balance text-black"
             >
-              Nueve hogares.
+              Quince hogares.
               <br />
               <span className="text-black">Un edificio que se siente diferente</span>
             </h2>
@@ -425,7 +316,7 @@ export function ConceptSection() {
               style={{ ["--reveal-delay" as string]: "160ms" }}
               className="text-lg text-gray-700 mb-6 leading-relaxed text-pretty"
             >
-              Ambrosoni no es un edificio más. Son 9 departamentos en 3 pisos diseñados con una lógica distinta: menos
+              Ambrosoni no es un edificio más. Son 15 departamentos en 3 pisos diseñados con una lógica distinta: menos
               unidades, más atención a cada detalle. Espacios amplios, luz natural, terminaciones de calidad y cocheras
               propias para que nada falte.
             </p>
@@ -436,23 +327,6 @@ export function ConceptSection() {
             >
               Porque cuando el edificio es chico, cada familia importa.
             </p>
-            <div ref={statsRef} className="grid grid-cols-3 gap-6">
-              {brand.stats.map((stat, i) => (
-                <div
-                  key={stat.label}
-                  data-stat
-                  data-reveal="fade-up"
-                  style={{ ["--reveal-delay" as string]: `${320 + i * 80}ms` }}
-                  className="text-center"
-                >
-                  <div className="text-3xl font-bold text-black mb-2">
-                    {counts[i]}
-                    {stat.suffix}
-                  </div>
-                  <div className="text-sm text-gray-600">{stat.label}</div>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </div>
