@@ -188,21 +188,21 @@ export const brand = {
   tours360: [
     {
       id: "depto-a",
-      title: "Depto A",
+      title: "Depto 1 - A",
       description: "3 Ambientes",
       url: "https://kuula.co/share/collection/7Mntx?logo=1&info=1&fs=1&vr=0&thumbs=0&inst=es&title=0&desc=0",
     },
     {
       id: "depto-b",
-      title: "Depto B",
+      title: "Depto 3 - C",
       description: "2 Ambientes",
-      url: "https://kuula.co/share/collection/7MntQ?logo=1&info=1&fs=1&vr=0&thumbs=0&inst=es&title=0&desc=0",
+      url: "https://kuula.co/share/collection/7M64p?logo=1&info=1&fs=1&vr=0&thumbs=0&inst=es&title=0&desc=0",
     },
     {
       id: "depto-c",
-      title: "Depto C",
+      title: "Depto 1 - B",
       description: "3 Ambientes",
-      url: "https://kuula.co/share/collection/7M64p?logo=1&info=1&fs=1&vr=0&thumbs=0&inst=es&title=0&desc=0",
+      url: "https://kuula.co/share/collection/7MntQ?logo=1&info=1&fs=1&vr=0&thumbs=0&inst=es&title=0&desc=0",
     },
   ] satisfies Tour360[],
 
@@ -269,7 +269,7 @@ export const brand = {
   typologies: [
     {
       id: "depto-1",
-      name: "Depto 1",
+      name: "Depto 1 - Tipologías A y B",
       totalArea: 81, // 65 cub + 16 desc (tipología A/B)
       coveredArea: 65,
       bedrooms: 2,
@@ -279,7 +279,7 @@ export const brand = {
     },
     {
       id: "depto-2",
-      name: "Depto 2",
+      name: "Depto 2 - Tipologías D y E",
       totalArea: 65, // 53 cub + 12 desc (tipología D/E)
       coveredArea: 53,
       bedrooms: 1,
@@ -289,7 +289,7 @@ export const brand = {
     },
     {
       id: "depto-3",
-      name: "Depto 3",
+      name: "Depto 3 - Tipología C",
       totalArea: 60, // 53 cub + 7.5 desc (tipología C, redondeado)
       coveredArea: 53,
       bedrooms: 1,

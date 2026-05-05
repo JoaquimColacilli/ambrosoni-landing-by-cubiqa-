@@ -91,10 +91,20 @@ for (const job of jobs) {
       }
     }
   }
-  for (let y = 0; y < H; y++) if (rowDark[y] >= MIN_DARK) { top = y; break }
-  for (let y = H - 1; y >= 0; y--) if (rowDark[y] >= MIN_DARK) { bottom = y; break }
-  for (let x = 0; x < W; x++) if (colDark[x] >= MIN_DARK) { left = x; break }
-  for (let x = W - 1; x >= 0; x--) if (colDark[x] >= MIN_DARK) { right = x; break }
+  // Filter isolated 1-pixel-wide lines (page-edge artifacts) — a column only
+  // counts as content if at least one of its immediate neighbors also has dark
+  // pixels above threshold. Real plano content (walls, dimensions) is always
+  // contiguous; stray PDF page borders show up as solitary columns.
+  const isContent = (arr, i, len) => {
+    if (arr[i] < MIN_DARK) return false
+    const prev = i > 0 ? arr[i - 1] : 0
+    const next = i < len - 1 ? arr[i + 1] : 0
+    return prev >= MIN_DARK || next >= MIN_DARK
+  }
+  for (let y = 0; y < H; y++) if (isContent(rowDark, y, H)) { top = y; break }
+  for (let y = H - 1; y >= 0; y--) if (isContent(rowDark, y, H)) { bottom = y; break }
+  for (let x = 0; x < W; x++) if (isContent(colDark, x, W)) { left = x; break }
+  for (let x = W - 1; x >= 0; x--) if (isContent(colDark, x, W)) { right = x; break }
   const PAD = 80
   const cropLeft = Math.max(0, left - PAD)
   const cropTop = Math.max(0, top - PAD)
