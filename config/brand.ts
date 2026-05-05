@@ -187,21 +187,21 @@ export const brand = {
   // Formato /share/collection/{ID} es el embed oficial; /post/ bloquea iframes via X-Frame-Options
   tours360: [
     {
-      id: "depto-a",
+      id: "depto-1-a",
       title: "Depto 1 - A",
       description: "3 Ambientes",
       url: "https://kuula.co/share/collection/7Mntx?logo=1&info=1&fs=1&vr=0&thumbs=0&inst=es&title=0&desc=0",
     },
     {
-      id: "depto-b",
-      title: "Depto 3 - C",
-      description: "2 Ambientes",
+      id: "depto-1-b",
+      title: "Depto 1 - B",
+      description: "3 Ambientes",
       url: "https://kuula.co/share/collection/7M64p?logo=1&info=1&fs=1&vr=0&thumbs=0&inst=es&title=0&desc=0",
     },
     {
-      id: "depto-c",
-      title: "Depto 1 - B",
-      description: "3 Ambientes",
+      id: "depto-3-c",
+      title: "Depto 3 - C",
+      description: "2 Ambientes",
       url: "https://kuula.co/share/collection/7MntQ?logo=1&info=1&fs=1&vr=0&thumbs=0&inst=es&title=0&desc=0",
     },
   ] satisfies Tour360[],
