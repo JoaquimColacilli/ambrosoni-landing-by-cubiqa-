@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ffprobe -v error -show_entries format_tags=major_brand,encoder -show_entries format=tags -of default=noprint_wrappers=1 C:/dev/AMBROSONI/public/video/hero-fachada.mp4)",
+      "Bash(ffprobe -v error -read_intervals \"%+#1\" -show_entries packet=flags -of csv=p=0 C:/dev/AMBROSONI/public/video/hero-fachada.mp4)",
+      "Bash(ffmpeg -y -i \"C:/dev/AMBROSONI/public/video/Animacion ambrosoni_fachada.mp4\" -vf \"scale=1280:720:flags=lanczos,fps=fps=30\" -c:v libx264 -profile:v high -level 4.0 -preset slow -crf 25 -pix_fmt yuv420p -g 30 -keyint_min 30 -bf 0 -refs 1 -tune film -x264-params \"no-scenecut=1\" -movflags +faststart -an C:/dev/AMBROSONI/public/video/hero-fachada-v2.mp4)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "magic"
+  ]
+}

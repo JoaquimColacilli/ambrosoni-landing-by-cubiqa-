@@ -75,6 +75,54 @@ export type OfficeHours = {
   sunday: string
 }
 
+export type SeoFaqEntry = {
+  question: string
+  answer: string
+}
+
+export type SeoOfferTipo = {
+  name: string
+  description: string
+  rooms: number
+  coveredSqm: number
+  uncoveredSqm: number
+}
+
+export type SeoConfig = {
+  // URL canónica de producción (se sobreescribe via NEXT_PUBLIC_SITE_URL)
+  siteUrl: string
+  // Geo del edificio (verificar con cliente)
+  geo: { latitude: number; longitude: number }
+  postalCode: string
+  // Color del theme (PWA / Safari address bar)
+  themeColor: string
+  // Codigo de Google Search Console (vacio = sin meta tag)
+  googleVerification: string
+  // Imagen OG (1200x630 ideal). TODO: render dedicado.
+  ogImage: string
+  // Schema.org: tipologia summary
+  schema: {
+    siteName: string
+    title: string
+    description: string
+    ogTitle: string
+    ogDescription: string
+    twitterDescription: string
+    locale: string // es_AR
+    htmlLang: string // es-AR
+    alternateName: string
+    totalUnits: number
+    totalFloors: number
+    unitsPerFloor: number
+    petsAllowed: boolean
+    priceRange: string // "$" | "$$" | "$$$"
+    amenities: string[]
+    additionalProperties: { name: string; value: string }[]
+    offers: SeoOfferTipo[]
+  }
+  faq: SeoFaqEntry[]
+}
+
 // ---------------------------------------------------------------------------
 // Brand data
 // ---------------------------------------------------------------------------
@@ -140,6 +188,109 @@ export const brand = {
     ogDescription:
       "Nuevo desarrollo inmobiliario en Victoria, San Fernando. Departamentos con diseño contemporaneo y amenities premium.",
   },
+
+  // --- SEO ---
+  // Toda la data extra para metadata avanzada, JSON-LD, llms.txt, sitemap.
+  // Pattern espejo del setup de Edificio MERCED.
+  seo: {
+    siteUrl: "https://edificioambrosoni.com",
+    // TODO: verificar coordenadas exactas del lote en Ambrosoni 1321 (estimadas del mapsEmbedUrl)
+    geo: { latitude: -34.453, longitude: -58.445 },
+    // TODO: confirmar codigo postal Victoria — San Fernando (B1644 es el estandar de la zona)
+    postalCode: "B1644",
+    themeColor: "#0a0a0a",
+    // TODO: cargar codigo Google Search Console cuando este verificado
+    googleVerification: "",
+    // TODO: render dedicado 1200x630 para OG (placeholder: usa la vista del hero)
+    ogImage: "/images/cbq_ab_am_view_01.jpg",
+    schema: {
+      siteName: "AMBROSONI — AR Building",
+      title: "Departamentos en Victoria, San Fernando | AMBROSONI",
+      description:
+        "AMBROSONI: nuevo edificio en Ambrosoni 1321, Victoria — San Fernando, Buenos Aires. Departamentos de 1 y 2 ambientes con diseno contemporaneo, ubicacion privilegiada y amenities premium.",
+      ogTitle: "Departamentos en Victoria, San Fernando | AMBROSONI",
+      ogDescription:
+        "AMBROSONI: nuevo edificio en Ambrosoni 1321, Victoria — San Fernando. Departamentos de 1 y 2 ambientes, diseno contemporaneo y ubicacion privilegiada.",
+      twitterDescription:
+        "El nuevo edificio en Victoria, San Fernando. Departamentos de 1 y 2 ambientes. Consulta disponibilidad!",
+      locale: "es_AR",
+      htmlLang: "es-AR",
+      alternateName: "AMBROSONI Edificio",
+      totalUnits: 15, // 3 pisos x 5 unidades por piso (segun comentario de typologies)
+      totalFloors: 3,
+      unitsPerFloor: 5,
+      petsAllowed: true,
+      priceRange: "$$",
+      // TODO: confirmar amenities reales del edificio con AR Building
+      amenities: [
+        "Ascensor",
+        "Iluminacion natural",
+        "Terrazas privadas",
+      ],
+      additionalProperties: [
+        { name: "Distancia a Plaza Dorrego", value: "En la puerta del edificio" },
+        { name: "Distancia a Estacion Victoria (Tren Mitre)", value: "5 min" },
+        { name: "Total de pisos", value: "3" },
+        { name: "Total de unidades", value: "15" },
+      ],
+      // Espejo de typologies — formato Schema.org Offer/Apartment
+      offers: [
+        {
+          name: "Departamento 2 Ambientes — Tipologia A/B",
+          description:
+            "Departamento de 2 ambientes de 65m2 cubiertos + 16m2 descubiertos en AMBROSONI, Victoria — San Fernando.",
+          rooms: 2,
+          coveredSqm: 65,
+          uncoveredSqm: 16,
+        },
+        {
+          name: "Departamento 1 Ambiente — Tipologia D/E",
+          description:
+            "Departamento de 1 ambiente de 53m2 cubiertos + 12m2 descubiertos en AMBROSONI, Victoria — San Fernando.",
+          rooms: 1,
+          coveredSqm: 53,
+          uncoveredSqm: 12,
+        },
+        {
+          name: "Departamento 1 Ambiente — Tipologia C",
+          description:
+            "Departamento de 1 ambiente de 53m2 cubiertos + 7.5m2 descubiertos en AMBROSONI, Victoria — San Fernando.",
+          rooms: 1,
+          coveredSqm: 53,
+          uncoveredSqm: 7.5,
+        },
+      ],
+    },
+    // FAQs alineadas al esquema FAQPage (JSON-LD) y al texto de llms.txt.
+    // Foco: ubicacion, tipologias, inversion, contacto, entorno.
+    faq: [
+      {
+        question: "Donde esta ubicado AMBROSONI?",
+        answer:
+          "AMBROSONI esta ubicado en Ambrosoni 1321, Victoria — San Fernando, Buenos Aires, Argentina. Frente a Plaza Dorrego y a 5 minutos de la Estacion Victoria del Tren Mitre.",
+      },
+      {
+        question: "Que tipos de departamentos tiene AMBROSONI?",
+        answer:
+          "AMBROSONI ofrece departamentos de 1 y 2 ambientes en tres tipologias (A/B, C, D/E). El edificio cuenta con 15 unidades distribuidas en 3 pisos de 5 unidades por piso.",
+      },
+      {
+        question: "Se puede invertir comprando un departamento en AMBROSONI?",
+        answer:
+          "Si. AMBROSONI esta ubicado en Victoria, San Fernando — una zona consolidada con alta demanda de alquiler por su cercania al Tren Mitre, accesos a CABA y servicios. La proximidad a Plaza Dorrego y a transporte publico lo convierte en una opcion solida para inversion inmobiliaria.",
+      },
+      {
+        question: "Como puedo consultar sobre unidades disponibles en AMBROSONI?",
+        answer:
+          "Podes consultar disponibilidad completando el formulario en la seccion de contacto del sitio, escribiendo a info@arbuilding.com.ar o por WhatsApp al +54 11 3862 8300 (Maiqui) o +54 11 4673 8609 (Leo). El horario de atencion es de lunes a viernes de 9:00 a 18:00 y sabados de 10:00 a 14:00.",
+      },
+      {
+        question: "Que tiene cerca AMBROSONI en Victoria, San Fernando?",
+        answer:
+          "AMBROSONI esta frente a Plaza Dorrego, a 5 minutos de la Estacion Victoria del Tren Mitre, a 2 minutos de Av. Presidente Peron (acceso a autopista y centro), con paradas de los colectivos 60, 203, 365 y 371 en la puerta, gastronomia y comercios a la redonda y un centro medico privado a 2 minutos sobre Ing. White.",
+      },
+    ],
+  } satisfies SeoConfig,
 
   // --- Navegacion ---
   navItems: [
@@ -216,12 +367,9 @@ export const brand = {
       description:
         "Cada unidad combina diseño contemporáneo con funcionalidad. Amplios ambientes con luz natural y terminaciones de primera calidad.", // TODO: copy pendiente de cliente
       images: [
-        "/images/cbq_ab_am_view_01.jpg",
-        "/images/cbq_ab_am_view_02.jpg",
         "/images/cbq_ab_am_view_03.jpg",
         "/images/cbq_ab_am_view_04.jpg",
         "/images/cbq_ab_am_view_05.jpg",
-        "/images/cbq_ab_am_view_06.jpg",
       ],
     },
     {
@@ -233,11 +381,6 @@ export const brand = {
         "Espacios comunes pensados para el disfrute y el bienestar. Cada espacio está diseñado para enriquecer tu día a día.", // TODO: copy pendiente de cliente
       images: [
         "/images/cbq_ab_am_view_06.jpg",
-        "/images/cbq_ab_am_view_05.jpg",
-        "/images/cbq_ab_am_view_04.jpg",
-        "/images/cbq_ab_am_view_03.jpg",
-        "/images/cbq_ab_am_view_02.jpg",
-        "/images/cbq_ab_am_view_01.jpg",
       ],
     },
   ] satisfies GalleryCategory[],

@@ -261,33 +261,53 @@ export function ProjectsSection() {
   return (
     <section id="proyectos" ref={sectionRef} className="relative py-24 bg-gray-50 overflow-hidden">
       <GridPattern />
-      <div className="relative container mx-auto px-4 lg:px-8">
-        <div ref={headerRef} className="text-center mb-20" style={{ perspective: "1000px" }}>
-          <span
-            data-eyebrow
-            data-reveal="fade-up"
-            className="text-black text-sm font-semibold tracking-[0.2em] uppercase"
-          >
-            El Proyecto
-          </span>
-          <h2
-            data-reveal="fade-up"
-            style={{ ["--reveal-delay" as string]: "80ms" }}
-            className="text-5xl md:text-6xl lg:text-7xl font-bold mt-6 mb-8 text-balance text-black leading-tight"
-          >
-            Desarrollos que transforman
-            <br />
-            la forma de vivir
-          </h2>
-          <p
-            data-reveal="fade-up"
-            style={{ ["--reveal-delay" as string]: "160ms" }}
-            className="text-xl text-gray-600 max-w-3xl mx-auto text-pretty leading-relaxed"
-          >
-            Cada detalle pensado para crear espacios excepcionales que elevan la calidad de vida
-          </p>
-        </div>
 
+      <div
+        ref={headerRef}
+        className="relative w-full overflow-hidden mb-20"
+        style={{ perspective: "1000px" }}
+      >
+        <div className="relative w-full aspect-[21/9] md:aspect-[21/7] lg:aspect-[21/6]">
+          <Image
+            src="/images/cbq_ab_am_view_02.jpg"
+            alt="Hall de acceso"
+            fill
+            sizes="100vw"
+            className="object-cover"
+            priority={false}
+          />
+          <div className="absolute inset-0 bg-black/45" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-center container mx-auto px-4 lg:px-8">
+              <span
+                data-eyebrow
+                data-reveal="fade-up"
+                className="text-white text-sm font-semibold tracking-[0.2em] uppercase"
+              >
+                El Proyecto
+              </span>
+              <h2
+                data-reveal="fade-up"
+                style={{ ["--reveal-delay" as string]: "80ms" }}
+                className="text-5xl md:text-6xl lg:text-7xl font-bold mt-6 mb-8 text-balance text-white leading-tight drop-shadow-lg"
+              >
+                Desarrollos que transforman
+                <br />
+                la forma de vivir
+              </h2>
+              <p
+                data-reveal="fade-up"
+                style={{ ["--reveal-delay" as string]: "160ms" }}
+                className="text-xl text-white/90 max-w-3xl mx-auto text-pretty leading-relaxed drop-shadow"
+              >
+                Cada detalle pensado para crear espacios excepcionales que elevan la calidad de vida
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="relative container mx-auto px-4 lg:px-8">
         <div className="space-y-24">
           {brand.gallery.map((category, index) => {
             const Icon = iconMap[category.iconName] ?? Building2

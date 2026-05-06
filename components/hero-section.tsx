@@ -11,7 +11,7 @@ import { gsap, getScrubValue, isTouchDevice, useGSAP } from "@/lib/gsapConfig"
 export function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null)
   const imageWrapperRef = useRef<HTMLDivElement>(null)
-  const imageRef = useRef<HTMLImageElement>(null)
+  const imageRef = useRef<HTMLVideoElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
   const dividerRef = useRef<HTMLDivElement>(null)
@@ -108,71 +108,27 @@ export function HeroSection() {
           })
 
           // -- 1. Background image reveal ------------------------------
+          // Composited-only entry: opacity + transform on the wrapper.
+          // No clip-path (forces repaint), no scale on the <video> element
+          // (forces re-rasterizing each decoded frame). The video plays
+          // unscaled while the wrapper fades in, keeping the GPU happy.
           if (imageWrapperRef.current) {
-            if (isMobile) {
-              // Mobile: no clipPath (iOS Safari repaints the full layer on
-              // clip-path animation). Scale + opacity is composited.
-              tl.fromTo(
-                imageWrapperRef.current,
-                {
-                  opacity: 0,
-                  scale: 1.08,
-                  willChange: "transform, opacity",
-                },
-                {
-                  opacity: 1,
-                  scale: 1,
-                  duration: 1.4,
-                  ease: "power3.out",
-                  onComplete: () => {
-                    if (imageWrapperRef.current) {
-                      // Keep willChange — parallax scroll below needs the layer.
-                      gsap.set(imageWrapperRef.current, { clearProps: "transform" })
-                    }
-                  },
-                },
-                0,
-              )
-            } else {
-              tl.fromTo(
-                imageWrapperRef.current,
-                {
-                  clipPath: "inset(0 50% 0 50%)",
-                  opacity: 0,
-                  willChange: "clip-path, opacity",
-                },
-                {
-                  clipPath: "inset(0 0% 0 0%)",
-                  opacity: 1,
-                  duration: 1.8,
-                  ease: "power3.inOut",
-                  onComplete: () => {
-                    if (imageWrapperRef.current) {
-                      // Swap willChange to `transform` for the scroll parallax
-                      // that follows. Don't clear it entirely.
-                      gsap.set(imageWrapperRef.current, {
-                        willChange: "transform",
-                        clearProps: "clip-path",
-                      })
-                    }
-                  },
-                },
-                0,
-              )
-            }
-          }
-
-          if (imageRef.current) {
             tl.fromTo(
-              imageRef.current,
-              { scale: 1.2, willChange: "transform" },
+              imageWrapperRef.current,
               {
+                opacity: 0,
+                scale: isMobile ? 1.08 : 1.04,
+                willChange: "transform, opacity",
+              },
+              {
+                opacity: 1,
                 scale: 1,
-                duration: 2.4 * factor,
-                ease: "power2.out",
+                duration: isMobile ? 1.4 : 1.6,
+                ease: "power3.out",
                 onComplete: () => {
-                  if (imageRef.current) {
-                    gsap.set(imageRef.current, { clearProps: "willChange,transform" })
+                  if (imageWrapperRef.current) {
+                    // Keep willChange — parallax scroll below needs the layer.
+                    gsap.set(imageWrapperRef.current, { clearProps: "transform" })
                   }
                 },
               },
@@ -375,14 +331,20 @@ export function HeroSection() {
       ref={sectionRef}
       className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background"
     >
-      {/* Background Image */}
+      {/* Background Video */}
       <div ref={imageWrapperRef} className="absolute inset-0 opacity-0">
         {/* Dark overlay for text readability */}
         <div className="absolute inset-0 bg-black/40 z-10" />
-        <img
+        <video
           ref={imageRef}
-          src="/images/cbq_ab_am_view_01.jpg"
-          alt="Hero Architecture"
+          src="/video/hero-fachada.mp4"
+          poster="/video/hero-fachada-poster.jpg"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          aria-hidden="true"
           className="w-full h-full object-cover"
         />
       </div>
