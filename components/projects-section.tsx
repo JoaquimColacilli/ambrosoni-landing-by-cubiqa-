@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
-import { X, Building2, Sparkles, type LucideIcon } from "lucide-react"
+import { X } from "lucide-react"
 import SplitType from "split-type"
 import { brand, type GalleryCategory } from "@/config/brand"
 import { SpotlightCard } from "@/components/ui/spotlight-card"
@@ -10,7 +10,6 @@ import { GridPattern } from "@/components/ui/grid-pattern"
 import { useScrollReveal } from "@/hooks/useScrollReveal"
 import { gsap, prefersReducedMotion, isTouchDevice, useGSAP } from "@/lib/gsapConfig"
 
-const iconMap: Record<string, LucideIcon> = { Building2, Sparkles }
 
 export function ProjectsSection() {
   const [selectedCategory, setSelectedCategory] = useState<GalleryCategory | null>(null)
@@ -97,7 +96,6 @@ export function ProjectsSection() {
         const bigImageWrap = block.querySelector<HTMLElement>("[data-img-big]")
         const smallImages = block.querySelectorAll<HTMLElement>("[data-img-small]")
         const textSide = block.querySelector<HTMLElement>("[data-text-side]")
-        const badge = textSide?.querySelector<HTMLElement>("[data-category-badge]")
         const h3 = textSide?.querySelector<HTMLHeadingElement>("h3")
         const paragraph = textSide?.querySelector<HTMLParagraphElement>("p")
         const button = textSide?.querySelector<HTMLButtonElement>("button")
@@ -154,22 +152,7 @@ export function ProjectsSection() {
           )
         }
 
-        // 3. Text side: badge → h3 words → paragraph → button
-        if (badge) {
-          blockTl.fromTo(
-            badge,
-            { opacity: 0, scale: 0.8, y: 15 },
-            {
-              opacity: 1,
-              scale: 1,
-              y: 0,
-              duration: reduced ? 0 : 0.6,
-              ease: "back.out(1.6)",
-            },
-            reduced ? 0 : 0.4,
-          )
-        }
-
+        // 3. Text side: h3 words → paragraph → button
         if (splitH3?.words && splitH3.words.length > 0) {
           blockTl.fromTo(
             splitH3.words,
@@ -310,7 +293,6 @@ export function ProjectsSection() {
       <div className="relative container mx-auto px-4 lg:px-8">
         <div className="space-y-24">
           {brand.gallery.map((category, index) => {
-            const Icon = iconMap[category.iconName] ?? Building2
             const isEven = index % 2 === 0
             // Alternating slide direction per block on touch; desktop uses GSAP.
             const imageReveal = isEven ? "slide-in-left" : "slide-in-right"
@@ -378,14 +360,6 @@ export function ProjectsSection() {
                     style={{ ["--reveal-delay" as string]: "120ms", perspective: "1000px" }}
                     className={`space-y-6 ${!isEven ? "lg:col-start-1 lg:row-start-1" : ""}`}
                   >
-                    <div
-                      data-category-badge
-                      className="inline-flex items-center gap-3 px-4 py-2 bg-gray-100 rounded-full"
-                    >
-                      <Icon size={20} className="text-black" />
-                      <span className="text-sm font-semibold tracking-wider uppercase text-black">{category.name}</span>
-                    </div>
-
                     <h3 className="text-4xl md:text-5xl font-bold text-black leading-tight">{category.subtitle}</h3>
 
                     <p className="text-lg text-gray-600 leading-relaxed">{category.description}</p>

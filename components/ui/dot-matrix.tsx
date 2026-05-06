@@ -173,9 +173,9 @@ export function DotMatrix({
         ctx.arc(dot.x, dot.y, dot.radius, 0, Math.PI * 2)
         // Blend between neutral dark and warm accent based on warmth
         if (dot.warmth > 0.01) {
-          // Warm accent: oklch(0.72 0.12 45)
+          // Brand accent (AR Building green): oklch(0.78 0.15 135)
           const alpha = 0.35 + dot.warmth * 0.55
-          ctx.fillStyle = `oklch(0.72 0.12 45 / ${alpha})`
+          ctx.fillStyle = `oklch(0.78 0.15 135 / ${alpha})`
         } else {
           ctx.fillStyle = "oklch(0.3 0.02 60 / 0.35)"
         }

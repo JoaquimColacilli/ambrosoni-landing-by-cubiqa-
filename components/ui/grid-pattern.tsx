@@ -89,10 +89,10 @@ export function GridPattern({ className = "" }: GridPatternProps) {
             height="80"
             patternUnits="userSpaceOnUse"
           >
-            <circle cx="0" cy="0" r="1.2" fill="oklch(0.72 0.1 45 / 0.5)" />
+            <circle cx="0" cy="0" r="1.2" fill="oklch(0.78 0.13 135 / 0.5)" />
           </pattern>
           <radialGradient id="cursor-fade" cx="50%" cy="50%">
-            <stop offset="0%" stopColor="oklch(0.82 0.08 55 / 0.35)" />
+            <stop offset="0%" stopColor="oklch(0.82 0.13 135 / 0.35)" />
             <stop offset="100%" stopColor="transparent" />
           </radialGradient>
         </defs>
@@ -101,13 +101,13 @@ export function GridPattern({ className = "" }: GridPatternProps) {
         <rect width="100%" height="100%" fill="url(#grid-dots)" />
       </svg>
 
-      {/* Cursor-follow warm light */}
+      {/* Cursor-follow brand light (AR Building green) */}
       <div
         ref={cursorLightRef}
         className="absolute w-[500px] h-[500px] rounded-full pointer-events-none"
         style={{
           background:
-            "radial-gradient(circle, oklch(0.82 0.08 55 / 0.25) 0%, transparent 70%)",
+            "radial-gradient(circle, oklch(0.82 0.13 135 / 0.25) 0%, transparent 70%)",
           transform: "translate(-50%, -50%)",
           opacity: 0,
           transition: "opacity 300ms ease",

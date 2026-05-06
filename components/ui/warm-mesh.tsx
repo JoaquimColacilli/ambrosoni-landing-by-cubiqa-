@@ -10,19 +10,19 @@ interface WarmMeshProps {
 
 const variants = {
   a: `
-    radial-gradient(circle 600px at 20% 30%, oklch(0.82 0.08 55 / 0.18) 0%, transparent 60%),
-    radial-gradient(circle 500px at 80% 70%, oklch(0.88 0.05 75 / 0.15) 0%, transparent 55%),
-    radial-gradient(circle 400px at 50% 90%, oklch(0.78 0.1 45 / 0.12) 0%, transparent 55%)
+    radial-gradient(circle 600px at 20% 30%, oklch(0.82 0.13 135 / 0.18) 0%, transparent 60%),
+    radial-gradient(circle 500px at 80% 70%, oklch(0.88 0.10 135 / 0.15) 0%, transparent 55%),
+    radial-gradient(circle 400px at 50% 90%, oklch(0.78 0.15 135 / 0.12) 0%, transparent 55%)
   `,
   b: `
-    radial-gradient(circle 550px at 85% 20%, oklch(0.82 0.08 55 / 0.18) 0%, transparent 60%),
-    radial-gradient(circle 620px at 15% 75%, oklch(0.88 0.05 75 / 0.15) 0%, transparent 55%),
-    radial-gradient(circle 380px at 60% 45%, oklch(0.78 0.1 45 / 0.1) 0%, transparent 55%)
+    radial-gradient(circle 550px at 85% 20%, oklch(0.82 0.13 135 / 0.18) 0%, transparent 60%),
+    radial-gradient(circle 620px at 15% 75%, oklch(0.88 0.10 135 / 0.15) 0%, transparent 55%),
+    radial-gradient(circle 380px at 60% 45%, oklch(0.78 0.15 135 / 0.1) 0%, transparent 55%)
   `,
 }
 
 /**
- * Subtle static warm gradient mesh — three blurred radial blobs in warm tones.
+ * Subtle static brand gradient mesh — three blurred radial blobs in AR Building green.
  * No continuous animation, just a fade-in when the section enters the viewport.
  * Designed for sections with dense content that need a calm background accent.
  */

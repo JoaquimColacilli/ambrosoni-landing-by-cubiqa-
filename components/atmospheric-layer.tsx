@@ -74,7 +74,7 @@ export function AtmosphericLayer() {
         className="absolute left-1/2 -translate-x-1/2 w-[700px] h-[900px]"
         style={{
           background:
-            "radial-gradient(ellipse at center, oklch(0.80 0.07 65 / 0.55) 0%, oklch(0.83 0.05 68 / 0.22) 40%, transparent 75%)",
+            "radial-gradient(ellipse at center, oklch(0.80 0.13 135 / 0.55) 0%, oklch(0.83 0.10 135 / 0.22) 40%, transparent 75%)",
           filter: "blur(90px)",
           mixBlendMode: "multiply",
           willChange: "transform, opacity",
@@ -87,7 +87,7 @@ export function AtmosphericLayer() {
         className="absolute left-[20%] w-[500px] h-[700px]"
         style={{
           background:
-            "radial-gradient(ellipse at center, oklch(0.82 0.06 72 / 0.35) 0%, transparent 70%)",
+            "radial-gradient(ellipse at center, oklch(0.82 0.13 135 / 0.35) 0%, transparent 70%)",
           filter: "blur(110px)",
           mixBlendMode: "multiply",
           willChange: "transform",
@@ -100,7 +100,7 @@ export function AtmosphericLayer() {
         className="absolute right-[15%] w-[550px] h-[750px]"
         style={{
           background:
-            "radial-gradient(ellipse at center, oklch(0.72 0.10 45 / 0.40) 0%, transparent 70%)",
+            "radial-gradient(ellipse at center, oklch(0.78 0.15 135 / 0.40) 0%, transparent 70%)",
           filter: "blur(100px)",
           mixBlendMode: "multiply",
           willChange: "transform, opacity",

@@ -325,7 +325,7 @@ export function ConceptSection() {
               style={{ ["--reveal-delay" as string]: "240ms" }}
               className="text-lg text-gray-700 mb-8 leading-relaxed text-pretty"
             >
-              Porque cuando el edificio es chico, cada familia importa.
+              Un proyecto donde cada espacio está pensado para vivir mejor.
             </p>
           </div>
         </div>

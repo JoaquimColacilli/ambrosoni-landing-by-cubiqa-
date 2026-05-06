@@ -112,8 +112,8 @@ export function GeometricShapes({ className = "" }: GeometricShapesProps) {
       {shapes.map((shape) => {
         const isWarm = shape.color === "warm"
         const stroke = isWarm
-          ? "oklch(0.72 0.12 45 / 0.45)"
-          : "oklch(0.35 0.015 60 / 0.3)"
+          ? "oklch(0.78 0.15 135 / 0.45)"
+          : "oklch(0.35 0.015 135 / 0.3)"
 
         const style = {
           left: `${shape.x}%`,

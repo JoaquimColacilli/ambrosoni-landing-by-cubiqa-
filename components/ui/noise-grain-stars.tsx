@@ -94,7 +94,7 @@ export function NoiseGrainStars({
         ctx.beginPath()
         ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2)
         if (star.warm) {
-          ctx.fillStyle = `oklch(0.82 0.1 55 / ${alpha * 1.3})`
+          ctx.fillStyle = `oklch(0.82 0.13 135 / ${alpha * 1.3})`
         } else {
           ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`
         }

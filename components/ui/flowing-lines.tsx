@@ -151,7 +151,7 @@ export function FlowingLines({
               y1={`${line.y}%`}
               x2="100%"
               y2={`${line.y}%`}
-              stroke="oklch(0.72 0.12 45 / 0.55)"
+              stroke="oklch(0.78 0.15 135 / 0.55)"
               strokeWidth="1"
               strokeDasharray="60 340"
               strokeDashoffset="400"
@@ -168,7 +168,7 @@ export function FlowingLines({
             cx={`${t.x}%`}
             cy={`${t.y}%`}
             r="2.5"
-            fill="oklch(0.72 0.12 45 / 0.7)"
+            fill="oklch(0.78 0.15 135 / 0.7)"
           />
         ))}
       </svg>

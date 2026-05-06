@@ -149,7 +149,7 @@ export function NetworkNodes({
         }
       }
 
-      // Draw nodes — warm accent for ones near cursor
+      // Draw nodes — brand green accent for ones near cursor
       for (const node of nodes) {
         let nearMouse = false
         if (mouse.active) {
@@ -161,8 +161,8 @@ export function NetworkNodes({
         ctx.beginPath()
         ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2)
         ctx.fillStyle = nearMouse
-          ? "oklch(0.72 0.12 45 / 0.9)"
-          : "oklch(0.35 0.02 60 / 0.55)"
+          ? "oklch(0.78 0.15 135 / 0.9)"
+          : "oklch(0.35 0.02 135 / 0.55)"
         ctx.fill()
       }
     }

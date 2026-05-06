@@ -19,7 +19,7 @@ interface SpotlightCardProps {
 export function SpotlightCard({
   children,
   className,
-  spotlightColor = "oklch(0.92 0.02 80 / 0.45)",
+  spotlightColor = "oklch(0.85 0.13 135 / 0.45)",
   spotlightSize = 500,
   glowBorder = true,
 }: SpotlightCardProps) {
@@ -51,7 +51,7 @@ export function SpotlightCard({
         className="pointer-events-none absolute inset-0 z-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100 spotlight-layer"
         style={{
           background:
-            "radial-gradient(var(--spotlight-size, 500px) circle at var(--spotlight-x) var(--spotlight-y), var(--spotlight-color, oklch(0.92 0.02 80 / 0.45)), transparent 45%)",
+            "radial-gradient(var(--spotlight-size, 500px) circle at var(--spotlight-x) var(--spotlight-y), var(--spotlight-color, oklch(0.85 0.13 135 / 0.45)), transparent 45%)",
         }}
       />
       {/* Content */}
