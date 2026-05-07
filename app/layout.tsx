@@ -6,7 +6,6 @@ import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import { brand } from "@/config/brand"
 import { SmoothScrollProvider } from "@/components/smooth-scroll-provider"
-import { AtmosphericLayerClient } from "@/components/atmospheric-layer-client"
 import { SITE_URL, allSchemas } from "@/lib/seo/schemas"
 import "./globals.css"
 
@@ -88,7 +87,6 @@ export default function RootLayout({
         ))}
       </head>
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased overflow-x-hidden`}>
-        <AtmosphericLayerClient />
         <SmoothScrollProvider>
           <Suspense fallback={<div>Loading...</div>}>
             {children}
