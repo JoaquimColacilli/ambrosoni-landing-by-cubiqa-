@@ -9,6 +9,7 @@ interface AirtableRecord {
 const estadoMap: Record<string, UnitStatus> = {
   Disponible: "available",
   Reservado: "reserved",
+  Consultar: "consultar",
   Vendido: "sold",
   Sold: "sold",
 }

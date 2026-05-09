@@ -11,15 +11,22 @@
 // Types
 // ---------------------------------------------------------------------------
 
+export type TypologyFeature = {
+  iconName: string // nombre del icono de lucide-react
+  label: string
+}
+
 export type Typology = {
   id: string
   name: string
   totalArea: number
   coveredArea: number
+  uncoveredArea: number // semicubierta (balcón/terraza) — del brochure
   bedrooms: number
   bathrooms: number
   planImage: string
   description?: string
+  features?: TypologyFeature[]
 }
 
 export type Phone = {
@@ -34,7 +41,7 @@ export type Stat = {
   label: string
 }
 
-export type UnitStatus = "available" | "reserved" | "sold"
+export type UnitStatus = "available" | "reserved" | "consultar" | "sold"
 
 export type Unit = {
   floor: string
@@ -136,6 +143,13 @@ export const brand = {
   // --- Logo ---
   logo: "/AMBROSONI/LOGO_sin_fondo.png",
   logoAlt: "AR Building — AMBROSONI",
+
+  // --- Brochure (PDF descargable) ---
+  brochure: {
+    url: "/AMBROSONI/brochure-ambrosoni.pdf",
+    filename: "AMBROSONI-brochure.pdf",
+    label: "Descargar brochure",
+  },
 
   // --- Contacto ---
   email: "info@arbuilding.com.ar",
@@ -415,30 +429,54 @@ export const brand = {
       name: "Depto 1 - Tipologías A y B",
       totalArea: 81, // 65 cub + 16 desc (tipología A/B)
       coveredArea: 65,
+      uncoveredArea: 16,
       bedrooms: 2,
       bathrooms: 2,
       planImage: "/AMBROSONI/depto-1-plano.png",
-      description: "",
+      description:
+        "Estar comedor con cocina integrada, dos dormitorios — el principal con baño en suite — y balcón-terraza.",
+      features: [
+        { iconName: "Bed", label: "2 dormitorios" },
+        { iconName: "Bath", label: "Baño en suite" },
+        { iconName: "ChefHat", label: "Cocina integrada" },
+        { iconName: "Car", label: "Cochera subterránea" },
+      ],
     },
     {
       id: "depto-2",
       name: "Depto 2 - Tipologías D y E",
       totalArea: 65, // 53 cub + 12 desc (tipología D/E)
       coveredArea: 53,
+      uncoveredArea: 12,
       bedrooms: 1,
       bathrooms: 2,
       planImage: "/AMBROSONI/depto-2-plano.png",
-      description: "",
+      description:
+        "Estar comedor con cocina integrada, dormitorio en suite, toilette y balcón-terraza.",
+      features: [
+        { iconName: "Bed", label: "Dorm. en suite" },
+        { iconName: "Bath", label: "Toilette" },
+        { iconName: "ChefHat", label: "Cocina integrada" },
+        { iconName: "Car", label: "Cochera subterránea" },
+      ],
     },
     {
       id: "depto-3",
       name: "Depto 3 - Tipología C",
       totalArea: 60, // 53 cub + 7.5 desc (tipología C, redondeado)
       coveredArea: 53,
+      uncoveredArea: 7.5,
       bedrooms: 1,
       bathrooms: 2,
       planImage: "/AMBROSONI/depto-3-plano.png",
-      description: "",
+      description:
+        "Estar comedor con cocina integrada, dormitorio en suite, toilette y balcón-terraza.",
+      features: [
+        { iconName: "Bed", label: "Dorm. en suite" },
+        { iconName: "Bath", label: "Toilette" },
+        { iconName: "ChefHat", label: "Cocina integrada" },
+        { iconName: "Car", label: "Cochera subterránea" },
+      ],
     },
   ] satisfies Typology[],
 } as const

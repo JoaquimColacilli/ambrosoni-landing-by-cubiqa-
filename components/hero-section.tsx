@@ -6,7 +6,11 @@ import SplitType from "split-type"
 import { brand } from "@/config/brand"
 import { useMagnetic } from "@/hooks/use-magnetic"
 import { useScrollReveal } from "@/hooks/useScrollReveal"
+import { useSmoothScroll } from "@/components/smooth-scroll-provider"
 import { gsap, getScrubValue, isTouchDevice, useGSAP } from "@/lib/gsapConfig"
+
+// Mismo offset que Navigation — compensa el navbar fijo al scrollear.
+const NAV_OFFSET = -80
 
 export function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -21,6 +25,13 @@ export function HeroSection() {
 
   const primaryMagnetic = useMagnetic<HTMLAnchorElement>({ strength: 0.35, radius: 100 })
   const secondaryMagnetic = useMagnetic<HTMLAnchorElement>({ strength: 0.35, radius: 100 })
+
+  const smoothScroll = useSmoothScroll()
+
+  const handlePrimaryClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault()
+    smoothScroll?.scrollTo("#concepto", { offset: NAV_OFFSET })
+  }
 
   // useGSAP runs pre-paint (via useLayoutEffect internally) and handles full
   // cleanup via gsap.context().revert() on unmount — including matchMedia and
@@ -379,7 +390,8 @@ export function HeroSection() {
             onMouseEnter={primaryMagnetic.handleMouseEnter}
             onMouseMove={primaryMagnetic.handleMouseMove}
             onMouseLeave={primaryMagnetic.handleMouseLeave}
-            href="#experiencia"
+            onClick={handlePrimaryClick}
+            href="#concepto"
             className="group px-8 py-4 bg-white text-black rounded-lg font-semibold hover:bg-white/90 active:scale-[0.97] transition-transform duration-300 ease-out animate-glow-pulse opacity-0"
           >
             {brand.cta.primary}

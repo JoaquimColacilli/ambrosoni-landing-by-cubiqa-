@@ -4,7 +4,6 @@ import { useState, useRef } from "react"
 import { Check, X, AlertCircle, Loader2 } from "lucide-react"
 import SplitType from "split-type"
 import { Button } from "@/components/ui/button"
-import { Alert, AlertDescription } from "@/components/ui/alert"
 import { type UnitStatus, type Unit } from "@/config/brand"
 import { WarmMesh } from "@/components/ui/warm-mesh"
 import { useScrollReveal } from "@/hooks/useScrollReveal"
@@ -13,7 +12,8 @@ import { gsap, prefersReducedMotion, isTouchDevice, useGSAP } from "@/lib/gsapCo
 
 const statusConfig: Record<UnitStatus, { label: string; color: string }> = {
   available: { label: "Disponible", color: "bg-primary text-primary-foreground" },
-  reserved: { label: "Reservado", color: "bg-[oklch(0.80_0.05_80)] text-black" },
+  reserved: { label: "Reservado", color: "bg-gray-200 text-gray-600" },
+  consultar: { label: "Consultar", color: "bg-[oklch(0.80_0.05_80)] text-black" },
   sold: { label: "Vendido", color: "bg-muted text-muted-foreground" },
 }
 
@@ -21,7 +21,6 @@ export function UnitsSection() {
   const { unidades, loading, error, reintentar } = useUnidades()
   const [selectedRooms, setSelectedRooms] = useState<number | null>(null)
   const [hoveredUnit, setHoveredUnit] = useState<string | null>(null)
-  const [showReservedAlert, setShowReservedAlert] = useState<string | null>(null)
   const sectionRef = useRef<HTMLElement>(null)
   const headerRef = useRef<HTMLDivElement>(null)
   const filtersRef = useRef<HTMLDivElement>(null)
@@ -201,11 +200,6 @@ export function UnitsSection() {
       : `${unit.coveredSqm}m² cubiertos`
     const unitInfo = `Piso ${unit.floor}, Unidad ${unit.unit} - ${unit.rooms} ambientes, ${sqmInfo} - ${unit.price}`
 
-    if (unit.status === "reserved") {
-      setShowReservedAlert(`${unit.floor}-${unit.unit}`)
-      setTimeout(() => setShowReservedAlert(null), 5000)
-    }
-
     const contactSection = document.getElementById("contacto")
     if (contactSection) {
       contactSection.scrollIntoView({ behavior: "smooth" })
@@ -213,11 +207,7 @@ export function UnitsSection() {
       setTimeout(() => {
         const messageTextarea = document.getElementById("message") as HTMLTextAreaElement
         if (messageTextarea) {
-          const message =
-            unit.status === "reserved"
-              ? `Hola, me interesa consultar sobre la unidad ${unitInfo}. Entiendo que está reservada, pero me gustaría saber si hay posibilidades de disponibilidad o unidades similares.`
-              : `Hola, me interesa consultar sobre la unidad ${unitInfo}. Me gustaría recibir más información y coordinar una visita.`
-          messageTextarea.value = message
+          messageTextarea.value = `Hola, me interesa consultar sobre la unidad ${unitInfo}. Me gustaría recibir más información y coordinar una visita.`
           messageTextarea.dispatchEvent(new Event("input", { bubbles: true }))
         }
       }, 800)
@@ -352,7 +342,6 @@ export function UnitsSection() {
                 {!loading && !error && filteredUnits.map((unit, i) => {
                   const unitKey = `${unit.floor}-${unit.unit}-${i}`
                   const status = statusConfig[unit.status]
-                  const showAlert = showReservedAlert === unitKey
 
                   return (
                     <tr
@@ -388,26 +377,23 @@ export function UnitsSection() {
                             Consultar
                           </Button>
                         )}
+                        {unit.status === "consultar" && (
+                          <Button
+                            size="sm"
+                            onClick={() => handleConsult(unit)}
+                            className="bg-[oklch(0.40_0.04_80)] text-white hover:bg-[oklch(0.32_0.04_80)] font-medium cursor-pointer"
+                          >
+                            Consultar
+                          </Button>
+                        )}
                         {unit.status === "reserved" && (
-                          <div className="relative">
-                            <Button
-                              size="sm"
-                              onClick={() => handleConsult(unit)}
-                              className="bg-[oklch(0.40_0.04_80)] text-white hover:bg-[oklch(0.32_0.04_80)] font-medium cursor-pointer"
-                            >
-                              Consultar
-                            </Button>
-                            {showAlert && (
-                              <div className="absolute top-full left-0 mt-2 w-64 z-10">
-                                <Alert className="bg-[oklch(0.92_0.02_80)]/40 border-[oklch(0.60_0.05_80)]">
-                                  <AlertCircle className="h-4 w-4 text-[oklch(0.40_0.04_80)]" />
-                                  <AlertDescription className="text-xs text-[oklch(0.30_0.04_80)]">
-                                    Unidad reservada. Te contactaremos para informarte sobre disponibilidad.
-                                  </AlertDescription>
-                                </Alert>
-                              </div>
-                            )}
-                          </div>
+                          <Button
+                            size="sm"
+                            disabled
+                            className="bg-gray-200 text-gray-500 font-medium cursor-not-allowed hover:bg-gray-200"
+                          >
+                            Consultar
+                          </Button>
                         )}
                         {unit.status === "sold" && (
                           <Button size="sm" variant="ghost" disabled className="text-gray-500 cursor-not-allowed">

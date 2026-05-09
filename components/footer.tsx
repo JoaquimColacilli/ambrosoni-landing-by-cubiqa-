@@ -2,7 +2,7 @@
 
 import { useRef } from "react"
 import Image from "next/image"
-import { Instagram, Mail, MapPin, Phone } from "lucide-react"
+import { Download, Instagram, Mail, MapPin, Phone } from "lucide-react"
 import { brand } from "@/config/brand"
 import { NoiseGrainStars } from "@/components/ui/noise-grain-stars"
 import { useScrollReveal } from "@/hooks/useScrollReveal"
@@ -192,10 +192,20 @@ export function Footer() {
               href={brand.instagram.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm text-white/60 hover:text-white transition-colors"
+              className="flex w-fit items-center gap-2 text-sm text-white/60 hover:text-white transition-colors"
             >
               <Instagram size={16} />
               {brand.instagram.handle}
+            </a>
+            <a
+              href={brand.brochure.url}
+              download={brand.brochure.filename}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 flex w-fit items-center gap-2 text-sm text-white/60 hover:text-white transition-colors"
+            >
+              <Download size={16} />
+              {brand.brochure.label}
             </a>
           </div>
         </div>
