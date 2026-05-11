@@ -207,7 +207,7 @@ export const brand = {
   // Toda la data extra para metadata avanzada, JSON-LD, llms.txt, sitemap.
   // Pattern espejo del setup de Edificio MERCED.
   seo: {
-    siteUrl: "https://edificioambrosoni.com",
+    siteUrl: "https://arbuilding-ambrosoni.netlify.app",
     // TODO: verificar coordenadas exactas del lote en Ambrosoni 1321 (estimadas del mapsEmbedUrl)
     geo: { latitude: -34.453, longitude: -58.445 },
     // TODO: confirmar codigo postal Victoria — San Fernando (B1644 es el estandar de la zona)

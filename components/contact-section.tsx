@@ -13,6 +13,30 @@ import { AntiGravityCanvas } from "@/components/ui/particle-effect-for-hero"
 import { useScrollReveal } from "@/hooks/useScrollReveal"
 import { gsap, prefersReducedMotion, isTouchDevice, useGSAP } from "@/lib/gsapConfig"
 
+/**
+ * Form de contacto — Web3Forms
+ *
+ * Destinatario final: info@arbuilding.com.ar
+ *
+ * NOTA: El destinatario NO se configura en este código. Se gestiona desde el
+ * dashboard de Web3Forms (https://web3forms.com → Forms → Ambrosoni Contacto → Settings).
+ *
+ * Estado actual (post-migración Resend → Web3Forms):
+ * - Mientras `info@arbuilding.com.ar` esté unverified en Web3Forms,
+ *   los submissions se envían a `joaquimcolacilli9@gmail.com` (cuenta del dev)
+ *   y se reenvían manualmente.
+ * - Cuando AR Building (Maiqui / Leo) verifique el mail desde el inbox de
+ *   info@, cambiar el recipient en el dashboard de Web3Forms. Sin redeploy.
+ *
+ * Todos los submissions quedan guardados 30 días en el dashboard de Web3Forms
+ * (tab Submissions del form), independientemente del estado de verificación.
+ *
+ * El POST se hace desde el cliente directamente a api.web3forms.com porque
+ * el endpoint está protegido por Cloudflare managed challenge — los fetch
+ * server-side son bloqueados con 403. La access key es pública por diseño
+ * (Web3Forms la declara safe en client-side code), por eso usa el prefijo
+ * NEXT_PUBLIC_ y se incluye en el bundle.
+ */
 export function ContactSection() {
   const [formData, setFormData] = useState({
     name: "",
@@ -253,19 +277,39 @@ export function ContactSection() {
     e.preventDefault()
     if (isSubmitting) return
 
+    const accessKey = process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY
+    if (!accessKey) {
+      setSubmitError("Configuración incompleta — falta NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY")
+      return
+    }
+
     setIsSubmitting(true)
     setSubmitError(null)
 
     try {
-      const res = await fetch("/api/contact", {
+      const res = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          access_key: accessKey,
+          subject: "Nueva consulta - Ambrosoni Landing",
+          from_name: "Web Ambrosoni",
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          message: formData.message?.trim() || "(sin mensaje)",
+          replyto: formData.email,
+          botcheck: "",
+        }),
       })
 
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}))
-        throw new Error(body.error || "Error al enviar el formulario")
+      const result = await res.json().catch(() => ({}))
+
+      if (!res.ok || !result.success) {
+        throw new Error(result.message || "Error al enviar el formulario")
       }
 
       setIsSubmitted(true)

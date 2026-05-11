@@ -23,4 +23,4 @@ Allow: /
 User-agent: Googlebot
 Allow: /
 
-Sitemap: https://edificioambrosoni.com/sitemap.xml
+Sitemap: https://arbuilding-ambrosoni.netlify.app/sitemap.xml
