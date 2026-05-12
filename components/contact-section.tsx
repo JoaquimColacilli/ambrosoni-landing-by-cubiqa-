@@ -394,9 +394,9 @@ export function ContactSection() {
                 <div>
                   <h4 className="font-semibold mb-1 text-black">Oficina</h4>
                   <p className="text-black/70">
-                    {brand.location.address}
+                    {brand.office.address}
                     <br />
-                    {brand.location.area}
+                    {brand.office.area}
                   </p>
                 </div>
               </div>
