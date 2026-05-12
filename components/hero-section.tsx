@@ -368,7 +368,7 @@ export function HeroSection() {
         >
           Tu próximo capítulo
           <br />
-          <span className="text-white break-words">empieza en San Fernando.</span>
+          <span className="text-white break-words">empieza en Victoria, San Fernando.</span>
         </h1>
         <div
           ref={dividerRef}
