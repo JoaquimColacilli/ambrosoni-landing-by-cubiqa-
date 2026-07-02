@@ -6,6 +6,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import { brand } from "@/config/brand"
 import { SmoothScrollProvider } from "@/components/smooth-scroll-provider"
+import { MetaPixel } from "@/components/meta-pixel"
 import { SITE_URL, allSchemas } from "@/lib/seo/schemas"
 import "./globals.css"
 
@@ -71,6 +72,8 @@ export default function RootLayout({
   return (
     <html lang={brand.seo.schema.htmlLang} className="dark overflow-x-hidden">
       <head>
+        {/* Meta Pixel — debe ir lo más arriba posible del <head> */}
+        <MetaPixel />
         {/* Resource hints: pre-warm conexión a Kuula (iframe 360°) */}
         <link rel="preconnect" href="https://kuula.co" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://kuula.co" />
